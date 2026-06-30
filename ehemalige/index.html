@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ehemaligen-Treffen – Chilbi Herrliberg Cl1.063-dev</title>
+<title>Ehemaligen-Treffen – Chilbi Herrliberg Cl1.064-dev</title>
 <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
@@ -78,6 +78,7 @@
       <div class="field"><label>Name</label><input id="z-name" type="text" autocomplete="family-name"></div>
       <div class="err" id="z-err">Bitte Vorname und Name ausfüllen.</div>
       <div class="field"><label>E-Mail</label><input id="z-mail" type="email" autocomplete="email"></div>
+      <div class="err" id="z-mail-err">Bitte eine gültige E-Mail angeben (für den Gutschein).</div>
       <div class="field"><label>Telefon</label><input id="z-tel" type="tel" autocomplete="tel" placeholder="+41 79 123 45 67"></div>
       <div class="err" id="z-tel-err">Bitte eine gültige Telefonnummer eingeben.</div>
       <button class="btn btn-yes" onclick="submitZusage()">Anmelden</button>
@@ -88,8 +89,13 @@
     <div class="screen" id="scr-danke">
       <div class="ok-ico">🎉</div>
       <h2 style="text-align:center" id="danke-title">Danke für die Anmeldung!</h2>
-      <p style="text-align:center">Wir freuen uns auf Dich!</p>
-      <button class="btn btn-red" onclick="downloadICS()">📅 In meinen Kalender eintragen</button>
+      <p style="text-align:center">Dein Gutschein für ein Getränk nach Wahl:</p>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px;">
+        <button class="btn btn-yes" style="margin-top:0;flex:1 1 150px;width:auto;" onclick="downloadGutschein()">⬇ Gutschein herunterladen</button>
+        <button class="btn btn-red" id="btn-gut-mail" style="margin-top:0;flex:1 1 150px;width:auto;" onclick="mailGutschein()">✉ Gutschein per Mail senden</button>
+      </div>
+      <div id="gut-hint" style="display:none;text-align:center;color:var(--green);font-size:13px;margin-top:8px;"></div>
+      <button class="btn btn-ghost" onclick="downloadICS()">📅 In meinen Kalender eintragen</button>
     </div>
 
     <!-- ABSAGE -->
@@ -123,9 +129,10 @@
     </div>
 
   </div>
-  <div class="foot">© Stützpunktfeuerwehr Meilen / LOL &nbsp;·&nbsp; Chilbi Herrliberg &nbsp;·&nbsp; Cl1.063-dev</div>
+  <div class="foot">© Stützpunktfeuerwehr Meilen / LOL &nbsp;·&nbsp; Chilbi Herrliberg &nbsp;·&nbsp; Cl1.064-dev</div>
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script>
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbztZ9C8RapYojQAb0U4fkY6xc_7JVsDMPsQEao4T1z_ObspHSeGB_X0ZONgqLANoyEbzQ/exec';
 
@@ -138,6 +145,72 @@ function show(id){
 function post(data){
   // no-cors: Antwort ist opak, daher optimistisch weiter
   return fetch(SCRIPT_URL, {method:'POST', mode:'no-cors', headers:{'Content-Type':'text/plain'}, body: JSON.stringify(data)});
+}
+
+// ===== Gutschein =====
+let GUT = { vorname:'', name:'', mail:'' };
+let _gLogo, _gHahn;
+function _loadImg(src){ return new Promise((res,rej)=>{ const i=new Image(); i.onload=()=>res(i); i.onerror=()=>rej(new Error('Bild '+src)); i.src=src; }); }
+async function _ensureAssets(){
+  if(!_gLogo) _gLogo = await _loadImg('assets/gutschein_logo.png');
+  if(!_gHahn) _gHahn = await _loadImg('assets/gutschein_hahn.png');
+}
+async function buildGutscheinDoc(vorname, name){
+  await _ensureAssets();
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ orientation:'landscape', unit:'mm', format:'a5' }); // 210 x 148
+  const m=8, W=210, H=148, bx=105;
+  // Wasserzeichen (Hahn) - zuerst, hinter allem; unten rechts, angeschnitten
+  const wmH=158, wmW=wmH*(583/610);
+  doc.addImage(_gHahn,'PNG', W-wmW+30, 24, wmW, wmH);
+  // Rahmen
+  doc.setDrawColor(204,204,204); doc.setLineWidth(0.3); doc.rect(m,m,W-2*m,H-2*m);
+  // Kopfbalken
+  doc.setFillColor(26,26,26); doc.rect(m,m,W-2*m,26,'F');
+  doc.setFillColor(204,0,0); doc.rect(m,34,W-2*m,1.4,'F');
+  doc.addImage(_gLogo,'PNG', 14, 11, 20, 20);
+  doc.setTextColor(255,255,255); doc.setFont('helvetica','bold'); doc.setFontSize(15); doc.text('CHILBI HERRLIBERG', 40, 20);
+  doc.setTextColor(187,187,187); doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.text('EHEMALIGEN-TREFFEN', 40, 26);
+  // Body
+  doc.setTextColor(204,0,0); doc.setFont('helvetica','bold'); doc.setFontSize(32); doc.text('GUTSCHEIN', bx, 51.4, {align:'center'});
+  doc.setTextColor(102,102,102); doc.setFont('helvetica','normal'); doc.setFontSize(10.5); doc.text('für', bx, 58.4, {align:'center'});
+  doc.setTextColor(26,26,26); doc.setFont('helvetica','bold'); doc.setFontSize(17); doc.text(vorname+' '+name, bx, 66.4, {align:'center'});
+  doc.setDrawColor(204,0,0); doc.setLineWidth(0.4); doc.line(bx-28, 70.9, bx+28, 70.9);
+  doc.setTextColor(51,51,51); doc.setFont('helvetica','normal'); doc.setFontSize(10.5); doc.text('Gegen Abgabe dieses Gutscheins:', bx, 77.4, {align:'center'});
+  doc.setTextColor(26,26,26); doc.setFont('helvetica','bold'); doc.setFontSize(15); doc.text('1 Getränk nach Wahl', bx, 84.9, {align:'center'});
+  doc.setTextColor(51,51,51); doc.setFont('helvetica','normal'); doc.setFontSize(10.5); doc.text('am Sonntag, 16.08.26', bx, 92.4, {align:'center'});
+  doc.setTextColor(102,102,102); doc.setFontSize(9); doc.text('zwischen', bx, 96.9, {align:'center'});
+  doc.setTextColor(26,26,26); doc.setFont('helvetica','bold'); doc.setFontSize(11); doc.text('14:00 und 16:00', bx, 101.9, {align:'center'});
+  doc.setTextColor(26,26,26); doc.setFont('helvetica','bold'); doc.setFontSize(10.5); doc.text('In der Füürwehr Spätzlibeiz', bx, 109.4, {align:'center'});
+  doc.setTextColor(102,102,102); doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.text('an der', bx, 113.9, {align:'center'});
+  doc.setTextColor(26,26,26); doc.setFont('helvetica','bold'); doc.setFontSize(10.5); doc.text('Chilbi Herrliberg', bx, 118.9, {align:'center'});
+  // Fusszeile
+  const d=new Date(), z=n=>('0'+n).slice(-2);
+  const ts = z(d.getDate())+'.'+z(d.getMonth()+1)+'.'+d.getFullYear()+' '+z(d.getHours())+':'+z(d.getMinutes())+' Uhr';
+  doc.setTextColor(102,102,102); doc.setFont('helvetica','normal'); doc.setFontSize(7.5); doc.text('© Stützpunktfeuerwehr Meilen / LOL', bx, 135.5, {align:'center'});
+  doc.setTextColor(153,153,153); doc.setFontSize(6.5); doc.text('Erstellt: '+ts, bx, 138.5, {align:'center'});
+  return doc;
+}
+function _gutFile(){ return ('Gutschein_'+GUT.vorname+'_'+GUT.name).replace(/[^A-Za-z0-9_]/g,'_')+'.pdf'; }
+async function downloadGutschein(){
+  try{ const doc = await buildGutscheinDoc(GUT.vorname, GUT.name); doc.save(_gutFile()); }
+  catch(e){ alert('Gutschein konnte nicht erstellt werden: '+e.message); }
+}
+async function mailGutschein(){
+  if(!GUT.mail){ alert('Für den Mailversand bitte eine E-Mail angeben.'); return; }
+  const btn = document.getElementById('btn-gut-mail');
+  try{
+    btn.disabled=true; btn.textContent='Wird gesendet…';
+    const doc = await buildGutscheinDoc(GUT.vorname, GUT.name);
+    const b64 = doc.output('datauristring').split(',')[1];
+    await post({ action:'gutscheinMail', vorname:GUT.vorname, name:GUT.name, mail:GUT.mail, pdf:b64 });
+    btn.textContent='✓ Gutschein gesendet';
+    const h=document.getElementById('gut-hint');
+    h.textContent='Gutschein wurde an '+GUT.mail+' gesendet.'; h.style.display='block';
+  }catch(e){
+    btn.disabled=false; btn.textContent='✉ Gutschein per Mail senden';
+    alert('Versand fehlgeschlagen: '+e.message);
+  }
 }
 
 // Telefonnummer normalisieren: CH schön als "+41 XX XXX XX XX",
@@ -180,10 +253,20 @@ function submitZusage(){
   const mail = document.getElementById('z-mail').value.trim();
   if(!name || !vorname){ document.getElementById('z-err').style.display='block'; return; }
   document.getElementById('z-err').style.display='none';
+  // E-Mail Pflicht bei Zusage (für den Gutschein)
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(mail)){
+    document.getElementById('z-mail-err').style.display='block';
+    document.getElementById('z-mail').focus(); return;
+  }
+  document.getElementById('z-mail-err').style.display='none';
   const tel = validateTel('z-tel','z-tel-err');
   if(tel === false) return;
   post({action:'ehemaligeSignup', anmeldung:'Zusage', name, vorname, mail, tel});
+  GUT = { vorname, name, mail };
   document.getElementById('danke-title').textContent = `Danke für die Anmeldung, lieber ${vorname}!`;
+  document.getElementById('btn-gut-mail').disabled = false;
+  document.getElementById('btn-gut-mail').textContent = '✉ Gutschein per Mail senden';
+  document.getElementById('gut-hint').style.display = 'none';
   show('scr-danke');
 }
 
