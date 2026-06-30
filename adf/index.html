@@ -6,7 +6,7 @@
 <link rel="icon" href="../favicon.ico" sizes="any">
 <link rel="icon" type="image/svg+xml" href="../favicon.svg">
 <link rel="apple-touch-icon" href="../apple-touch-icon.png">
-<title>Feuerwehr – Chilbi Herrliberg Cl1.069-dev</title>
+<title>Feuerwehr – Chilbi Herrliberg Cl1.070-dev</title>
 <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
@@ -82,7 +82,7 @@
     <!-- ZUSAGE FORMULAR -->
     <div class="screen" id="scr-zusage">
       <h2>Schön, dass Du kommst!</h2>
-      <div class="field"><label>Grad <span class="opt">(freiwillig)</span></label><input id="z-grad" type="text" placeholder="z. B. Korporal"></div>
+      <div class="field"><label>Grad <span class="opt">(freiwillig)</span></label><input id="z-grad" type="text"></div>
       <div class="field"><label>Vorname</label><input id="z-vorname" type="text" autocomplete="given-name"></div>
       <div class="field"><label>Name</label><input id="z-name" type="text" autocomplete="family-name"></div>
       <div class="err" id="z-err">Bitte Vorname und Name ausfüllen.</div>
@@ -122,7 +122,7 @@
     <div class="screen" id="scr-absage-form">
       <h2>Deine Kontaktdaten</h2>
       <p>Danke! So bleiben wir in Kontakt.</p>
-      <div class="field"><label>Grad <span class="opt">(freiwillig)</span></label><input id="a-grad" type="text" placeholder="z. B. Korporal"></div>
+      <div class="field"><label>Grad <span class="opt">(freiwillig)</span></label><input id="a-grad" type="text"></div>
       <div class="field"><label>Vorname</label><input id="a-vorname" type="text" autocomplete="given-name"></div>
       <div class="field"><label>Name</label><input id="a-name" type="text" autocomplete="family-name"></div>
       <div class="err" id="a-err">Bitte Vorname und Name ausfüllen.</div>
@@ -143,7 +143,7 @@
     </div>
 
   </div>
-  <div class="foot">© Stützpunktfeuerwehr Meilen / LOL &nbsp;·&nbsp; Chilbi Herrliberg &nbsp;·&nbsp; Cl1.069-dev</div>
+  <div class="foot">© Stützpunktfeuerwehr Meilen / LOL &nbsp;·&nbsp; Chilbi Herrliberg &nbsp;·&nbsp; Cl1.070-dev</div>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -212,7 +212,7 @@ async function buildGutscheinDoc(vorname, name, grad, fw){
   doc.setFillColor(204,0,0); doc.rect(m,34,W-2*m,1.4,'F');
   doc.addImage(_gLogo,'PNG', 14, 11, 20, 20);
   doc.setTextColor(255,255,255); doc.setFont('helvetica','bold'); doc.setFontSize(15); doc.text('CHILBI HERRLIBERG', 40, 20);
-  doc.setTextColor(187,187,187); doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.text('Feuerwehr ' + (fw || ''), 40, 26);
+  doc.setTextColor(187,187,187); doc.setFont('helvetica','normal'); doc.setFontSize(11); doc.text('Feuerwehr ' + (fw || ''), 40, 26.2);
   // Body
   doc.setTextColor(204,0,0); doc.setFont('helvetica','bold'); doc.setFontSize(30); doc.text('GUTSCHEIN', bx, 50, {align:'center'});
   doc.setTextColor(102,102,102); doc.setFont('helvetica','normal'); doc.setFontSize(10); doc.text('für', bx, 57.5, {align:'center'});
