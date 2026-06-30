@@ -3,7 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Feuerwehr – Chilbi Herrliberg Cl1.067-dev</title>
+<link rel="icon" href="../favicon.ico" sizes="any">
+<link rel="icon" type="image/svg+xml" href="../favicon.svg">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png">
+<title>Feuerwehr – Chilbi Herrliberg Cl1.068-dev</title>
 <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
@@ -26,6 +29,8 @@
   p{margin-bottom:14px;color:var(--text2);}
   .highlight{background:var(--bg2);border-left:3px solid var(--red);padding:14px 16px;margin:18px 0;font-size:16px;}
   .highlight strong{color:var(--black);font-size:18px;}
+  .addr{background:var(--bg2);border-left:3px solid var(--black);padding:12px 16px;margin:0 0 18px;font-size:14px;color:var(--text2);line-height:1.5;}
+  .addr strong{color:var(--black);}
   .btn{display:block;width:100%;border:none;padding:14px 16px;font-family:inherit;font-size:15px;font-weight:700;cursor:pointer;margin-top:12px;text-align:center;}
   .btn-yes{background:var(--green);color:#fff;}
   .btn-yes:hover{background:#245417;}
@@ -57,13 +62,17 @@
     <!-- WILLKOMMEN -->
     <div class="screen active" id="scr-welcome">
       <p>Liebe Feuerwehrkolleginnen und -kollegen,</p>
-      <p>Wir laden Euch herzlich in unsere <strong>Füürwehr Spätzli-Beiz</strong> an der Chilbi Herrliberg ein – auf eine Portion Spätzli, ein Getränk und gemütliches Beisammensein.</p>
+      <p>Wir würden uns freuen, Dich in unserer <strong>Füürwehr-Spätzlibeiz</strong> an der Chilbi Herrliberg begrüssen zu dürfen.</p>
       <div class="highlight">
         <strong>Freitag, 14.08.26</strong> · 16:00–22:00<br>
         <strong>Samstag, 15.08.26</strong> · 17:00–22:00<br>
         <strong>Sonntag, 16.08.26</strong> · 11:00–21:00
       </div>
-      <p>Wir würden uns sehr freuen, Euch an einem der Tage bei uns begrüssen zu dürfen.</p>
+      <div class="addr">
+        <strong>Primarschule Rebacker</strong><br>
+        Schulhausstrasse 23, 8704 Herrliberg
+      </div>
+      <p>Damit wir Dich auch alle erkennen, bitten wir Dich, mit einem Oberteil (T-Shirt oder ähnlich) Deiner Feuerwehr zu kommen … dafür laden wir Dich gerne auf ein Essen und Trinken für eine Zehnernote ein!</p>
       <p style="margin-top:18px;font-weight:600;color:var(--black);">Euer Chilbi-OK</p>
       <div style="height:22px;"></div>
       <button class="btn btn-yes" onclick="show('scr-zusage')">Ja, ich komme gerne</button>
@@ -73,7 +82,6 @@
     <!-- ZUSAGE FORMULAR -->
     <div class="screen" id="scr-zusage">
       <h2>Schön, dass Du kommst!</h2>
-      <p>Bitte trag Dich kurz ein, damit wir wissen, wer dabei ist.</p>
       <div class="field"><label>Grad <span class="opt">(freiwillig)</span></label><input id="z-grad" type="text" placeholder="z. B. Korporal"></div>
       <div class="field"><label>Vorname</label><input id="z-vorname" type="text" autocomplete="given-name"></div>
       <div class="field"><label>Name</label><input id="z-name" type="text" autocomplete="family-name"></div>
@@ -92,22 +100,20 @@
     <div class="screen" id="scr-danke">
       <div class="ok-ico">🎉</div>
       <h2 style="text-align:center" id="danke-title">Danke für die Anmeldung!</h2>
-      <p style="text-align:center">Bitte drucke Deinen Gutschein aus und gib ihn am Stammtisch ab.</p>
+      <p style="text-align:center">Bitte drucke Deinen Gutschein aus und gib ihn in der Spätzli-Beiz dem Servicepersonal ab.</p>
       <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px;">
         <button class="btn btn-no" style="margin-top:0;flex:1 1 150px;width:auto;" onclick="downloadGutschein()">Gutschein herunterladen</button>
         <button class="btn btn-no" id="btn-gut-mail" style="margin-top:0;flex:1 1 150px;width:auto;" onclick="mailGutschein()">Gutschein per Mail senden</button>
       </div>
       <div id="gut-hint" style="display:none;text-align:center;color:var(--green);font-size:13px;margin-top:8px;"></div>
       <p style="text-align:center;margin-top:18px;">Wir freuen uns auf Dich!</p>
-      <p style="text-align:center;margin-top:18px;">Gerne kannst Du Dir auch einen Kalendereintrag für das Treffen machen:</p>
-      <button class="btn btn-ghost" onclick="downloadICS()">Kalendereintrag Füürwehr Spätzli-Beiz</button>
+      <button class="btn btn-ghost" style="width:auto;display:block;margin:14px auto 0;padding:9px 18px;font-size:13px;" onclick="downloadICS()">Kalendereintrag Füürwehr Spätzli-Beiz</button>
     </div>
 
     <!-- ABSAGE -->
     <div class="screen" id="scr-absage">
       <h2>Schade!</h2>
-      <p>Wir würden uns aber natürlich freuen, wenn wir Dich und Deine Liebsten sonst an der Chilbi antreffen würden …</p>
-      <p style="margin-top:20px">Möchtest Du uns Deine Kontaktdaten dalassen, damit wir Dich erreichen können?</p>
+      <p>Möchtest Du uns Deine Kontaktdaten dalassen, damit wir Dich erreichen können?</p>
       <button class="btn btn-ghost" onclick="show('scr-absage-form')">Ja, Kontaktdaten angeben</button>
       <button class="btn btn-no" onclick="showBye('nodata')">Nein danke</button>
     </div>
@@ -137,7 +143,7 @@
     </div>
 
   </div>
-  <div class="foot">© Stützpunktfeuerwehr Meilen / LOL &nbsp;·&nbsp; Chilbi Herrliberg &nbsp;·&nbsp; Cl1.067-dev</div>
+  <div class="foot">© Stützpunktfeuerwehr Meilen / LOL &nbsp;·&nbsp; Chilbi Herrliberg &nbsp;·&nbsp; Cl1.068-dev</div>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -184,14 +190,14 @@ function post(data){
 }
 
 // ===== Gutschein =====
-let GUT = { vorname:'', name:'', mail:'' };
+let GUT = { vorname:'', name:'', mail:'', grad:'', fw:'' };
 let _gLogo, _gHahn;
 function _loadImg(src){ return new Promise((res,rej)=>{ const i=new Image(); i.onload=()=>res(i); i.onerror=()=>rej(new Error('Bild '+src)); i.src=src; }); }
 async function _ensureAssets(){
   if(!_gLogo) _gLogo = await _loadImg('assets/gutschein_logo.png');
   if(!_gHahn) _gHahn = await _loadImg('assets/gutschein_hahn.png');
 }
-async function buildGutscheinDoc(vorname, name){
+async function buildGutscheinDoc(vorname, name, grad, fw){
   await _ensureAssets();
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF({ orientation:'landscape', unit:'mm', format:'a5' }); // 210 x 148
@@ -206,11 +212,11 @@ async function buildGutscheinDoc(vorname, name){
   doc.setFillColor(204,0,0); doc.rect(m,34,W-2*m,1.4,'F');
   doc.addImage(_gLogo,'PNG', 14, 11, 20, 20);
   doc.setTextColor(255,255,255); doc.setFont('helvetica','bold'); doc.setFontSize(15); doc.text('CHILBI HERRLIBERG', 40, 20);
-  doc.setTextColor(187,187,187); doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.text('FEUERWEHR', 40, 26);
+  doc.setTextColor(187,187,187); doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.text('Feuerwehr ' + (fw || ''), 40, 26);
   // Body
   doc.setTextColor(204,0,0); doc.setFont('helvetica','bold'); doc.setFontSize(30); doc.text('GUTSCHEIN', bx, 50, {align:'center'});
   doc.setTextColor(102,102,102); doc.setFont('helvetica','normal'); doc.setFontSize(10); doc.text('für', bx, 57.5, {align:'center'});
-  doc.setTextColor(26,26,26); doc.setFont('helvetica','bold'); doc.setFontSize(16); doc.text(vorname+' '+name, bx, 65.5, {align:'center'});
+  doc.setTextColor(26,26,26); doc.setFont('helvetica','bold'); doc.setFontSize(16); doc.text([grad, vorname, name].filter(Boolean).join(' '), bx, 65.5, {align:'center'});
   doc.setDrawColor(204,0,0); doc.setLineWidth(0.4); doc.line(bx-28, 69.5, bx+28, 69.5);
   doc.setTextColor(51,51,51); doc.setFont('helvetica','normal'); doc.setFontSize(10); doc.text('Gegen Abgabe dieses Gutscheins:', bx, 76.5, {align:'center'});
   doc.setTextColor(26,26,26); doc.setFont('helvetica','bold'); doc.setFontSize(13); doc.text('Eine Portion Spätzli und ein Süssgetränk/Bier für 10 CHF', bx, 84, {align:'center'});
@@ -220,6 +226,7 @@ async function buildGutscheinDoc(vorname, name){
   doc.text('Samstag, 15.08.26 · 17:00–22:00', bx, 106.5, {align:'center'});
   doc.text('Sonntag, 16.08.26 · 11:00–21:00', bx, 112.5, {align:'center'});
   doc.setTextColor(51,51,51); doc.setFont('helvetica','normal'); doc.setFontSize(10.5); doc.text('Füürwehr Spätzli-Beiz, Chilbi Herrliberg', bx, 121.5, {align:'center'});
+  doc.setTextColor(102,102,102); doc.setFont('helvetica','normal'); doc.setFontSize(8.5); doc.text('Primarschule Rebacker, Schulhausstrasse 23, 8704 Herrliberg', bx, 127, {align:'center'});
   // Fusszeile
   const d=new Date(), z=n=>('0'+n).slice(-2);
   const ts = z(d.getDate())+'.'+z(d.getMonth()+1)+'.'+d.getFullYear()+' '+z(d.getHours())+':'+z(d.getMinutes())+' Uhr';
@@ -229,7 +236,7 @@ async function buildGutscheinDoc(vorname, name){
 }
 function _gutFile(){ return ('Gutschein_'+GUT.vorname+'_'+GUT.name).replace(/[^A-Za-z0-9_]/g,'_')+'.pdf'; }
 async function downloadGutschein(){
-  try{ const doc = await buildGutscheinDoc(GUT.vorname, GUT.name); doc.save(_gutFile()); }
+  try{ const doc = await buildGutscheinDoc(GUT.vorname, GUT.name, GUT.grad, GUT.fw); doc.save(_gutFile()); }
   catch(e){ alert('Gutschein konnte nicht erstellt werden: '+e.message); }
 }
 async function mailGutschein(){
@@ -237,7 +244,7 @@ async function mailGutschein(){
   const btn = document.getElementById('btn-gut-mail');
   try{
     btn.disabled=true; btn.textContent='Wird gesendet…';
-    const doc = await buildGutscheinDoc(GUT.vorname, GUT.name);
+    const doc = await buildGutscheinDoc(GUT.vorname, GUT.name, GUT.grad, GUT.fw);
     const b64 = doc.output('datauristring').split(',')[1];
     await post({ action:'gutscheinMail', variant:'fw', vorname:GUT.vorname, name:GUT.name, mail:GUT.mail, pdf:b64 });
     btn.textContent='Gutschein gesendet';
@@ -301,7 +308,7 @@ function submitZusage(){
   const tel = validateTel('z-tel','z-tel-err');
   if(tel === false) return;
   post({action:'feuerwehrSignup', anmeldung:'Zusage', feuerwehr:fw, grad, vorname, name, mail, tel});
-  GUT = { vorname, name, mail };
+  GUT = { vorname, name, mail, grad, fw };
   document.getElementById('danke-title').textContent = `Danke für die Anmeldung, lieber ${vorname}!`;
   document.getElementById('btn-gut-mail').disabled = false;
   document.getElementById('btn-gut-mail').textContent = 'Gutschein per Mail senden';
