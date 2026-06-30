@@ -6,7 +6,7 @@
 <link rel="icon" href="../favicon.ico" sizes="any">
 <link rel="icon" type="image/svg+xml" href="../favicon.svg">
 <link rel="apple-touch-icon" href="../apple-touch-icon.png">
-<title>Feuerwehr – Chilbi Herrliberg Cl1.070-dev</title>
+<title>Feuerwehr – Chilbi Herrliberg Cl1.071-dev</title>
 <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
@@ -143,7 +143,7 @@
     </div>
 
   </div>
-  <div class="foot">© Stützpunktfeuerwehr Meilen / LOL &nbsp;·&nbsp; Chilbi Herrliberg &nbsp;·&nbsp; Cl1.070-dev</div>
+  <div class="foot">© Stützpunktfeuerwehr Meilen / LOL &nbsp;·&nbsp; Chilbi Herrliberg &nbsp;·&nbsp; Cl1.071-dev</div>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -164,8 +164,18 @@ async function loadFeuerwehren(){
     const dataRows = hasLabel ? rows : rows.slice(1); // Kopfzeile überspringen, falls nicht als Label erkannt
     const list = [];
     dataRows.forEach(r => { const c = r.c && r.c[0]; const v = c ? c.v : null; if(v != null && String(v).trim() !== '') list.push(String(v).trim()); });
-    fillFwSelect(list);
+    fillFwSelect(sortFwList(list));
   }catch(e){ /* Dropdown bleibt mit Platzhalter */ }
+}
+// alphabetisch, "andere" immer ans Ende
+function sortFwList(arr){
+  return (arr||[]).slice().sort((a,b)=>{
+    const aA = String(a).trim().toLowerCase()==='andere';
+    const bA = String(b).trim().toLowerCase()==='andere';
+    if(aA && !bA) return 1;
+    if(bA && !aA) return -1;
+    return String(a).localeCompare(String(b), 'de', {sensitivity:'base'});
+  });
 }
 function fillFwSelect(list){
   ['z-fw','a-fw'].forEach(id => {
