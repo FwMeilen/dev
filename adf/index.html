@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ehemaligen-Treffen – Chilbi Herrliberg Cl1.067-dev</title>
+<title>Feuerwehr – Chilbi Herrliberg Cl1.067-dev</title>
 <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
@@ -38,8 +38,8 @@
   .field{margin-bottom:12px;}
   .field label{display:block;font-size:13px;font-weight:600;margin-bottom:4px;}
   .field label .opt{font-weight:400;color:var(--text3);}
-  .field input{width:100%;height:42px;padding:0 12px;border:1px solid var(--gray-mid);font-family:inherit;font-size:15px;background:#fff;}
-  .field input:focus{outline:none;border-color:var(--red);}
+  .field input,.field select{width:100%;height:42px;padding:0 12px;border:1px solid var(--gray-mid);font-family:inherit;font-size:15px;background:#fff;}
+  .field input:focus,.field select:focus{outline:none;border-color:var(--red);}
   .err{color:var(--red);font-size:13px;margin-top:-6px;margin-bottom:10px;display:none;}
   .back{background:none;border:none;color:var(--text3);font-size:13px;cursor:pointer;margin-top:14px;text-decoration:underline;padding:0;}
   .foot{font-size:11px;color:var(--text3);text-align:center;padding:14px;}
@@ -50,20 +50,20 @@
 <div class="wrap">
   <div class="head">
     <img src="https://www.feuerwehr-meilen.ch/fileadmin/Public/Website/Templates/Images/Logo-FeuerwehrMeilen.png" alt="Feuerwehr Meilen">
-    <div class="t">Chilbi Herrliberg<span>Ehemaligen-Treffen</span></div>
+    <div class="t">Chilbi Herrliberg<span>Feuerwehr</span></div>
   </div>
   <div class="body">
 
     <!-- WILLKOMMEN -->
     <div class="screen active" id="scr-welcome">
-      <p>Liebe ehemaligen FeuerwehrkameradInnen,<br>Liebe Feuerwehrfreunde aus Nah und Fern,</p>
-      <p>Wie in den letzten Jahren würden wir uns sehr freuen, Euch am</p>
+      <p>Liebe Feuerwehrkolleginnen und -kollegen,</p>
+      <p>Wir laden Euch herzlich in unsere <strong>Füürwehr Spätzli-Beiz</strong> an der Chilbi Herrliberg ein – auf eine Portion Spätzli, ein Getränk und gemütliches Beisammensein.</p>
       <div class="highlight">
-        <strong>Sonntag, 16.08.26</strong><br>
-        zwischen <strong>14:00 und 16:00</strong> Uhr
+        <strong>Freitag, 14.08.26</strong> · 16:00–22:00<br>
+        <strong>Samstag, 15.08.26</strong> · 17:00–22:00<br>
+        <strong>Sonntag, 16.08.26</strong> · 11:00–21:00
       </div>
-      <p>bei uns im Füürwehrbeizli der Chilbi Herrliberg willkommen zu heissen – einfach um uns wieder einmal zu sehen und Geschichten auszutauschen.</p>
-      <p>Gerne laden wir Euch zu dieser Zeit auf ein Getränk an unserem Stammtisch ein.</p>
+      <p>Wir würden uns sehr freuen, Euch an einem der Tage bei uns begrüssen zu dürfen.</p>
       <p style="margin-top:18px;font-weight:600;color:var(--black);">Euer Chilbi-OK</p>
       <div style="height:22px;"></div>
       <button class="btn btn-yes" onclick="show('scr-zusage')">Ja, ich komme gerne</button>
@@ -74,9 +74,12 @@
     <div class="screen" id="scr-zusage">
       <h2>Schön, dass Du kommst!</h2>
       <p>Bitte trag Dich kurz ein, damit wir wissen, wer dabei ist.</p>
+      <div class="field"><label>Grad <span class="opt">(freiwillig)</span></label><input id="z-grad" type="text" placeholder="z. B. Korporal"></div>
       <div class="field"><label>Vorname</label><input id="z-vorname" type="text" autocomplete="given-name"></div>
       <div class="field"><label>Name</label><input id="z-name" type="text" autocomplete="family-name"></div>
       <div class="err" id="z-err">Bitte Vorname und Name ausfüllen.</div>
+      <div class="field"><label>Feuerwehr</label><select id="z-fw"><option value="">– bitte wählen –</option></select></div>
+      <div class="err" id="z-fw-err">Bitte Deine Feuerwehr wählen.</div>
       <div class="field"><label>E-Mail</label><input id="z-mail" type="email" autocomplete="email"></div>
       <div class="err" id="z-mail-err">Bitte eine gültige E-Mail angeben (für den Gutschein).</div>
       <div class="field"><label>Telefon</label><input id="z-tel" type="tel" autocomplete="tel" placeholder="+41 79 123 45 67"></div>
@@ -97,7 +100,7 @@
       <div id="gut-hint" style="display:none;text-align:center;color:var(--green);font-size:13px;margin-top:8px;"></div>
       <p style="text-align:center;margin-top:18px;">Wir freuen uns auf Dich!</p>
       <p style="text-align:center;margin-top:18px;">Gerne kannst Du Dir auch einen Kalendereintrag für das Treffen machen:</p>
-      <button class="btn btn-ghost" onclick="downloadICS()">Kalendereintrag Ehemaligentreffen</button>
+      <button class="btn btn-ghost" onclick="downloadICS()">Kalendereintrag Füürwehr Spätzli-Beiz</button>
     </div>
 
     <!-- ABSAGE -->
@@ -113,11 +116,14 @@
     <div class="screen" id="scr-absage-form">
       <h2>Deine Kontaktdaten</h2>
       <p>Danke! So bleiben wir in Kontakt.</p>
+      <div class="field"><label>Grad <span class="opt">(freiwillig)</span></label><input id="a-grad" type="text" placeholder="z. B. Korporal"></div>
       <div class="field"><label>Vorname</label><input id="a-vorname" type="text" autocomplete="given-name"></div>
       <div class="field"><label>Name</label><input id="a-name" type="text" autocomplete="family-name"></div>
       <div class="err" id="a-err">Bitte Vorname und Name ausfüllen.</div>
-      <div class="field"><label>E-Mail</label><input id="a-mail" type="email" autocomplete="email"></div>
-      <div class="field"><label>Telefon</label><input id="a-tel" type="tel" autocomplete="tel" placeholder="+41 79 123 45 67"></div>
+      <div class="field"><label>Feuerwehr</label><select id="a-fw"><option value="">– bitte wählen –</option></select></div>
+      <div class="err" id="a-fw-err">Bitte Deine Feuerwehr wählen.</div>
+      <div class="field"><label>E-Mail <span class="opt">(freiwillig)</span></label><input id="a-mail" type="email" autocomplete="email"></div>
+      <div class="field"><label>Telefon <span class="opt">(freiwillig)</span></label><input id="a-tel" type="tel" autocomplete="tel" placeholder="+41 79 123 45 67"></div>
       <div class="err" id="a-tel-err">Bitte eine gültige Telefonnummer eingeben.</div>
       <button class="btn btn-red" onclick="submitAbsage()">Absenden</button>
       <button class="back" onclick="show('scr-absage')">← zurück</button>
@@ -137,6 +143,34 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script>
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbztZ9C8RapYojQAb0U4fkY6xc_7JVsDMPsQEao4T1z_ObspHSeGB_X0ZONgqLANoyEbzQ/exec';
+const SHEET_ID = '1GAxPj-6QtpkzVjNwww1L6ZERTJUje6pmsCBbtBzYq3Y';
+
+// Feuerwehren-Dropdown aus Sheet-Reiter "Feuerwehren" (Spalte A) laden
+async function loadFeuerwehren(){
+  try{
+    const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=Feuerwehren&_=${Date.now()}`;
+    const res = await fetch(url); const txt = await res.text();
+    const m = txt.match(/google\.visualization\.Query\.setResponse\(([\s\S]*)\)/);
+    if(!m) return;
+    const json = JSON.parse(m[1]);
+    const rows = json.table.rows || [];
+    const hasLabel = (json.table.cols[0] && json.table.cols[0].label || '').trim() !== '';
+    const dataRows = hasLabel ? rows : rows.slice(1); // Kopfzeile überspringen, falls nicht als Label erkannt
+    const list = [];
+    dataRows.forEach(r => { const c = r.c && r.c[0]; const v = c ? c.v : null; if(v != null && String(v).trim() !== '') list.push(String(v).trim()); });
+    fillFwSelect(list);
+  }catch(e){ /* Dropdown bleibt mit Platzhalter */ }
+}
+function fillFwSelect(list){
+  ['z-fw','a-fw'].forEach(id => {
+    const sel = document.getElementById(id); if(!sel) return;
+    const cur = sel.value;
+    sel.innerHTML = '<option value="">– bitte wählen –</option>' +
+      list.map(f => `<option>${f.replace(/&/g,'&amp;').replace(/</g,'&lt;')}</option>`).join('');
+    sel.value = cur;
+  });
+}
+loadFeuerwehren();
 
 function show(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
@@ -172,16 +206,20 @@ async function buildGutscheinDoc(vorname, name){
   doc.setFillColor(204,0,0); doc.rect(m,34,W-2*m,1.4,'F');
   doc.addImage(_gLogo,'PNG', 14, 11, 20, 20);
   doc.setTextColor(255,255,255); doc.setFont('helvetica','bold'); doc.setFontSize(15); doc.text('CHILBI HERRLIBERG', 40, 20);
-  doc.setTextColor(187,187,187); doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.text('EHEMALIGEN-TREFFEN', 40, 26);
+  doc.setTextColor(187,187,187); doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.text('FEUERWEHR', 40, 26);
   // Body
-  doc.setTextColor(204,0,0); doc.setFont('helvetica','bold'); doc.setFontSize(32); doc.text('GUTSCHEIN', bx, 53.4, {align:'center'});
-  doc.setTextColor(102,102,102); doc.setFont('helvetica','normal'); doc.setFontSize(10.5); doc.text('für', bx, 62.4, {align:'center'});
-  doc.setTextColor(26,26,26); doc.setFont('helvetica','bold'); doc.setFontSize(17); doc.text(vorname+' '+name, bx, 72.4, {align:'center'});
-  doc.setDrawColor(204,0,0); doc.setLineWidth(0.4); doc.line(bx-28, 77.4, bx+28, 77.4);
-  doc.setTextColor(51,51,51); doc.setFont('helvetica','normal'); doc.setFontSize(11); doc.text('Gegen Abgabe dieses Gutscheins:', bx, 88.4, {align:'center'});
-  doc.setTextColor(26,26,26); doc.setFont('helvetica','bold'); doc.setFontSize(16); doc.text('1 Getränk nach Wahl', bx, 98.4, {align:'center'});
-  doc.setTextColor(26,26,26); doc.setFont('helvetica','bold'); doc.setFontSize(11.5); doc.text('Am Sonntag, 16.08.26 zwischen 14:00 und 16:00', bx, 112.4, {align:'center'});
-  doc.setTextColor(51,51,51); doc.setFont('helvetica','normal'); doc.setFontSize(11); doc.text('Füürwehr Spätzlibeiz, Chilbi Herrliberg', bx, 122.4, {align:'center'});
+  doc.setTextColor(204,0,0); doc.setFont('helvetica','bold'); doc.setFontSize(30); doc.text('GUTSCHEIN', bx, 50, {align:'center'});
+  doc.setTextColor(102,102,102); doc.setFont('helvetica','normal'); doc.setFontSize(10); doc.text('für', bx, 57.5, {align:'center'});
+  doc.setTextColor(26,26,26); doc.setFont('helvetica','bold'); doc.setFontSize(16); doc.text(vorname+' '+name, bx, 65.5, {align:'center'});
+  doc.setDrawColor(204,0,0); doc.setLineWidth(0.4); doc.line(bx-28, 69.5, bx+28, 69.5);
+  doc.setTextColor(51,51,51); doc.setFont('helvetica','normal'); doc.setFontSize(10); doc.text('Gegen Abgabe dieses Gutscheins:', bx, 76.5, {align:'center'});
+  doc.setTextColor(26,26,26); doc.setFont('helvetica','bold'); doc.setFontSize(13); doc.text('Eine Portion Spätzli und ein Süssgetränk/Bier für 10 CHF', bx, 84, {align:'center'});
+  doc.setTextColor(51,51,51); doc.setFont('helvetica','normal'); doc.setFontSize(10.5); doc.text('Nur gültig in Kombination mit einem Feuerwehr-T-Shirt / Oberteil.', bx, 91, {align:'center'});
+  doc.setTextColor(26,26,26); doc.setFont('helvetica','bold'); doc.setFontSize(10.5);
+  doc.text('Freitag, 14.08.26 · 16:00–22:00', bx, 100.5, {align:'center'});
+  doc.text('Samstag, 15.08.26 · 17:00–22:00', bx, 106.5, {align:'center'});
+  doc.text('Sonntag, 16.08.26 · 11:00–21:00', bx, 112.5, {align:'center'});
+  doc.setTextColor(51,51,51); doc.setFont('helvetica','normal'); doc.setFontSize(10.5); doc.text('Füürwehr Spätzli-Beiz, Chilbi Herrliberg', bx, 121.5, {align:'center'});
   // Fusszeile
   const d=new Date(), z=n=>('0'+n).slice(-2);
   const ts = z(d.getDate())+'.'+z(d.getMonth()+1)+'.'+d.getFullYear()+' '+z(d.getHours())+':'+z(d.getMinutes())+' Uhr';
@@ -201,7 +239,7 @@ async function mailGutschein(){
     btn.disabled=true; btn.textContent='Wird gesendet…';
     const doc = await buildGutscheinDoc(GUT.vorname, GUT.name);
     const b64 = doc.output('datauristring').split(',')[1];
-    await post({ action:'gutscheinMail', vorname:GUT.vorname, name:GUT.name, mail:GUT.mail, pdf:b64 });
+    await post({ action:'gutscheinMail', variant:'fw', vorname:GUT.vorname, name:GUT.name, mail:GUT.mail, pdf:b64 });
     btn.textContent='Gutschein gesendet';
     const h=document.getElementById('gut-hint');
     h.textContent='Gutschein wurde an '+GUT.mail+' gesendet.'; h.style.display='block';
@@ -246,12 +284,15 @@ function validateTel(inputId, errId){
 }
 
 function submitZusage(){
-  const name = document.getElementById('z-name').value.trim();
+  const grad = document.getElementById('z-grad').value.trim();
   const vorname = document.getElementById('z-vorname').value.trim();
+  const name = document.getElementById('z-name').value.trim();
+  const fw = document.getElementById('z-fw').value;
   const mail = document.getElementById('z-mail').value.trim();
   if(!name || !vorname){ document.getElementById('z-err').style.display='block'; return; }
   document.getElementById('z-err').style.display='none';
-  // E-Mail Pflicht bei Zusage (für den Gutschein)
+  if(!fw){ document.getElementById('z-fw-err').style.display='block'; document.getElementById('z-fw').focus(); return; }
+  document.getElementById('z-fw-err').style.display='none';
   if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(mail)){
     document.getElementById('z-mail-err').style.display='block';
     document.getElementById('z-mail').focus(); return;
@@ -259,7 +300,7 @@ function submitZusage(){
   document.getElementById('z-mail-err').style.display='none';
   const tel = validateTel('z-tel','z-tel-err');
   if(tel === false) return;
-  post({action:'ehemaligeSignup', anmeldung:'Zusage', name, vorname, mail, tel});
+  post({action:'feuerwehrSignup', anmeldung:'Zusage', feuerwehr:fw, grad, vorname, name, mail, tel});
   GUT = { vorname, name, mail };
   document.getElementById('danke-title').textContent = `Danke für die Anmeldung, lieber ${vorname}!`;
   document.getElementById('btn-gut-mail').disabled = false;
@@ -269,14 +310,18 @@ function submitZusage(){
 }
 
 function submitAbsage(){
-  const name = document.getElementById('a-name').value.trim();
+  const grad = document.getElementById('a-grad').value.trim();
   const vorname = document.getElementById('a-vorname').value.trim();
+  const name = document.getElementById('a-name').value.trim();
+  const fw = document.getElementById('a-fw').value;
   const mail = document.getElementById('a-mail').value.trim();
   if(!name || !vorname){ document.getElementById('a-err').style.display='block'; return; }
   document.getElementById('a-err').style.display='none';
+  if(!fw){ document.getElementById('a-fw-err').style.display='block'; document.getElementById('a-fw').focus(); return; }
+  document.getElementById('a-fw-err').style.display='none';
   const tel = validateTel('a-tel','a-tel-err');
   if(tel === false) return;
-  post({action:'ehemaligeSignup', anmeldung:'Absage', name, vorname, mail, tel});
+  post({action:'feuerwehrSignup', anmeldung:'Absage', feuerwehr:fw, grad, vorname, name, mail, tel});
   showBye('data');
 }
 
@@ -295,29 +340,30 @@ function showBye(mode){
 
 function downloadICS(){
   const dtstamp = new Date().toISOString().replace(/[-:]/g,'').split('.')[0]+'Z';
-  const uid = 'ehemalige-' + Date.now() + '@chilbi.feuerwehrmeilen.ch';
-  // 16.08.2026 14:00–16:00 (CEST = UTC+2) -> 12:00–14:00 UTC
-  const ics = [
-    'BEGIN:VCALENDAR',
-    'VERSION:2.0',
-    'PRODID:-//Stuetzpunktfeuerwehr Meilen//Chilbi Ehemalige//DE',
-    'CALSCALE:GREGORIAN',
-    'METHOD:PUBLISH',
-    'BEGIN:VEVENT',
-    'UID:' + uid,
-    'DTSTAMP:' + dtstamp,
-    'DTSTART:20260816T120000Z',
-    'DTEND:20260816T140000Z',
-    'SUMMARY:Feuerwehrtreffen an der Chilbi Herrliberg',
-    'LOCATION:Primarschule Rebacker\\, Schulhausstrasse 23\\, 8704 Herrliberg',
-    'DESCRIPTION:Ehemaligen-Treffen im Füürwehrbeizli der Chilbi Herrliberg. Wir freuen uns auf Dich!',
-    'END:VEVENT',
-    'END:VCALENDAR'
-  ].join('\r\n');
-  const blob = new Blob([ics], {type:'text/calendar;charset=utf-8'});
+  const loc = 'Füürwehr Spätzli-Beiz\\, Chilbi Herrliberg\\, Primarschule Rebacker\\, Schulhausstrasse 23\\, 8704 Herrliberg';
+  // CEST = UTC+2
+  const tage = [
+    { t:'Fr', s:'20260814T140000Z', e:'20260814T200000Z' },  // 16:00–22:00
+    { t:'Sa', s:'20260815T150000Z', e:'20260815T200000Z' },  // 17:00–22:00
+    { t:'So', s:'20260816T090000Z', e:'20260816T190000Z' }   // 11:00–21:00
+  ];
+  let lines = ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Stuetzpunktfeuerwehr Meilen//Chilbi Feuerwehr//DE','CALSCALE:GREGORIAN','METHOD:PUBLISH'];
+  tage.forEach(d => {
+    lines.push('BEGIN:VEVENT',
+      'UID:fw-' + d.t + '-' + Date.now() + '@chilbi.feuerwehrmeilen.ch',
+      'DTSTAMP:' + dtstamp,
+      'DTSTART:' + d.s,
+      'DTEND:' + d.e,
+      'SUMMARY:Füürwehr Spätzli-Beiz – Chilbi Herrliberg',
+      'LOCATION:' + loc,
+      'DESCRIPTION:Füürwehr Spätzli-Beiz an der Chilbi Herrliberg. Wir freuen uns auf Dich!',
+      'END:VEVENT');
+  });
+  lines.push('END:VCALENDAR');
+  const blob = new Blob([lines.join('\r\n')], {type:'text/calendar;charset=utf-8'});
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = 'Feuerwehrtreffen_Chilbi_Herrliberg.ics';
+  a.download = 'Fuuerwehr_Spaetzli-Beiz_Chilbi.ics';
   document.body.appendChild(a); a.click(); document.body.removeChild(a);
 }
 </script>

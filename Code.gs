@@ -1,6 +1,6 @@
 // ============================================================
 // Chilbi Herrliberg – Schichtplanung Backend
-// Google Apps Script  |  Cl1.066-dev
+// Google Apps Script  |  Cl1.067-dev
 // Schema Konfiguration: ID|Datum|Von|Bis|Schicht|Aufgabe|Max Personen|Farbe|Informationen|Geschlossen
 // Schema Anmeldungen:   ID|Name|Schicht|Aufgabe|Timestamp
 // Schema Tage:          Datum|Typ
@@ -17,6 +17,8 @@ const SH_SIGNUP      = 'Anmeldungen';
 const SH_TAGE        = 'Tage';
 const SH_GAST        = 'Gast';
 const SH_EHEMALIGE   = 'Ehemalige';
+const SH_FEUERWEHR   = 'Feuerwehr';
+const SH_FEUERWEHREN = 'Feuerwehren';
 
 function doGet(e) {
   return jsonResponse({ config: getConfig(), signups: getSignups(), tage: getTage() });
@@ -33,6 +35,11 @@ function doPost(e) {
     if (p.action === 'updateGuest')        return jsonResponse(updateGuest(p));
     if (p.action === 'deleteGuest')        return jsonResponse(deleteGuest(p));
     if (p.action === 'ehemaligeSignup')    return jsonResponse(ehemaligeSignup(p));
+    if (p.action === 'feuerwehrSignup')    return jsonResponse(feuerwehrSignup(p));
+    if (p.action === 'saveFeuerwehren') {
+      if (p.password !== ADMIN_PW) return jsonResponse({ ok: false, error: 'Falsches Passwort' });
+      return jsonResponse(saveFeuerwehren(p.rows));
+    }
     if (p.action === 'gutscheinMail')      return jsonResponse(gutscheinMail(p));
     if (p.action === 'saveConfig') {
       if (p.password !== ADMIN_PW) return jsonResponse({ ok: false, error: 'Falsches Passwort' });
@@ -253,6 +260,34 @@ function ehemaligeSignup(p) {
   return { ok: true };
 }
 
+// Feuerwehrkollegen-Anmeldung -> Reiter "Feuerwehr"
+function feuerwehrSignup(p) {
+  let sh = SS.getSheetByName(SH_FEUERWEHR);
+  if (!sh) {
+    sh = SS.insertSheet(SH_FEUERWEHR);
+    sh.appendRow(['Timestamp', 'Feuerwehr', 'Anmeldung', 'Grad', 'Vorname', 'Name', 'Mail', 'Tel']);
+  }
+  const r = sh.getLastRow() + 1;
+  // Mail + Tel als Text, damit fuehrendes "+" nicht als Formel gilt
+  sh.getRange(r, 7, 1, 2).setNumberFormat('@');
+  sh.getRange(r, 1, 1, 8).setValues([[
+    new Date(), p.feuerwehr || '', p.anmeldung || '', p.grad || '', p.vorname || '', p.name || '', p.mail || '', p.tel || ''
+  ]]);
+  return { ok: true };
+}
+
+// Feuerwehren-Liste (Dropdown-Quelle) speichern: Spalte A, Kopf "Feuerwehr" in A1, replace-all
+function saveFeuerwehren(rows) {
+  let sh = SS.getSheetByName(SH_FEUERWEHREN);
+  if (!sh) sh = SS.insertSheet(SH_FEUERWEHREN);
+  var list = (rows || []).map(function (v) { return String(v == null ? '' : v).trim(); })
+                         .filter(function (v) { return v !== ''; });
+  sh.clearContents();
+  sh.getRange(1, 1).setValue('Feuerwehr');
+  if (list.length) sh.getRange(2, 1, list.length, 1).setValues(list.map(function (v) { return [v]; }));
+  return { ok: true, count: list.length };
+}
+
 // Gutschein per Mail senden (PDF kommt fertig als Base64 vom Frontend; Versand via Alias chilbi@feuerwehrmeilen.ch)
 function gutscheinMail(p) {
   try {
@@ -262,21 +297,43 @@ function gutscheinMail(p) {
     var fn = ('Gutschein_' + (p.vorname || '') + '_' + (p.name || '')).replace(/[^A-Za-z0-9_]/g, '_') + '.pdf';
     var blob = Utilities.newBlob(bytes, 'application/pdf', fn);
     var vn = p.vorname || '';
-    var subj = 'Dein Gutschein fürs Ehemaligen-Treffen an der Chilbi Herrliberg';
-    var text = 'Liebe/r ' + vn + ',\n\n'
-      + 'Schön, dass Du am Ehemaligen-Treffen dabei bist! Im Anhang findest Du Deinen persönlichen Gutschein für ein Getränk nach Wahl.\n\n'
-      + 'Wann: Sonntag, 16. August 2026, 14:00–16:00 Uhr\n'
-      + 'Wo: Füürwehr Spätzlibeiz an der Chilbi Herrliberg (Primarschule Rebacker, Schulhausstrasse 23, 8704 Herrliberg)\n\n'
-      + 'Bitte druck den Gutschein aus und gib ihn bei uns am Stammtisch ab.\n\n'
-      + 'Wir freuen uns auf Dich!\n\nKameradschaftliche Grüsse\nEuer Chilbi-OK';
-    var html = '<div style="font-family:Arial,Helvetica,sans-serif;font-size:14px;color:#222;line-height:1.55">'
-      + '<p>Liebe/r ' + vn + ',</p>'
-      + '<p>Schön, dass Du am Ehemaligen-Treffen dabei bist! Im Anhang findest Du Deinen persönlichen Gutschein für ein Getränk nach Wahl.</p>'
-      + '<p><b>Wann:</b> Sonntag, 16. August 2026, 14:00–16:00 Uhr<br>'
-      + '<b>Wo:</b> Füürwehr Spätzlibeiz an der Chilbi Herrliberg (Primarschule Rebacker, Schulhausstrasse 23, 8704 Herrliberg)</p>'
-      + '<p>Bitte <b>druck den Gutschein aus und gib ihn bei uns am Stammtisch ab.</b></p>'
-      + '<p>Wir freuen uns auf Dich!</p>'
-      + '<p>Kameradschaftliche Grüsse<br>Euer Chilbi-OK</p></div>';
+    var subj, text, html;
+    if (p.variant === 'fw') {
+      subj = 'Dein Gutschein für die Füürwehr Spätzli-Beiz an der Chilbi Herrliberg';
+      text = 'Liebe/r ' + vn + ',\n\n'
+        + 'Schön, dass Du dabei bist! Im Anhang findest Du Deinen persönlichen Gutschein für eine Portion Spätzli und ein Süssgetränk/Bier für 10 CHF (nur gültig in Kombination mit einem Feuerwehr-T-Shirt / Oberteil).\n\n'
+        + 'Wann:\n'
+        + 'Freitag, 14.08.26 · 16:00–22:00\n'
+        + 'Samstag, 15.08.26 · 17:00–22:00\n'
+        + 'Sonntag, 16.08.26 · 11:00–21:00\n'
+        + 'Wo: Füürwehr Spätzli-Beiz an der Chilbi Herrliberg (Primarschule Rebacker, Schulhausstrasse 23, 8704 Herrliberg)\n\n'
+        + 'Bitte druck den Gutschein aus und gib ihn bei uns am Stand ab.\n\n'
+        + 'Wir freuen uns auf Dich!\n\nKameradschaftliche Grüsse\nEuer Chilbi-OK';
+      html = '<div style="font-family:Arial,Helvetica,sans-serif;font-size:14px;color:#222;line-height:1.55">'
+        + '<p>Liebe/r ' + vn + ',</p>'
+        + '<p>Schön, dass Du dabei bist! Im Anhang findest Du Deinen persönlichen Gutschein für eine Portion Spätzli und ein Süssgetränk/Bier für 10 CHF (nur gültig in Kombination mit einem Feuerwehr-T-Shirt / Oberteil).</p>'
+        + '<p><b>Wann:</b><br>Freitag, 14.08.26 · 16:00–22:00<br>Samstag, 15.08.26 · 17:00–22:00<br>Sonntag, 16.08.26 · 11:00–21:00<br>'
+        + '<b>Wo:</b> Füürwehr Spätzli-Beiz an der Chilbi Herrliberg (Primarschule Rebacker, Schulhausstrasse 23, 8704 Herrliberg)</p>'
+        + '<p>Bitte <b>druck den Gutschein aus und gib ihn bei uns am Stand ab.</b></p>'
+        + '<p>Wir freuen uns auf Dich!</p>'
+        + '<p>Kameradschaftliche Grüsse<br>Euer Chilbi-OK</p></div>';
+    } else {
+      subj = 'Dein Gutschein fürs Ehemaligen-Treffen an der Chilbi Herrliberg';
+      text = 'Liebe/r ' + vn + ',\n\n'
+        + 'Schön, dass Du am Ehemaligen-Treffen dabei bist! Im Anhang findest Du Deinen persönlichen Gutschein für ein Getränk nach Wahl.\n\n'
+        + 'Wann: Sonntag, 16. August 2026, 14:00–16:00 Uhr\n'
+        + 'Wo: Füürwehr Spätzlibeiz an der Chilbi Herrliberg (Primarschule Rebacker, Schulhausstrasse 23, 8704 Herrliberg)\n\n'
+        + 'Bitte druck den Gutschein aus und gib ihn bei uns am Stammtisch ab.\n\n'
+        + 'Wir freuen uns auf Dich!\n\nKameradschaftliche Grüsse\nEuer Chilbi-OK';
+      html = '<div style="font-family:Arial,Helvetica,sans-serif;font-size:14px;color:#222;line-height:1.55">'
+        + '<p>Liebe/r ' + vn + ',</p>'
+        + '<p>Schön, dass Du am Ehemaligen-Treffen dabei bist! Im Anhang findest Du Deinen persönlichen Gutschein für ein Getränk nach Wahl.</p>'
+        + '<p><b>Wann:</b> Sonntag, 16. August 2026, 14:00–16:00 Uhr<br>'
+        + '<b>Wo:</b> Füürwehr Spätzlibeiz an der Chilbi Herrliberg (Primarschule Rebacker, Schulhausstrasse 23, 8704 Herrliberg)</p>'
+        + '<p>Bitte <b>druck den Gutschein aus und gib ihn bei uns am Stammtisch ab.</b></p>'
+        + '<p>Wir freuen uns auf Dich!</p>'
+        + '<p>Kameradschaftliche Grüsse<br>Euer Chilbi-OK</p></div>';
+    }
     GmailApp.sendEmail(p.mail, subj, text, {
       from: 'chilbi@feuerwehrmeilen.ch',
       name: 'Chilbi Herrliberg',

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Chilbi Admin – Schichtverwaltung Cl1.066-dev</title>
+<title>Chilbi Admin – Schichtverwaltung Cl1.067-dev</title>
 <meta property="og:title" content="Chilbi Herrliberg – Admin">
 <meta property="og:description" content="Schichtverwaltung Chilbi Herrliberg – Stützpunktfeuerwehr Meilen">
 <meta property="og:image" content="https://www.feuerwehr-meilen.ch/fileadmin/Public/Website/Templates/Images/Logo-FeuerwehrMeilen.png">
@@ -43,9 +43,9 @@ body{font-family:'Open Sans',Arial,sans-serif;background:var(--bg3);color:var(--
 
 /* ── ADMIN TABS ──────────────────────────────────────────── */
 .admin-tabs{display:flex;border-bottom:2px solid var(--black);margin-bottom:1.5rem;background:var(--bg);}
-.admin-tab{padding:12px 20px;border:none;background:none;font-family:inherit;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text);opacity:.4;cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;transition:all .15s;}
-.admin-tab:hover{opacity:.7;}
-.admin-tab.active{opacity:1;border-bottom-color:var(--red);}
+.admin-tab{padding:12px 20px;border:none;background:none;font-family:inherit;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;transition:color .15s,border-color .15s;}
+.admin-tab:hover{color:var(--text2);}
+.admin-tab.active{color:var(--text);border-bottom-color:var(--red);}
 .admin-section{display:none;}
 .admin-section.active{display:block;}
 
@@ -162,7 +162,7 @@ td input[type=color]{width:36px;height:26px;padding:1px;cursor:pointer;border:1p
     <div class="login-error" id="loginError"></div>
     <button class="btn btn-red" style="width:100%" onclick="doLogin()">Einloggen</button>
     <div style="margin-top:16px;padding-top:12px;border-top:1px solid var(--gray-mid);text-align:center;font-size:11px;color:var(--text3);">
-      © Stützpunktfeuerwehr Meilen / LOL &nbsp;·&nbsp; <strong>Cl1.066-dev</strong>
+      © Stützpunktfeuerwehr Meilen / LOL &nbsp;·&nbsp; <strong>Cl1.067-dev</strong>
     </div>
   </div>
 </div>
@@ -173,7 +173,7 @@ td input[type=color]{width:36px;height:26px;padding:1px;cursor:pointer;border:1p
     <img src="https://www.feuerwehr-meilen.ch/fileadmin/Public/Website/Templates/Images/Logo-FeuerwehrMeilen.png" alt="Feuerwehr Meilen" style="height:38px;width:auto;object-fit:contain;">
     <div class="logo-text">Chilbi Herrliberg<span>Admin – Schichtverwaltung</span></div>
     <div class="header-right">
-      <span class="header-version">Cl1.066-dev</span>
+      <span class="header-version">Cl1.067-dev</span>
       <button class="help-btn" onclick="document.getElementById('helpOverlay').style.display='flex'" title="Bedienungsanleitung" style="background:none;border:1.5px solid rgba(255,255,255,.5);color:white;width:22px;height:22px;border-radius:50%;font-size:12px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;margin-left:4px;">?</button>
       <button class="btn btn-sm" onclick="window.open('index.html','_blank')">Zu Schichtplan Signup</button>
       <button class="btn btn-sm btn-red" onclick="loadData()">↺ Aktualisieren</button>
@@ -188,6 +188,7 @@ td input[type=color]{width:36px;height:26px;padding:1px;cursor:pointer;border:1p
     <button class="admin-tab" onclick="switchSection('uebersicht',this)">Übersicht</button>
     <button class="admin-tab" onclick="switchSection('schichtplan',this)">Schichten bearbeiten</button>
     <button class="admin-tab" onclick="switchSection('ehemalige',this)">Ehemaligen Treff</button>
+    <button class="admin-tab" onclick="switchSection('feuerwehrkollegen',this)">Feuerwehrkollegen</button>
     <button class="admin-tab" onclick="switchSection('einstellungen',this)">Einstellungen</button>
   </div>
 
@@ -263,6 +264,30 @@ td input[type=color]{width:36px;height:26px;padding:1px;cursor:pointer;border:1p
     </div>
   </div>
 
+  <!-- FEUERWEHRKOLLEGEN -->
+  <div class="admin-section" id="sec-feuerwehrkollegen">
+    <div class="stats" id="fwStats"></div>
+    <div class="card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
+        <div class="card-title" style="margin-bottom:0">Feuerwehrkollegen – Rückmeldungen</div>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+          <div style="display:flex;gap:4px;" id="fwFilterBtns">
+            <button class="btn btn-sm active" data-f="all" onclick="setFwFilter('all',this)">Alle</button>
+            <button class="btn btn-sm" data-f="Zusage" onclick="setFwFilter('Zusage',this)">Zusagen</button>
+            <button class="btn btn-sm" data-f="Absage" onclick="setFwFilter('Absage',this)">Absagen</button>
+          </div>
+          <button class="btn btn-sm" onclick="exportFeuerwehrCSV()">⬇ CSV Export</button>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Timestamp</th><th>Feuerwehr</th><th>Anmeldung</th><th>Grad</th><th>Vorname</th><th>Name</th><th>Mail</th><th>Tel</th></tr></thead>
+          <tbody id="fwBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
   <!-- EINSTELLUNGEN -->
   <div class="admin-section" id="sec-einstellungen">
 
@@ -329,6 +354,21 @@ td input[type=color]{width:36px;height:26px;padding:1px;cursor:pointer;border:1p
         </div>
         <div style="margin-top:8px;font-size:12px;color:var(--text3);">⚠ Achtung: Bestehende Farben werden beim Anwenden überschrieben.</div>
       </div>
+      </div>
+    </div>
+    <!-- 4. FEUERWEHREN -->
+    <div class="accordion-card">
+      <div class="accordion-header" onclick="toggleAccordion('acc-feuerwehren')">
+        <span class="accordion-title">Feuerwehren</span>
+        <span class="accordion-arrow" id="arr-acc-feuerwehren">▼</span>
+      </div>
+      <div class="accordion-body" id="acc-feuerwehren">
+        <div class="help-text" style="margin-bottom:10px;">Liste für das Feuerwehr-Dropdown auf der Anmeldeseite (chilbi.feuerwehrmeilen.ch/adf). Eine Feuerwehr pro Zeile.</div>
+        <div id="fwListEditor"></div>
+        <div class="btn-row" style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;">
+          <button class="btn btn-sm" onclick="addFwRow()">+ Feuerwehr hinzufügen</button>
+          <button class="btn btn-red btn-sm" onclick="saveFeuerwehrenList()">💾 Feuerwehren speichern</button>
+        </div>
       </div>
     </div>
 
@@ -524,7 +564,7 @@ td input[type=color]{width:36px;height:26px;padding:1px;cursor:pointer;border:1p
   </div>
 </div>
 <div class="toast" id="toast"></div>
-<div class="site-footer" style="position:relative;z-index:1;">© Stützpunktfeuerwehr Meilen / LOL &nbsp;·&nbsp; Admin &nbsp;·&nbsp; Cl1.066-dev</div>
+<div class="site-footer" style="position:relative;z-index:1;">© Stützpunktfeuerwehr Meilen / LOL &nbsp;·&nbsp; Admin &nbsp;·&nbsp; Cl1.067-dev</div>
 
 <script>
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbztZ9C8RapYojQAb0U4fkY6xc_7JVsDMPsQEao4T1z_ObspHSeGB_X0ZONgqLANoyEbzQ/exec';
@@ -535,6 +575,9 @@ let CONFIG  = [];
 let SIGNUPS = [];
 let EHEMALIGE = [];
 let ehFilter = 'all';
+let FEUERWEHR = [];
+let fwFilter = 'all';
+let FW_LIST = [];
 let authed  = false;
 
 document.getElementById('loginPw').addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });
@@ -575,6 +618,10 @@ async function loadData() {
     if(localStorage.getItem('chilbi_autoColor')!=='false') buildAufgabenColorList();
     try { EHEMALIGE = await fetchGvizSheet('Ehemalige'); } catch(e){ EHEMALIGE = []; }
     renderEhemalige();
+    try { FEUERWEHR = await fetchGvizSheet('Feuerwehr'); } catch(e){ FEUERWEHR = []; }
+    renderFeuerwehr();
+    try { FW_LIST = (await fetchGvizSheet('Feuerwehren')).map(r => r.Feuerwehr).filter(v => v && String(v).trim() !== ''); } catch(e){ FW_LIST = []; }
+    renderFwEditor();
   } catch(e) { showToast('Ladefehler: ' + e.message, 'error'); }
 }
 
@@ -971,6 +1018,105 @@ function exportEhemaligeCSV() {
   a.click();
 }
 
+// ===== Feuerwehrkollegen =====
+function renderFeuerwehr() {
+  const data = FEUERWEHR || [];
+  const norm = v => String(v||'').trim().toLowerCase();
+  const zus = data.filter(r => norm(r.Anmeldung) === 'zusage').length;
+  const abs = data.filter(r => norm(r.Anmeldung) === 'absage').length;
+  const total = data.length;
+  const statsEl = document.getElementById('fwStats');
+  if (statsEl) {
+    const zDeg = total ? (zus/total)*360 : 0;
+    const pie = total
+      ? `background:conic-gradient(var(--green) 0 ${zDeg}deg, var(--red) ${zDeg}deg 360deg);`
+      : `background:var(--gray-mid);`;
+    statsEl.innerHTML = `
+      <div class="stat"><div class="stat-num" style="color:var(--green)">${zus}</div><div class="stat-lbl">Zusagen</div></div>
+      <div class="stat"><div class="stat-num" style="color:var(--red)">${abs}</div><div class="stat-lbl">Absagen</div></div>
+      <div class="stat"><div class="stat-num">${total}</div><div class="stat-lbl">Total</div></div>
+      <div class="stat" style="display:flex;align-items:center;gap:10px;justify-content:center;">
+        <div style="width:56px;height:56px;border-radius:50%;${pie}flex:none;"></div>
+        <div style="font-size:11px;line-height:1.7;text-align:left;">
+          <div><span style="display:inline-block;width:9px;height:9px;background:var(--green);margin-right:5px;"></span>Zusagen</div>
+          <div><span style="display:inline-block;width:9px;height:9px;background:var(--red);margin-right:5px;"></span>Absagen</div>
+        </div>
+      </div>`;
+  }
+  const body = document.getElementById('fwBody');
+  if (!body) return;
+  let rows = data.slice();
+  if (fwFilter !== 'all') rows = rows.filter(r => norm(r.Anmeldung) === norm(fwFilter));
+  rows.sort((a,b) => String(b.Timestamp).localeCompare(String(a.Timestamp)));
+  if (!rows.length) {
+    body.innerHTML = `<tr><td colspan="8" style="text-align:center;color:var(--text3);padding:18px;">Keine Einträge.</td></tr>`;
+    return;
+  }
+  body.innerHTML = rows.map(r => {
+    const isZ = norm(r.Anmeldung) === 'zusage';
+    const badge = `<span style="font-size:11px;font-weight:700;padding:2px 8px;color:white;background:${isZ?'var(--green)':'var(--red)'};">${esc(r.Anmeldung||'')}</span>`;
+    return `<tr>
+      <td style="font-size:12px;color:var(--text2)">${esc(r.Timestamp||'')}</td>
+      <td>${esc(r.Feuerwehr||'')}</td>
+      <td>${badge}</td>
+      <td>${esc(r.Grad||'')}</td>
+      <td>${esc(r.Vorname||'')}</td>
+      <td>${esc(r.Name||'')}</td>
+      <td>${r.Mail ? `<a href="mailto:${esc(r.Mail)}">${esc(r.Mail)}</a>` : '<span style="color:var(--text3)">–</span>'}</td>
+      <td>${r.Tel ? esc(r.Tel) : '<span style="color:var(--text3)">–</span>'}</td>
+    </tr>`;
+  }).join('');
+}
+
+function setFwFilter(f, btn) {
+  fwFilter = f;
+  document.querySelectorAll('#fwFilterBtns .btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  renderFeuerwehr();
+}
+
+function exportFeuerwehrCSV() {
+  const data = FEUERWEHR || [];
+  if (!data.length) { showToast('Keine Einträge zum Exportieren', 'error'); return; }
+  const headers = ['Timestamp','Feuerwehr','Anmeldung','Grad','Vorname','Name','Mail','Tel'];
+  const q = v => `"${String(v==null?'':v).replace(/"/g,'""')}"`;
+  const lines = data.map(r => [r.Timestamp, r.Feuerwehr, r.Anmeldung, r.Grad, r.Vorname, r.Name, r.Mail, r.Tel].map(q).join(','));
+  const csv = [headers.join(','), ...lines].join('\n');
+  const a = Object.assign(document.createElement('a'),{href:URL.createObjectURL(new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8'})),download:'chilbi_feuerwehr.csv'});
+  a.click();
+}
+
+// ===== Feuerwehren-Liste (Dropdown-Quelle) editieren =====
+function fwRowHtml(val) {
+  return `<div class="fw-row" style="display:flex;gap:8px;margin-bottom:6px;align-items:center;">
+    <input type="text" value="${esc(val)}" style="flex:1;height:32px;padding:0 10px;border:1px solid var(--gray-mid);font-family:inherit;font-size:13px;">
+    <button class="btn btn-sm btn-red" onclick="this.parentElement.remove()" title="Entfernen">✕</button>
+  </div>`;
+}
+function renderFwEditor() {
+  const box = document.getElementById('fwListEditor');
+  if (!box) return;
+  box.innerHTML = (FW_LIST && FW_LIST.length)
+    ? FW_LIST.map(f => fwRowHtml(f)).join('')
+    : '<div style="color:var(--text3);font-size:13px;">Noch keine Feuerwehren – füge welche hinzu.</div>';
+}
+function addFwRow() {
+  const box = document.getElementById('fwListEditor');
+  if (!box.querySelector('.fw-row')) box.innerHTML = '';
+  box.insertAdjacentHTML('beforeend', fwRowHtml(''));
+  const inputs = box.querySelectorAll('.fw-row input');
+  if (inputs.length) inputs[inputs.length-1].focus();
+}
+async function saveFeuerwehrenList() {
+  const inputs = [...document.querySelectorAll('#fwListEditor .fw-row input')];
+  const rows = inputs.map(i => i.value.trim()).filter(v => v !== '');
+  await fetch(SCRIPT_URL, {method:'POST', mode:'no-cors', headers:{'Content-Type':'text/plain'},
+    body: JSON.stringify({action:'saveFeuerwehren', password:ADMIN_PW, rows})});
+  FW_LIST = rows;
+  renderFwEditor();
+  showToast('✓ Feuerwehren gespeichert', 'success');
+}
+
 const WEEKDAYS = ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'];
 function dayHeaderText(label) {
   const m = label.match(/(\d{1,2})\.(\d{1,2})\.(\d{2,4})?/);
@@ -1177,7 +1323,7 @@ function printDay(dayId) {
   </head><body>
     <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:${px(0.5)}px;padding-bottom:${px(0.3)}px;border-bottom:2px solid black;">
       <div style="font-size:${px(1.3)}px;font-weight:700;text-transform:uppercase">${titleText}</div>
-      <div style="font-size:${px(0.62)}px;color:#666">Stützpunktfeuerwehr Meilen &nbsp;·&nbsp; Chilbi Herrliberg &nbsp;·&nbsp; Cl1.066-dev</div>
+      <div style="font-size:${px(0.62)}px;color:#666">Stützpunktfeuerwehr Meilen &nbsp;·&nbsp; Chilbi Herrliberg &nbsp;·&nbsp; Cl1.067-dev</div>
     </div>
     <div style="display:flex;margin-bottom:${px(0.2)}px;">
       <div style="width:${labelW}px;min-width:${labelW}px;"></div>
