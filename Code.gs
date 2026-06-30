@@ -1,6 +1,6 @@
 // ============================================================
 // Chilbi Herrliberg – Schichtplanung Backend
-// Google Apps Script  |  Cl1.065-dev
+// Google Apps Script  |  Cl1.066-dev
 // Schema Konfiguration: ID|Datum|Von|Bis|Schicht|Aufgabe|Max Personen|Farbe|Informationen|Geschlossen
 // Schema Anmeldungen:   ID|Name|Schicht|Aufgabe|Timestamp
 // Schema Tage:          Datum|Typ
@@ -264,18 +264,19 @@ function gutscheinMail(p) {
     var vn = p.vorname || '';
     var subj = 'Dein Gutschein fürs Ehemaligen-Treffen an der Chilbi Herrliberg';
     var text = 'Liebe/r ' + vn + ',\n\n'
-      + 'schön, dass Du am Ehemaligen-Treffen dabei bist! Im Anhang findest Du Deinen persönlichen Gutschein für ein Getränk nach Wahl.\n\n'
+      + 'Schön, dass Du am Ehemaligen-Treffen dabei bist! Im Anhang findest Du Deinen persönlichen Gutschein für ein Getränk nach Wahl.\n\n'
       + 'Wann: Sonntag, 16. August 2026, 14:00–16:00 Uhr\n'
       + 'Wo: Füürwehr Spätzlibeiz an der Chilbi Herrliberg (Primarschule Rebacker, Schulhausstrasse 23, 8704 Herrliberg)\n\n'
-      + 'Bitte druck den Gutschein aus und gib ihn bei uns am Stammtisch ab – dafür erhältst Du Dein Getränk nach Wahl.\n\n'
-      + 'Wir freuen uns auf Dich!\nHerzliche Grüsse\nEuer Chilbi-OK';
+      + 'Bitte druck den Gutschein aus und gib ihn bei uns am Stammtisch ab.\n\n'
+      + 'Wir freuen uns auf Dich!\n\nKameradschaftliche Grüsse\nEuer Chilbi-OK';
     var html = '<div style="font-family:Arial,Helvetica,sans-serif;font-size:14px;color:#222;line-height:1.55">'
       + '<p>Liebe/r ' + vn + ',</p>'
-      + '<p>schön, dass Du am Ehemaligen-Treffen dabei bist! Im Anhang findest Du Deinen persönlichen Gutschein für ein Getränk nach Wahl.</p>'
+      + '<p>Schön, dass Du am Ehemaligen-Treffen dabei bist! Im Anhang findest Du Deinen persönlichen Gutschein für ein Getränk nach Wahl.</p>'
       + '<p><b>Wann:</b> Sonntag, 16. August 2026, 14:00–16:00 Uhr<br>'
       + '<b>Wo:</b> Füürwehr Spätzlibeiz an der Chilbi Herrliberg (Primarschule Rebacker, Schulhausstrasse 23, 8704 Herrliberg)</p>'
-      + '<p>Bitte <b>druck den Gutschein aus und gib ihn bei uns am Stammtisch ab</b> – dafür erhältst Du Dein Getränk nach Wahl.</p>'
-      + '<p>Wir freuen uns auf Dich!<br>Herzliche Grüsse<br>Euer Chilbi-OK</p></div>';
+      + '<p>Bitte <b>druck den Gutschein aus und gib ihn bei uns am Stammtisch ab.</b></p>'
+      + '<p>Wir freuen uns auf Dich!</p>'
+      + '<p>Kameradschaftliche Grüsse<br>Euer Chilbi-OK</p></div>';
     GmailApp.sendEmail(p.mail, subj, text, {
       from: 'chilbi@feuerwehrmeilen.ch',
       name: 'Chilbi Herrliberg',
