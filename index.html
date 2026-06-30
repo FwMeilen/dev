@@ -1,0 +1,1297 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chilbi Herrliberg – Schichtplan Cl1.063-dev</title>
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --red:#CC0000;--red-dark:#990000;--red-light:#FDEAEA;
+  --black:#1a1a1a;--gray:#666;--gray-mid:#e0e0e0;
+  --bg:#fff;--bg2:#f4f4f4;--bg3:#e8e8e8;
+  --text:#1a1a1a;--text2:#555;--text3:#888;
+  --green:#2d6a1f;--green-light:#eaf3e6;
+  --blue:#1565c0;--blue-light:#e3f2fd;
+  --name-bar-h: 46px;
+  --ruler-h: 24px;
+}
+body{font-family:'Open Sans',Arial,sans-serif;background:var(--bg3);color:var(--text);min-height:100vh;font-size:14px;}
+
+/* ── HEADER ─────────────────────────────────────────────── */
+.site-header{background:var(--black);}
+.site-header-inner{width:100%;padding:0 1.5rem;display:flex;align-items:center;height:54px;gap:12px;}
+.logo-text{color:white;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:0.04em;line-height:1.2;}
+.logo-text span{display:block;font-size:10px;font-weight:400;color:#999;text-transform:none;letter-spacing:0;}
+.red-stripe{height:4px;background:var(--red);}
+.header-version{margin-left:auto;font-size:11px;color:#666;}
+
+/* ── NAMEBAR ─────────────────────────────────────────────── */
+.name-bar{background:var(--bg2);border-bottom:2px solid var(--gray-mid);padding:6px 1.5rem;position:sticky;top:0;z-index:50;display:flex;align-items:center;gap:10px;flex-wrap:wrap;width:100%;}
+.name-bar label{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;white-space:nowrap;}
+.name-input{height:32px;padding:0 10px;border:1px solid var(--gray-mid);font-family:inherit;font-size:13px;background:white;color:var(--text);min-width:160px;max-width:220px;border-radius:0;}
+.name-input:focus{outline:none;border-color:var(--black);}
+.name-hint{font-size:11px;color:var(--text3);}
+/* Slider */
+.toggle-wrap{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text2);}
+.toggle-switch{position:relative;width:36px;height:20px;cursor:pointer;}
+.toggle-switch input{opacity:0;width:0;height:0;}
+.toggle-slider{position:absolute;inset:0;background:var(--gray-mid);transition:.2s;border-radius:20px;}
+.toggle-slider:before{content:'';position:absolute;height:14px;width:14px;left:3px;bottom:3px;background:white;transition:.2s;border-radius:50%;}
+.toggle-switch input:checked + .toggle-slider{background:var(--red);}
+.toggle-switch input:checked + .toggle-slider:before{transform:translateX(16px);}
+.legend{margin-left:auto;display:flex;gap:14px;flex-wrap:wrap;align-items:center;}
+.legend-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text2);}
+.legend-dot{width:10px;height:10px;}
+
+/* ── TABS ────────────────────────────────────────────────── */
+.tabs-wrap{background:var(--bg);border-bottom:2px solid var(--black);width:100%;}
+.tabs{display:flex;overflow-x:auto;width:100%;padding:0 1.5rem;}
+.tab-btn{padding:11px 18px;border:none;background:none;font-family:inherit;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--text);opacity:.45;cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;white-space:nowrap;transition:all .15s;}
+.tab-btn:hover{opacity:.75;}
+.tab-btn.active{opacity:1;border-bottom-color:var(--red);}
+.tab-type{display:inline-block;font-size:10px;padding:1px 5px;margin-left:5px;vertical-align:middle;font-weight:700;letter-spacing:0.04em;border:1px solid;}
+.tab-type.vorbereitung{background:var(--blue-light);color:var(--blue);border-color:var(--blue);}
+.tab-type.anlass{background:var(--red-light);color:var(--red);border-color:var(--red);}
+.tab-type.nachbereitung{background:var(--green-light);color:var(--green);border-color:var(--green);}
+
+/* ── DAY PANEL ───────────────────────────────────────────── */
+.day-panel{display:none;padding:1.25rem 1.5rem 4rem;}
+.day-panel.active{display:block;}
+.day-header{margin-bottom:1rem;}
+.day-title{font-size:15px;font-weight:700;text-transform:uppercase;letter-spacing:0.04em;color:var(--text3);}
+
+/* ── TIMELINE ────────────────────────────────────────────── */
+.timeline-wrap{overflow-x:auto;padding-bottom:16px;}
+/* Flex-Zeilen: label (sticky) + track */
+.tl-ruler{display:flex;position:sticky;top:0;z-index:10;background:var(--bg3);border-bottom:1px solid var(--gray-mid);}
+.tl-ruler-spacer{flex:0 0 130px;min-width:130px;position:sticky;left:0;z-index:6;background:var(--bg3);}
+.tl-ruler-ticks{flex:0 0 auto;position:relative;height:22px;}
+.hour-tick{position:absolute;font-size:10px;color:var(--text3);border-left:1px solid var(--gray-mid);padding-left:3px;top:4px;white-space:nowrap;}
+.tl-schicht{display:flex;align-items:stretch;min-height:26px;border-bottom:1px solid var(--gray-mid);margin-top:8px;}
+.tl-schicht-label{flex:0 0 130px;min-width:130px;position:sticky;left:0;z-index:5;background:var(--bg3);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--gray);display:flex;align-items:center;padding-right:10px;}
+.tl-row{display:flex;align-items:center;min-height:44px;}
+.tl-label{flex:0 0 130px;min-width:130px;position:sticky;left:0;z-index:5;background:var(--bg3);font-size:12px;font-weight:600;color:var(--text2);padding-right:10px;}
+.tl-track{flex:0 0 auto;position:relative;height:36px;background:rgba(0,0,0,.04);border:1px solid var(--gray-mid);}
+/* Namen inline rechts vom Block */
+.tl-names{position:absolute;top:50%;transform:translateY(-50%);display:flex;gap:4px;align-items:center;white-space:nowrap;}
+.signup-pill{font-size:11px;padding:1px 7px;background:rgba(0,0,0,.12);color:inherit;border-radius:2px;font-weight:600;}
+.signup-pill.me{background:rgba(0,0,0,.35);color:white;}
+
+/* Einheitliche Chips: Namensschild + Gesperrt immer exakt gleich gross */
+.tl-chip{display:inline-flex;align-items:center;height:20px;box-sizing:border-box;padding:0 7px;font-size:11px;font-weight:600;line-height:1;white-space:nowrap;border:1px solid transparent;}
+.tl-chip--name{color:var(--text2);background:var(--bg2);border-color:var(--gray-mid);}
+.tl-chip--name.is-mine{background:var(--black);color:white;border-color:var(--black);}
+.tl-chip--locked{color:white;background:#888;font-weight:700;}
+.tl-chip .lock-ico{font-size:11px;line-height:1;margin-right:3px;}
+
+/* ── BLOCK STATES ────────────────────────────────────────── */
+.task-block{
+  position:absolute;top:3px;height:calc(100% - 6px);
+  cursor:pointer;display:flex;align-items:center;gap:6px;
+  font-size:11px;font-weight:700;
+  transition:filter .15s;user-select:none;overflow:visible;padding:0 8px;
+}
+.task-block:hover{filter:brightness(1.08);}
+
+/* frei: volle Farbe, weisse Schrift (oder schwarz je nach Helligkeit) */
+/* andere: Farbe mit Overlay-Streifen */
+.task-block.andere::after{
+  content:'';position:absolute;inset:0;
+  background:repeating-linear-gradient(135deg,rgba(0,0,0,.08) 0px,rgba(0,0,0,.08) 2px,transparent 2px,transparent 8px);
+  pointer-events:none;
+}
+/* mine: schwarzer Hintergrund */
+.task-block.mine{background:var(--black) !important;color:white !important;}
+/* voll: grau, kein Cursor */
+.task-block.voll{background:#aaa !important;cursor:not-allowed;color:white !important;}
+.task-block.voll:hover{filter:none;}
+
+.block-time{font-weight:400;font-size:10px;opacity:.9;}
+.block-slots{display:flex;gap:3px;align-items:center;margin-left:auto;}
+
+/* Slot dots: free = outlined, taken = solid white, contrast on dark */
+.slot-dot{
+  width:16px;height:16px;border-radius:50%;
+  border:2px solid rgba(255,255,255,.8);
+  background:transparent;
+  flex-shrink:0;
+  display:inline-flex;align-items:center;justify-content:center;
+  font-size:10px;font-weight:700;line-height:1;
+}
+.slot-dot.taken{
+  background:rgba(255,255,255,.95);
+  border-color:rgba(255,255,255,.95);
+  color:#333;
+}
+/* On dark/mine blocks keep same */
+.task-block.mine .slot-dot{border-color:rgba(255,255,255,.5);}
+.task-block.mine .slot-dot.taken{background:white;border-color:white;}
+
+/* ── POPUP ───────────────────────────────────────────────── */
+.popup-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:200;align-items:center;justify-content:center;padding:20px;}
+.popup-overlay.open{display:flex;}
+.popup{background:var(--bg);max-width:420px;width:100%;box-shadow:0 8px 40px rgba(0,0,0,.25);animation:popIn .18s ease;}
+@keyframes popIn{from{transform:scale(.95);opacity:0}to{transform:scale(1);opacity:1}}
+.popup-header{background:var(--black);color:white;padding:16px 20px;}
+.popup-header h3{font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:0.04em;}
+.popup-header .popup-meta{font-size:11px;color:#999;margin-top:3px;}
+.popup-body{padding:20px;}
+.popup-info{background:var(--bg2);border-left:3px solid var(--red);padding:12px 14px;margin-bottom:14px;font-size:13px;}
+.pi-row{display:flex;justify-content:space-between;margin-bottom:3px;}
+.pi-row:last-child{margin-bottom:0;}
+.pi-label{color:var(--text3);}
+.pi-value{font-weight:700;}
+.popup-treffpunkt{background:var(--red-light);border-left:3px solid var(--red);padding:10px 14px;margin-bottom:14px;font-size:12px;color:var(--red-dark);}
+.popup-treffpunkt strong{display:block;font-size:10px;text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;}
+.popup-name-display{background:var(--bg2);border:1px solid var(--gray-mid);padding:10px 14px;font-size:13px;font-weight:700;margin-bottom:14px;}
+.popup-name-display small{display:block;font-size:10px;font-weight:400;color:var(--text3);margin-bottom:2px;text-transform:uppercase;letter-spacing:.05em;}
+.popup-name-hint{font-size:11px;color:var(--red);margin-top:4px;font-weight:600;}
+.popup-full{background:var(--red-light);border:1px solid var(--red);padding:14px 16px;font-size:13px;color:var(--red-dark);font-weight:600;text-align:center;line-height:1.5;}
+.btn-row{display:flex;gap:8px;justify-content:flex-end;margin-top:14px;}
+.btn{height:36px;padding:0 18px;border:2px solid var(--black);background:var(--bg);color:var(--black);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;cursor:pointer;display:inline-flex;align-items:center;gap:6px;font-family:inherit;border-radius:0;}
+.btn:hover{background:var(--black);color:#fff;}
+.btn-red{background:var(--red);color:#fff;border-color:var(--red);}
+.btn-red:hover{background:var(--red-dark);border-color:var(--red-dark);}
+.btn:disabled{opacity:.5;cursor:not-allowed;pointer-events:none;}
+
+/* ── MISC ────────────────────────────────────────────────── */
+.loading{text-align:center;padding:3rem;color:var(--text3);}
+.loading svg{display:block;margin:0 auto .75rem;animation:spin 1s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.empty{text-align:center;padding:3rem;color:var(--text3);font-size:13px;}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--black);color:white;padding:10px 22px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;z-index:999;transition:transform .3s ease;pointer-events:none;}
+.toast.show{transform:translateX(-50%) translateY(0);}
+.toast.success{background:var(--green);}
+.toast.error{background:var(--red);}
+.center-msg{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(.9);background:var(--black);color:white;padding:24px 36px;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;z-index:998;text-align:center;opacity:0;transition:all .25s ease;pointer-events:none;max-width:80vw;}
+.center-msg.show{opacity:1;transform:translate(-50%,-50%) scale(1);}
+.site-footer{background:var(--black);color:#666;font-size:11px;text-align:center;padding:1rem;}
+
+/* ── HILFE ───────────────────────────────────────────────── */
+.help-btn{background:none;border:1.5px solid rgba(255,255,255,.5);color:white;width:22px;height:22px;border-radius:50%;font-size:12px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;margin-left:8px;line-height:1;}
+.help-btn:hover{background:rgba(255,255,255,.15);}
+.help-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:800;align-items:center;justify-content:center;padding:20px;}
+.help-overlay.open{display:flex;}
+.help-box{background:white;max-width:520px;width:100%;max-height:85vh;overflow-y:auto;box-shadow:0 8px 40px rgba(0,0,0,.3);}
+.help-header{background:var(--black);color:white;padding:14px 20px;display:flex;justify-content:space-between;align-items:center;}
+.help-header h3{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;}
+.help-close{background:none;border:none;color:white;font-size:18px;cursor:pointer;padding:0 4px;}
+.help-body{padding:20px;}
+.help-section{margin-bottom:18px;}
+.help-section h4{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--red);margin-bottom:6px;border-bottom:1px solid var(--gray-mid);padding-bottom:4px;}
+.help-section p,.help-section li{font-size:12px;color:var(--text2);line-height:1.6;margin-bottom:4px;}
+.help-section ul{padding-left:16px;}
+
+/* ── SPLASH ──────────────────────────────────────────────── */
+.splash{position:fixed;inset:0;background:var(--black);z-index:999;display:flex;align-items:center;justify-content:center;padding:20px;}
+.splash-box{background:var(--bg);max-width:400px;width:100%;border-top:4px solid var(--red);}
+.splash-head{background:var(--black);padding:18px 24px;display:flex;align-items:center;gap:12px;}
+.splash-head img{height:38px;}
+.splash-head-text{color:white;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;line-height:1.3;}
+.splash-head-text span{display:block;font-size:10px;font-weight:400;color:#999;text-transform:none;}
+.splash-body{padding:24px;}
+.splash-body h2{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;margin-bottom:16px;}
+.splash-opt{border:2px solid var(--gray-mid);padding:14px 16px;margin-bottom:10px;cursor:pointer;transition:border-color .15s;display:flex;align-items:center;gap:12px;}
+.splash-opt:hover{border-color:var(--black);}
+.splash-opt.selected{border-color:var(--red);background:var(--red-light);}
+.splash-opt-icon{font-size:20px;line-height:1;}
+.splash-opt-title{font-size:13px;font-weight:700;margin-bottom:2px;}
+.splash-opt-sub{font-size:11px;color:var(--text3);}
+.splash-input-wrap{margin-top:16px;}
+.splash-input-wrap label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:5px;color:var(--text2);}
+.splash-input{width:100%;height:38px;padding:0 12px;border:2px solid var(--gray-mid);font-family:inherit;font-size:18px;letter-spacing:.15em;text-transform:uppercase;border-radius:0;}
+.splash-input.guest{text-transform:none;letter-spacing:0;font-size:14px;}
+.splash-input:focus{outline:none;border-color:var(--black);}
+.splash-error{color:var(--red);font-size:11px;min-height:16px;margin-top:4px;}
+.splash-btn{width:100%;height:40px;background:var(--red);color:white;border:none;font-family:inherit;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;cursor:pointer;margin-top:16px;}
+.splash-btn:hover{background:var(--red-dark);}
+/* Name-Bar: Name als Label statt Input */
+.name-display{font-size:14px;font-weight:700;color:var(--black);background:white;border:1px solid var(--gray-mid);padding:4px 12px;letter-spacing:.04em;}
+.name-change{font-size:11px;color:var(--red);cursor:pointer;text-decoration:underline;white-space:nowrap;}
+.name-change:hover{color:var(--red-dark);}
+.btn-group{margin-left:auto;display:flex;gap:8px;align-items:center;}
+.btn-refresh{height:30px;padding:0 12px;border:2px solid var(--black);background:var(--bg);color:var(--black);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;cursor:pointer;display:inline-flex;align-items:center;gap:5px;font-family:inherit;border-radius:0;}
+.btn-refresh:hover{background:var(--black);color:white;}
+.btn-refresh.spinning svg{animation:spin 1s linear infinite;}
+.btn-myshifts{height:30px;padding:0 12px;border:2px solid var(--black);background:var(--black);color:white;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;cursor:pointer;display:inline-flex;align-items:center;gap:5px;font-family:inherit;border-radius:0;}
+.btn-myshifts:hover,.btn-myshifts.active{background:var(--red);border-color:var(--red);}
+.my-shifts-panel{display:none;padding:1.25rem 1.5rem 4rem;}
+.my-shifts-panel.active{display:block;}
+.my-shifts-empty{text-align:center;padding:3rem;color:var(--text3);font-size:13px;}
+.ms-day-block{margin-bottom:2rem;}
+.ms-day-title{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--text3);padding-bottom:6px;border-bottom:2px solid var(--black);margin-bottom:10px;}
+.ms-card{background:white;border:1px solid var(--gray-mid);border-left:4px solid var(--red);padding:12px 16px;margin-bottom:8px;cursor:pointer;}
+.ms-card:hover{background:var(--bg2);}
+.ms-card-name{font-size:13px;font-weight:700;margin-bottom:2px;}
+.ms-card-time{font-size:12px;color:var(--text3);}
+.ms-card-schicht{font-size:11px;color:var(--gray);margin-top:2px;}
+.ms-card-treff{font-size:11px;color:var(--red-dark);margin-top:4px;background:var(--red-light);padding:3px 8px;display:inline-block;}
+</style>
+</head>
+<body>
+
+<!-- WILLKOMMEN GAST POPUP -->
+<div id="welcomeOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:1000;align-items:center;justify-content:center;padding:20px;">
+  <div style="background:white;max-width:420px;width:100%;box-shadow:0 8px 40px rgba(0,0,0,.3);">
+    <div style="background:var(--black);padding:16px 20px;">
+      <img src="https://www.feuerwehr-meilen.ch/fileadmin/Public/Website/Templates/Images/Logo-FeuerwehrMeilen.png" alt="Logo" style="height:32px;">
+    </div>
+    <div style="padding:24px;text-align:center;">
+      <div style="font-size:15px;font-weight:700;margin-bottom:12px;color:var(--black)">Herzlich willkommen bei der Stützpunktfeuerwehr Meilen.</div>
+      <div style="font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:16px;">Besten Dank für Deine Bereitschaft, uns an der Chilbi Herrliberg zu unterstützen!</div>
+      <div style="background:var(--bg2);border:1px solid var(--gray-mid);padding:14px;margin-bottom:16px;font-size:13px;line-height:1.6;color:var(--text2);">
+        Du kannst Dich ab sofort mit dem Kürzel <strong id="welcomeKuerzel" style="font-size:18px;color:var(--red);display:block;margin:8px 0;letter-spacing:.1em"></strong> wieder einloggen um Deine Daten anzusehen.
+      </div>
+      <div style="font-size:13px;color:var(--text2);margin-bottom:12px;">Willst du uns deine Kontaktdaten geben, damit wir dich bei Änderungen informieren können?</div>
+      <div style="display:grid;gap:8px;margin-bottom:16px;">
+        <input id="guestEmail" type="email" placeholder="E-Mail (optional)" style="box-sizing:border-box;width:100%;height:36px;padding:0 12px;border:1px solid var(--gray-mid);font-family:inherit;font-size:13px;">
+        <input id="guestTel" type="tel" placeholder="Mobile (optional)" style="box-sizing:border-box;width:100%;height:36px;padding:0 12px;border:1px solid var(--gray-mid);font-family:inherit;font-size:13px;">
+      </div>
+      <div style="font-size:12px;color:var(--text3);margin-bottom:16px;font-style:italic;">Das Herrliberger Chilbi-OK</div>
+      <div style="display:flex;gap:8px;">
+        <button class="btn" onclick="closeWelcome(false)" style="flex:1">Überspringen</button>
+        <button class="btn btn-red" onclick="closeWelcome(true)" style="flex:1">Speichern & weiter</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- HILFE POPUP -->
+<div class="help-overlay" id="helpOverlay" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="help-box">
+    <div class="help-header">
+      <h3>Bedienungsanleitung – Schichtplan</h3>
+      <button class="help-close" onclick="document.getElementById('helpOverlay').classList.remove('open')">✕</button>
+    </div>
+    <div class="help-body">
+      <div class="help-section">
+        <h4>Anmelden</h4>
+        <ul>
+          <li>Beim ersten Aufruf erscheint ein Anmeldebildschirm.</li>
+          <li><strong>Feuerwehr Meilen:</strong> 3-Buchstaben-Kürzel eingeben (z.B. MUS).</li>
+          <li><strong>Gast:</strong> Vor- und Nachname eingeben.</li>
+          <li>Mit <em>(ändern)</em> kannst du das Kürzel/Namen jederzeit wechseln.</li>
+        </ul>
+      </div>
+      <div class="help-section">
+        <h4>Schicht eintragen</h4>
+        <ul>
+          <li>Wähle oben in der Auswahl den gewünschten Tag.</li>
+          <li>Klicke auf einen freien Block um dich einzutragen.</li>
+          <li>Im Popup siehst du Details und kannst mit <strong>„In diese Schicht eintragen"</strong> bestätigen.</li>
+          <li>Bereits eingetragene Schichten erscheinen schwarz.</li>
+          <li>Volle Schichten (grau) können nicht mehr gewählt werden.</li>
+          <li>Gesperrte Schichten (grau, 🔒) sind für neue Einträge geschlossen.</li>
+        </ul>
+      </div>
+      <div class="help-section">
+        <h4>Meine Schichten</h4>
+        <ul>
+          <li>Klicke auf <strong>„Meine Schichten"</strong> um alle deine Einträge zu sehen.</li>
+          <li>Mit <strong>📅 In meinen Kalender eintragen</strong> kannst du alle Schichten als .ics-Datei herunterladen.</li>
+        </ul>
+      </div>
+      <div class="help-section">
+        <h4>Ansicht anpassen</h4>
+        <ul>
+          <li><strong>Kürzel / Namen:</strong> Schaltet zwischen Kürzel und vollem Namen um.</li>
+          <li><strong>Im Block / Links:</strong> Aufgabenname im Block oder als Beschriftung links. Beim ersten Öffnen steht die Ansicht auf <em>Links</em>; deine Wahl wird danach gemerkt.</li>
+          <li><strong>Aktualisieren:</strong> Lädt die aktuellen Daten neu (automatisch alle 20 Min).</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── SPLASH ─────────────────────────────────────────────── -->
+<div class="splash" id="splash">
+  <div class="splash-box">
+    <div class="splash-head">
+      <img src="https://www.feuerwehr-meilen.ch/fileadmin/Public/Website/Templates/Images/Logo-FeuerwehrMeilen.png" alt="Logo">
+      <div class="splash-head-text">Chilbi Herrliberg<span>Schichtplanung &amp; Anmeldung</span></div>
+    </div>
+    <div class="splash-body">
+      <h2>Willkommen – wer bist du?</h2>
+      <div class="splash-opt selected" id="opt-ff" onclick="splashSelect('ff')">
+        <div class="splash-opt-icon">🚒</div>
+        <div><div class="splash-opt-title">Feuerwehr Meilen</div><div class="splash-opt-sub">3-Buchstaben-Kürzel eingeben (z.B. MUS)</div></div>
+      </div>
+      <div class="splash-opt" id="opt-guest" onclick="splashSelect('guest')">
+        <div class="splash-opt-icon">👤</div>
+        <div><div class="splash-opt-title">Gast</div><div class="splash-opt-sub">Vorname und Name eingeben</div></div>
+      </div>
+      <div class="splash-input-wrap">
+        <label id="splashLabel">Dein Kürzel (3 Grossbuchstaben)</label>
+        <input type="text" id="splashInput" class="splash-input" maxlength="3" placeholder="MUS"
+          oninput="splashInputChange()" onkeydown="if(event.key==='Enter') splashSubmit()">
+        <div class="splash-error" id="splashError"></div>
+      </div>
+      <button class="splash-btn" id="splashSubmitBtn" onclick="splashSubmit()">Weiter zum Schichtplan →</button>
+    </div>
+  </div>
+</div>
+
+<div class="site-header">
+  <div class="site-header-inner">
+    <img src="https://www.feuerwehr-meilen.ch/fileadmin/Public/Website/Templates/Images/Logo-FeuerwehrMeilen.png" alt="Feuerwehr Meilen" style="height:38px;width:auto;object-fit:contain;">
+    <div class="logo-text">Chilbi Herrliberg<span>Schichtplanung &amp; Anmeldung</span></div>
+    <div class="header-version">Cl1.063-dev</div>
+    <button class="help-btn" onclick="document.getElementById('helpOverlay').classList.add('open')" title="Bedienungsanleitung">?</button>
+  </div>
+</div>
+<div class="red-stripe"></div>
+
+<!-- NAME BAR -->
+<div class="name-bar">
+  <label>Angemeldet als:</label>
+  <div class="name-display" id="nameDisplay">–</div>
+  <span class="name-change" onclick="splashShow()">(ändern)</span>
+  <div class="toggle-wrap" style="margin-left:12px">
+    <span>Kürzel</span>
+    <label class="toggle-switch">
+      <input type="checkbox" id="nameToggle" onchange="toggleNameDisplay(this.checked)">
+      <span class="toggle-slider"></span>
+    </label>
+    <span>Namen</span>
+  </div>
+  <div class="toggle-wrap" style="margin-left:10px">
+    <span>Im Block</span>
+    <label class="toggle-switch">
+      <input type="checkbox" id="labelToggle" onchange="toggleLabelDisplay(this.checked)">
+      <span class="toggle-slider"></span>
+    </label>
+    <span>Links</span>
+  </div>
+  <div class="btn-group">
+    <button class="btn-myshifts" id="btnMyShifts" onclick="toggleMyShifts()">Meine Schichten</button>
+    <button class="btn-myshifts" id="btnICS" onclick="downloadICS()" style="display:none" title="Als Kalender (.ics) herunterladen">📅 In meinen Kalender eintragen</button>
+    <button class="btn-refresh" id="btnRefresh" onclick="manualRefresh()">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg>
+      Aktualisieren
+    </button>
+  </div>
+</div>
+
+<!-- MEINE SCHICHTEN PANEL -->
+<div class="my-shifts-panel" id="myShiftsPanel"></div>
+
+<!-- TABS -->
+<div class="tabs-wrap" id="tabsWrap">
+  <div class="tabs" id="tabBar"></div>
+</div>
+
+<!-- CONTENT -->
+<div id="dayPanels" style="">
+  <div class="loading" id="loadingState" style="padding:3rem 1.5rem">
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2" stroke-linecap="round"><path d="M21 12a9 9 0 11-6.22-8.56"/></svg>
+    Daten werden geladen…
+  </div>
+</div>
+
+<!-- POPUP -->
+<div class="popup-overlay" id="popupOverlay">
+  <div class="popup">
+    <div class="popup-header">
+      <h3 id="popupTitle">Schicht eintragen</h3>
+      <div class="popup-meta" id="popupMeta"></div>
+    </div>
+    <div class="popup-body">
+      <div id="popupFull" class="popup-full" style="display:none">
+        Diese Schicht ist schon voll.<br>Es hat aber noch viele andere frei&nbsp;:)
+      </div>
+      <div id="popupNormal">
+        <div class="popup-info" id="popupInfo"></div>
+        <div id="popupTreffpunkt" class="popup-treffpunkt" style="display:none">
+          <strong>Treffpunkt / Info</strong>
+          <span id="popupTreffpunktText"></span>
+        </div>
+        <div class="popup-name-display">
+          <small>Eintragen als</small>
+          <span id="popupNameDisplay">–</span>
+          <div id="popupNameHint" class="popup-name-hint" style="display:none">⚠ Bitte zuerst Namen oben eingeben!</div>
+        </div>
+        <div class="btn-row">
+          <button class="btn" onclick="closePopup()">Abbrechen</button>
+          <button class="btn btn-red" id="btnSign" onclick="doSign()">In diese Schicht eintragen</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- BEREITS EINGETRAGEN POPUP -->
+<div id="alreadyOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:300;align-items:center;justify-content:center;padding:20px;">
+  <div style="background:white;max-width:360px;width:100%;box-shadow:0 8px 40px rgba(0,0,0,.25);">
+    <div style="background:var(--red);color:white;padding:16px 20px;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;">Bereits eingetragen</div>
+    <div style="padding:24px;text-align:center;">
+      <div style="font-size:32px;margin-bottom:12px;">✓</div>
+      <div style="font-size:14px;font-weight:600;margin-bottom:8px;">Du bist bereits in dieser Schicht eingetragen!</div>
+      <div style="font-size:12px;color:var(--text3);margin-bottom:20px;">Deine Anmeldung wurde bereits gespeichert.</div>
+      <button class="btn btn-red" onclick="document.getElementById('alreadyOverlay').style.display='none'" style="width:100%">OK</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<div class="site-footer">© Stützpunktfeuerwehr Meilen / LOL &nbsp;·&nbsp; Cl1.063-dev</div>
+
+<script>
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbztZ9C8RapYojQAb0U4fkY6xc_7JVsDMPsQEao4T1z_ObspHSeGB_X0ZONgqLANoyEbzQ/exec';
+
+let CONFIG  = [];
+let SIGNUPS = [];
+let KUERZEL = {};
+let TAGE = {}; // {datum: 'Chilbi'|'Vorbereitung'|'Aufräumen'}
+function showColors() { return localStorage.getItem('chilbi_showColors') !== 'false'; }
+function showLabels() { return localStorage.getItem('chilbi_showLabels') !== 'false'; } // {kuerzel: 'Vorname Nachname'}
+let showNames = false; // false=Kürzel, true=Namen
+let DAYS    = [];
+let activeDay = 0;
+let currentTarget = null;
+
+// Automatische Schriftfarbe nach Hintergrundfarbe
+function textColor(hex) {
+  const r = parseInt(hex.slice(1,3),16);
+  const g = parseInt(hex.slice(3,5),16);
+  const b = parseInt(hex.slice(5,7),16);
+  // Relative luminance
+  const lum = (0.299*r + 0.587*g + 0.114*b) / 255;
+  return lum > 0.55 ? '#1a1a1a' : '#ffffff';
+}
+
+let splashMode = 'ff';
+
+function splashSelect(mode) {
+  splashMode = mode;
+  document.getElementById('opt-ff').classList.toggle('selected', mode==='ff');
+  document.getElementById('opt-guest').classList.toggle('selected', mode==='guest');
+  const inp = document.getElementById('splashInput');
+  const lbl = document.getElementById('splashLabel');
+  if (mode === 'ff') {
+    inp.maxLength = 3; inp.placeholder = 'MUS';
+    inp.className = 'splash-input';
+    lbl.textContent = 'Dein Kürzel (3 Grossbuchstaben)';
+  } else {
+    inp.maxLength = 40; inp.placeholder = 'Vorname Name';
+    inp.className = 'splash-input guest';
+    lbl.textContent = 'Dein Name';
+  }
+  inp.value = '';
+  document.getElementById('splashError').textContent = '';
+  inp.focus();
+}
+
+function splashInputChange() {
+  const inp = document.getElementById('splashInput');
+  if (splashMode === 'ff') inp.value = inp.value.toUpperCase().replace(/[^A-Z]/g,'');
+  document.getElementById('splashError').textContent = '';
+}
+
+async function splashSubmit() {
+  const val = document.getElementById('splashInput').value.trim();
+  const err = document.getElementById('splashError');
+  if (splashMode === 'ff' && !/^[A-Z]{3}$/.test(val)) { err.textContent = 'Bitte genau 3 Grossbuchstaben eingeben.'; return; }
+  if (splashMode === 'guest' && val.length < 2) { err.textContent = 'Bitte Namen eingeben.'; return; }
+
+  if (splashMode === 'guest') {
+    // Vorname/Nachname aus Eingabe
+    const parts = val.trim().split(/\s+/);
+    const vorname = parts[0] || '';
+    const nachname = parts.slice(1).join(' ') || '';
+    const btn = document.getElementById('splashSubmitBtn');
+    if (btn) { btn.disabled = true; btn.textContent = 'Wird registriert…'; }
+    try {
+      const result = await registerGuest(vorname, nachname);
+      const kuerzel = result.kuerzel;
+      const displayName = 'G: ' + val;
+      localStorage.setItem('chilbi_name', kuerzel);
+      localStorage.setItem('chilbi_mode', 'ff');
+      localStorage.setItem('chilbi_display', displayName);
+      document.getElementById('nameDisplay').textContent = kuerzel;
+      document.getElementById('splash').style.display = 'none';
+      // Willkommens-Popup
+      document.getElementById('welcomeKuerzel').textContent = kuerzel;
+      document.getElementById('guestEmail').value = '';
+      document.getElementById('guestTel').value = '';
+      document.getElementById('welcomeOverlay').style.display = 'flex';
+      window._guestKuerzel = kuerzel;
+      window._guestVorname = vorname;
+      window._guestNachname = nachname;
+    } catch(e) {
+      err.textContent = 'Fehler bei der Registrierung: ' + e.message;
+      if (btn) { btn.disabled = false; btn.textContent = 'Weiter zum Schichtplan →'; }
+    }
+    return;
+  }
+
+  localStorage.setItem('chilbi_name', val);
+  localStorage.setItem('chilbi_mode', splashMode);
+  document.getElementById('nameDisplay').textContent = val;
+  document.getElementById('splash').style.display = 'none';
+}
+
+function closeWelcome(save) {
+  document.getElementById('welcomeOverlay').style.display = 'none';
+  if (save) {
+    const email = document.getElementById('guestEmail').value.trim();
+    const tel   = document.getElementById('guestTel').value.trim();
+    if (email || tel) {
+      fetch(SCRIPT_URL, {method:'POST', mode:'no-cors', headers:{'Content-Type':'text/plain'},
+        body: JSON.stringify({action:'updateGuestContact', kuerzel: window._guestKuerzel, email, tel})});
+    }
+  }
+}
+
+async function registerGuest(vorname, nachname) {
+  // Kürzel generieren: G + 1.Buchstabe Vorname + 1.Buchstabe Nachname
+  const v = vorname.toUpperCase().replace(/[^A-Z]/g,'');
+  const n = nachname.toUpperCase().replace(/[^A-Z]/g,'');
+  // Primär: 1.+2. Buchstabe Nachname + 1. Buchstabe Vorname (wie FF-Kürzel)
+  const candidates = [
+    (n[0]||'X') + (n[1]||'X') + (v[0]||'X'),   // z.B. LOL (Loepfe Lars)
+    'G' + (v[0]||'X') + (n[0]||'X'),             // Fallback 1: G+V1+N1
+    'G' + (n[1]||'X') + (v[0]||'X'),             // Fallback 2: G+N2+V1
+    'G' + (n[0]||'X') + (v[1]||'X'),             // Fallback 3: G+N1+V2
+    'GXX'
+  ];
+
+  // Bestehende Kürzel laden (Tabellenblatt1 + Gast)
+  const [sheet1, sheetGast] = await Promise.all([
+    fetchKuerzelSheet(),
+    fetchKuerzelSheetGast()
+  ]);
+  const allKuerzel = new Set([...sheet1, ...sheetGast].map(r => (r.Kürzel||r['Kürzel']||'').trim().toUpperCase()));
+
+  // Prüfe ob Gast schon registriert (gleicher Vor- und Nachname)
+  const existing = sheetGast.find(r => {
+    const rv = (r.Vorname||'').trim().toLowerCase();
+    const rn = (r.Name||r.Nachname||'').trim().toLowerCase();
+    return rv === vorname.toLowerCase() && rn === nachname.toLowerCase();
+  });
+  if (existing) {
+    return { kuerzel: (existing.Kürzel||existing['Kürzel']||'').trim() };
+  }
+
+  // Freies Kürzel wählen
+  const kuerzel = candidates.find(k => !allKuerzel.has(k)) || 'GXX';
+
+  // Ins Sheet schreiben via Apps Script
+  await fetch(SCRIPT_URL, {method:'POST', mode:'no-cors', headers:{'Content-Type':'text/plain'},
+    body: JSON.stringify({action:'registerGuest', vorname, nachname, kuerzel})});
+
+  // Lokal auch in KUERZEL speichern
+  KUERZEL[kuerzel] = 'G: ' + vorname + ' ' + nachname;
+
+  return { kuerzel };
+}
+
+function splashShow() {
+  const splash = document.getElementById('splash');
+  if (!splash) return;
+  const saved = localStorage.getItem('chilbi_name') || '';
+  const mode  = localStorage.getItem('chilbi_mode') || 'ff';
+  splashMode = mode;
+  document.getElementById('opt-ff').classList.toggle('selected', mode==='ff');
+  document.getElementById('opt-guest').classList.toggle('selected', mode==='guest');
+  const inp = document.getElementById('splashInput');
+  inp.value = saved;
+  if (mode === 'ff') {
+    inp.maxLength=3; inp.placeholder='MUS'; inp.className='splash-input';
+    document.getElementById('splashLabel').textContent='Dein Kürzel (3 Grossbuchstaben)';
+  } else {
+    inp.maxLength=40; inp.placeholder='Vorname Name'; inp.className='splash-input guest';
+    document.getElementById('splashLabel').textContent='Dein Name';
+  }
+  document.getElementById('splashError').textContent='';
+  splash.style.display = 'flex';
+  inp.focus();
+}
+
+function myName() { return localStorage.getItem('chilbi_name') || ''; }
+
+function displayName(kuerzel) {
+  const isGuest = KUERZEL[kuerzel] && KUERZEL[kuerzel].startsWith('G: ');
+  if (!showNames) return isGuest ? 'G: ' + kuerzel : kuerzel;
+  return KUERZEL[kuerzel] || kuerzel;
+}
+
+function toggleNameDisplay(checked) {
+  showNames = checked;
+  if (!myShiftsMode) rebuildActivePanel();
+  else buildMyShiftsPanel();
+}
+
+function toggleLabelDisplay(checked) {
+  localStorage.setItem('chilbi_showLabels', checked);
+  if (!myShiftsMode) rebuildActivePanel();
+}
+
+window.addEventListener('DOMContentLoaded', async () => {
+  const saved = localStorage.getItem('chilbi_name');
+  const savedLabel = localStorage.getItem('chilbi_showLabels');
+  { const lt = document.getElementById('labelToggle'); if(lt) lt.checked = (savedLabel === null) ? true : (savedLabel !== 'false'); }
+  const mode  = localStorage.getItem('chilbi_mode') || 'ff';
+  if (saved) {
+    document.getElementById('nameDisplay').textContent = saved;
+    document.getElementById('splash').style.display = 'none';
+    splashMode = mode;
+  } else {
+    splashSelect('ff');
+    document.getElementById('splashInput').focus();
+  }
+  document.getElementById('popupOverlay').addEventListener('click', e => {
+    if (e.target === document.getElementById('popupOverlay')) closePopup();
+  });
+  await loadData();
+  scheduleRefresh();
+});
+
+const AUTO_REFRESH = 20 * 60 * 1000;
+let refreshTimer = null;
+let myShiftsMode = false;
+
+function scheduleRefresh() {
+  if (refreshTimer) clearTimeout(refreshTimer);
+  refreshTimer = setTimeout(async () => { await silentRefresh(); scheduleRefresh(); }, AUTO_REFRESH);
+}
+
+async function manualRefresh() {
+  const btn = document.getElementById('btnRefresh');
+  btn.classList.add('spinning');
+  await silentRefresh();
+  btn.classList.remove('spinning');
+  scheduleRefresh();
+}
+
+async function silentRefresh() {
+  const savedDay = activeDay;
+  const savedScroll = document.querySelector('.day-panel.active .timeline-wrap')?.scrollLeft || 0;
+  try {
+    const [configRows, signupRows, kuerzelRows, tageRows] = await Promise.all([
+      fetchSheet('Konfiguration'), fetchSheet('Anmeldungen'), fetchKuerzelSheet(), fetchSheet('Tage')
+    ]);
+    CONFIG = configRows.filter(r => r.ID || r['ID']).map(r => {
+      r.Tag = r.ID || r.Tag || '';
+      r.MaxPersonen = r['Max Personen'] || r.MaxPersonen || '1';
+      r.Informationen = r.Informationen || '';
+      r.Geschlossen = String(r.Geschlossen||'0') === '1';
+      return r;
+    });
+    SIGNUPS = signupRows.filter(r => r.Name && (r.ID||r.Tag)).map(r => ({
+      Tag: r.ID || r.Tag, Name: r.Name, Schicht: r.Schicht, Aufgabe: r.Aufgabe
+    }));
+    KUERZEL = {};
+    (kuerzelRows||[]).forEach(r => {
+      const k = (r['Kürzel']||r['Kuerzel']||r.Kürzel||r.Kuerzel||'').trim();
+      const vorname = (r['Vorname']||r.Vorname||'').trim();
+      const nachname = (r['Name']||r.Name||r['Nachname']||r.Nachname||'').trim();
+      const name = [vorname, nachname].filter(Boolean).join(' ');
+      if (k && name) KUERZEL[k] = name;
+    });
+    try {
+      const gastRows2 = await fetchKuerzelSheetGast();
+      (gastRows2||[]).forEach(r => {
+        const k = (r['Kürzel']||r['Kuerzel']||r.Kürzel||r.Kuerzel||'').trim();
+        const vorname = (r['Vorname']||r.Vorname||'').trim();
+        const nachname = (r['Name']||r.Name||r['Nachname']||r.Nachname||'').trim();
+        const name = [vorname, nachname].filter(Boolean).join(' ');
+        if (k && name) KUERZEL[k] = 'G: ' + name;
+      });
+    } catch(e) {}
+    TAGE = {};
+    (tageRows||[]).forEach(r => {
+      let datum = (r['Datum']||r.Datum||'').trim();
+      const typ = (r['Typ']||r.Typ||'Chilbi').trim();
+      // Normalisiere Date(2026,7,12) → 12.08.2026
+      const dm = datum.match(/Date\((\d+),(\d+),(\d+)\)/);
+      if (dm) {
+        const d=parseInt(dm[3]), m=parseInt(dm[2])+1, y=parseInt(dm[1]);
+        datum = String(d).padStart(2,'0')+'.'+String(m).padStart(2,'0')+'.'+y;
+      }
+      if (datum) TAGE[datum] = typ;
+    });
+    buildUI();
+    activeDay = Math.min(savedDay, DAYS.length - 1);
+    document.querySelectorAll('.tab-btn').forEach((b,j) => b.classList.toggle('active', j===activeDay));
+    document.querySelectorAll('.day-panel').forEach((p,j) => p.classList.toggle('active', j===activeDay));
+    rebuildActivePanel();
+    requestAnimationFrame(() => {
+      const tw = document.querySelector('.day-panel.active .timeline-wrap');
+      if (tw) tw.scrollLeft = savedScroll;
+    });
+  } catch(e) { showToast('Fehler beim Laden', 'error'); }
+}
+
+function toggleMyShifts() {
+  myShiftsMode = !myShiftsMode;
+  document.getElementById('btnMyShifts').classList.toggle('active', myShiftsMode);
+  const panel = document.getElementById('myShiftsPanel');
+  const tabsWrap = document.getElementById('tabsWrap');
+  const dayPanels = document.getElementById('dayPanels');
+  if (myShiftsMode) {
+    panel.classList.add('active');
+    tabsWrap.style.display = 'none';
+    dayPanels.style.display = 'none';
+    document.getElementById('btnICS').style.display = '';
+    buildMyShiftsPanel();
+  } else {
+    panel.classList.remove('active');
+    tabsWrap.style.display = '';
+    dayPanels.style.display = '';
+    document.getElementById('btnICS').style.display = 'none';
+  }
+}
+
+function buildMyShiftsPanel() {
+  const name = myName();
+  const panel = document.getElementById('myShiftsPanel');
+  const mine = SIGNUPS.filter(s => s.Name === name);
+  if (!mine.length) {
+    panel.innerHTML = '<div class="my-shifts-empty">Du bist noch in keiner Schicht eingetragen.</div>';
+    return;
+  }
+  const byDay = {}, dayOrder = [];
+  mine.forEach(s => {
+    const cfg = CONFIG.find(r => r.Tag === s.Tag);
+    if (!cfg) return;
+    const lbl = cfg.Datum || cfg.TagLabel || '';
+    if (!byDay[lbl]) { byDay[lbl] = []; dayOrder.push(lbl); }
+    byDay[lbl].push({s, cfg});
+  });
+  const seen = new Set();
+  let html = '';
+  dayOrder.filter(d => seen.has(d) ? false : seen.add(d)).forEach(lbl => {
+    html += `<div class="ms-day-block"><div class="ms-day-title">${esc(buildDayHeaderText(lbl))}</div>`;
+    byDay[lbl].forEach(({s, cfg}) => {
+      html += `<div class="ms-card" onclick="openPopup('${esc(cfg.Tag)}','${esc(cfg.Schicht)}','${esc(cfg.Aufgabe)}','${esc(cfg.Von)}','${esc(cfg.Bis)}',${parseInt(cfg.MaxPersonen)||1},'${esc(cfg.Informationen||'')}')">
+        <div class="ms-card-schicht">${esc(cfg.Schicht)}</div>
+        <div class="ms-card-name">${esc(cfg.Aufgabe)}</div>
+        <div class="ms-card-time">${esc(cfg.Von)} – ${esc(cfg.Bis)}</div>
+        ${cfg.Informationen ? `<div class="ms-card-treff">${esc(cfg.Informationen)}</div>` : ''}
+      </div>`;
+    });
+    html += '</div>';
+  });
+  panel.innerHTML = html;
+}
+
+function downloadICS() {
+  const name = myName();
+  const mine = SIGNUPS.filter(s => s.Name === name);
+  if (!mine.length) { showToast('Keine Schichten eingetragen.', 'error'); return; }
+
+  let ics = ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Chilbi Herrliberg//Schichtplan//DE','CALSCALE:GREGORIAN'];
+
+  mine.forEach(s => {
+    const cfg = CONFIG.find(r => r.Tag === s.Tag);
+    if (!cfg) return;
+    const lbl = cfg.Datum || cfg.TagLabel || '';
+    // Datum parsen
+    const m = lbl.match(/(\d{1,2})\.(\d{1,2})\.(\d{2,4})?/);
+    if (!m) return;
+    const day=String(parseInt(m[1])).padStart(2,'0');
+    const month=String(parseInt(m[2])).padStart(2,'0');
+    const yr=m[3]?(m[3].length===2?'20'+m[3]:m[3]):String(new Date().getFullYear());
+    const dateStr=yr+month+day;
+    // Start: Schichtbeginn -10 Min
+    function t2m(t){const[h,mm]=(t||'00:00').split(':').map(Number);return h*60+(mm||0);}
+    function m2s(mins){const norm=((mins%1440)+1440)%1440;return String(Math.floor(norm/60)).padStart(2,'0')+String(norm%60).padStart(2,'0')+'00';}
+    const vonH=m2s(t2m(cfg.Von)-10);
+    const bisH=m2s(t2m(cfg.Bis));
+    const uid=`${s.Tag}-${name.replace(/\s/g,'')}-${Date.now()}@chilbi`;
+    const desc=(cfg.Informationen||'').replace(/,/g,'\\,');
+    ics.push('BEGIN:VEVENT');
+    ics.push(`UID:${uid}`);
+    ics.push(`DTSTART:${dateStr}T${vonH}`);
+    ics.push(`DTEND:${dateStr}T${bisH}`);
+    ics.push(`SUMMARY:Chilbi Herrliberg - ${cfg.Aufgabe}`);
+    if (desc) ics.push(`DESCRIPTION:${desc}`);
+    ics.push('END:VEVENT');
+  });
+  ics.push('END:VCALENDAR');
+
+  const blob = new Blob([ics.join('\r\n')], {type:'text/calendar;charset=utf-8'});
+  const a = Object.assign(document.createElement('a'), {href:URL.createObjectURL(blob), download:`Chilbi_Schichtplan_${name}.ics`});
+  a.click(); URL.revokeObjectURL(a.href);
+  showToast('Kalender heruntergeladen!', 'success');
+}
+
+function buildDayHeaderText(label) {
+  const WEEKDAYS = ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'];
+  const m = label.match(/(\d{1,2})\.(\d{1,2})\.(\d{2,4})?/);
+  if (m) {
+    const day=parseInt(m[1]), month=parseInt(m[2])-1;
+    const yr=m[3]?(m[3].length===2?2000+parseInt(m[3]):parseInt(m[3])):new Date().getFullYear();
+    const date=new Date(yr,month,day);
+    if (!isNaN(date.getTime())) return WEEKDAYS[date.getDay()]+', '+String(day).padStart(2,'0')+'.'+String(month+1).padStart(2,'0')+'.'+yr;
+  }
+  return label;
+}
+
+const SHEET_ID = '1GAxPj-6QtpkzVjNwww1L6ZERTJUje6pmsCBbtBzYq3Y';
+const KUERZEL_SHEET_ID = '1bK6IuVpAdLyYc9_NPbJxFMkvCZ0fNvadJABBUM-Rc0M';
+const GVIZ = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json`;
+
+async function fetchKuerzelSheet() {
+  const url = `https://docs.google.com/spreadsheets/d/1bK6IuVpAdLyYc9_NPbJxFMkvCZ0fNvadJABBUM-Rc0M/gviz/tq?tqx=out:json&_=${Date.now()}`;
+  try {
+    const res = await fetch(url);
+    const text = await res.text();
+    const match = text.match(/google\.visualization\.Query\.setResponse\(([\s\S]*)\)/);
+    if (!match) return [];
+    const json = JSON.parse(match[1]);
+    const rows = json.table.rows || [];
+    const gvizLabels = json.table.cols.map(c => c.label ? c.label.trim() : '');
+    const hasLabels = gvizLabels.some(l => l !== '');
+    let headers, dataRows;
+    if (hasLabels) { headers = gvizLabels; dataRows = rows; }
+    else { headers = rows[0]?.c.map(c => c ? String(c.v||'').trim() : '') || []; dataRows = rows.slice(1); }
+    return dataRows.filter(row => row && row.c && row.c[0] && row.c[0].v != null).map(row => {
+      const obj = {};
+      headers.forEach((col, i) => {
+        const cell = row.c ? row.c[i] : null;
+        obj[col] = cell ? ((cell.f != null && String(cell.f).match(/\d{1,2}\.\d{1,2}/)) ? String(cell.f).trim() : (cell.v != null ? String(cell.v).trim() : '')) : '';
+      });
+      return obj;
+    });
+  } catch(e) { console.warn('Kürzel-Sheet nicht ladbar:', e); return []; }
+}
+
+async function fetchSheet(sheetName) {
+  const url = `${GVIZ}&sheet=${encodeURIComponent(sheetName)}&_=${Date.now()}`;
+  const res = await fetch(url);
+  const text = await res.text();
+  const match = text.match(/google\.visualization\.Query\.setResponse\(([\s\S]*)\)/);
+  if (!match) return [];
+  const json = JSON.parse(match[1]);
+  const rows = json.table.rows || [];
+  // Prüfe ob gviz echte Labels hat
+  const gvizLabels = json.table.cols.map(c => c.label ? c.label.trim() : '');
+  const hasLabels = gvizLabels.some(l => l !== '');
+  let headers, dataRows;
+  if (hasLabels) {
+    // gviz gibt echte Header zurück
+    headers = gvizLabels;
+    dataRows = rows;
+  } else {
+    // Erste Zeile als Header verwenden
+    const firstRow = rows[0];
+    headers = firstRow ? firstRow.c.map(c => c ? String(c.v||'').trim() : '') : [];
+    dataRows = rows.slice(1);
+  }
+  return dataRows.filter(row => row && row.c && row.c.some(c => c && c.v != null)).map(row => {
+    const obj = {};
+    headers.forEach((col, i) => {
+      const cell = row.c ? row.c[i] : null;
+      obj[col] = cell ? (cell.v != null ? String(cell.v).trim() : (cell.f != null ? String(cell.f).trim() : '')) : '';
+    });
+    return obj;
+  });
+}
+
+async function fetchKuerzelSheet() {
+  try {
+    const url = `https://docs.google.com/spreadsheets/d/1bK6IuVpAdLyYc9_NPbJxFMkvCZ0fNvadJABBUM-Rc0M/gviz/tq?tqx=out:json&_=${Date.now()}`;
+    const res = await fetch(url);
+    const text = await res.text();
+    const match = text.match(/google\.visualization\.Query\.setResponse\(([\s\S]*)\)/);
+    if (!match) return [];
+    const json = JSON.parse(match[1]);
+    const rows = json.table.rows || [];
+    const gvizLabels = json.table.cols.map(c => c.label ? c.label.trim() : '');
+    const hasLabels = gvizLabels.some(l => l !== '');
+    let headers, dataRows;
+    if (hasLabels) { headers = gvizLabels; dataRows = rows; }
+    else { headers = rows[0]?.c.map(c => c ? String(c.v||'').trim() : '') || []; dataRows = rows.slice(1); }
+    return dataRows.filter(row => row && row.c && row.c[0] && row.c[0].v != null).map(row => {
+      const obj = {};
+      headers.forEach((col, i) => {
+        const cell = row.c ? row.c[i] : null;
+        obj[col] = cell ? ((cell.f != null && String(cell.f).match(/\d{1,2}\.\d{1,2}/)) ? String(cell.f).trim() : (cell.v != null ? String(cell.v).trim() : '')) : '';
+      });
+      return obj;
+    });
+  } catch(e) { console.warn('Kürzel-Sheet Ladefehler:', e); return []; }
+}
+
+async function fetchKuerzelSheetGast() {
+  try {
+    const url = `https://docs.google.com/spreadsheets/d/${KUERZEL_SHEET_ID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent('Gast')}&_=${Date.now()}`;
+    const res = await fetch(url);
+    const text = await res.text();
+    const match = text.match(/google\.visualization\.Query\.setResponse\(([\s\S]*)\)/);
+    if (!match) return [];
+    const json = JSON.parse(match[1]);
+    const rows = json.table.rows || [];
+    const gvizLabels = json.table.cols.map(c => c.label ? c.label.trim() : '');
+    const hasLabels = gvizLabels.some(l => l !== '');
+    let headers, dataRows;
+    if (hasLabels) { headers = gvizLabels; dataRows = rows; }
+    else { headers = rows[0]?.c.map(c => c ? String(c.v||'').trim() : '') || []; dataRows = rows.slice(1); }
+    return dataRows.filter(row => row && row.c && row.c[0] && row.c[0].v != null).map(row => {
+      const obj = {};
+      headers.forEach((col, i) => {
+        const cell = row.c ? row.c[i] : null;
+        obj[col] = cell ? (cell.v != null ? String(cell.v).trim() : '') : '';
+      });
+      return obj;
+    });
+  } catch(e) { return []; }
+}
+
+async function loadData() {
+  const el = document.getElementById('loadingState');
+  try {
+    const [configRows, signupRows, kuerzelRows, tageRows] = await Promise.all([
+      fetchSheet('Konfiguration'),
+      fetchSheet('Anmeldungen'),
+      fetchKuerzelSheet(),
+      fetchSheet('Tage')
+    ]);
+    CONFIG  = configRows.filter(r => r.ID || r['ID']).map(r => {
+      r.Tag         = r.ID || r.Tag || '';
+      r.MaxPersonen = r['Max Personen'] || r.MaxPersonen || '1';
+      r.Informationen = r.Informationen || '';
+      r.Geschlossen = String(r.Geschlossen||'0') === '1';
+      return r;
+    });
+    SIGNUPS = signupRows.filter(r => r.Name && (r.ID||r.Tag)).map(r => ({
+      Tag: r.ID || r.Tag, Name: r.Name, Schicht: r.Schicht, Aufgabe: r.Aufgabe
+    }));
+    KUERZEL = {};
+    (kuerzelRows||[]).forEach(r => {
+      const k = (r['Kürzel']||r['Kuerzel']||r.Kürzel||r.Kuerzel||'').trim();
+      const vorname = (r['Vorname']||r.Vorname||'').trim();
+      const nachname = (r['Name']||r.Name||r['Nachname']||r.Nachname||'').trim();
+      const name = [vorname, nachname].filter(Boolean).join(' ');
+      if (k && name) KUERZEL[k] = name;
+    });
+    try {
+      const gastRows2 = await fetchKuerzelSheetGast();
+      (gastRows2||[]).forEach(r => {
+        const k = (r['Kürzel']||r['Kuerzel']||r.Kürzel||r.Kuerzel||'').trim();
+        const vorname = (r['Vorname']||r.Vorname||'').trim();
+        const nachname = (r['Name']||r.Name||r['Nachname']||r.Nachname||'').trim();
+        const name = [vorname, nachname].filter(Boolean).join(' ');
+        if (k && name) KUERZEL[k] = 'G: ' + name;
+      });
+    } catch(e) {}
+    TAGE = {};
+    (tageRows||[]).forEach(r => {
+      let datum = (r['Datum']||r.Datum||'').trim();
+      const typ = (r['Typ']||r.Typ||'Chilbi').trim();
+      // Normalisiere Date(2026,7,12) → 12.08.2026
+      const dm = datum.match(/Date\((\d+),(\d+),(\d+)\)/);
+      if (dm) {
+        const d=parseInt(dm[3]), m=parseInt(dm[2])+1, y=parseInt(dm[1]);
+        datum = String(d).padStart(2,'0')+'.'+String(m).padStart(2,'0')+'.'+y;
+      }
+      if (datum) TAGE[datum] = typ;
+    });
+    buildUI();
+  } catch(e) {
+    if (el) el.innerHTML = `<div style="color:var(--red);padding:2rem;text-align:center">
+      ⚠ Fehler beim Laden:<br><code style="font-size:.8rem">${e.message}</code><br><br>
+      <button class="btn btn-red" onclick="loadData()">↺ Nochmals versuchen</button>
+    </div>`;
+  }
+}
+
+// ── BUILD UI ──────────────────────────────────────────────────
+function buildUI() {
+  const el = document.getElementById('loadingState');
+  if (el) el.remove();
+  // Gruppiere nach TagLabel - ein Tab pro Datum
+  const labelMap = {}, labelOrder = [];
+  CONFIG.forEach(row => {
+    const lbl = row.Datum || row.TagLabel || '';
+    if (!lbl || !lbl.match(/\d/)) return; // Zeilen ohne Datum ignorieren
+    if (!labelMap[lbl]) {
+      labelMap[lbl] = { id: lbl, label: lbl, type: TAGE[lbl] || '', rows: [] };
+      labelOrder.push(lbl);
+    }
+    labelMap[lbl].rows.push(row);
+  });
+  DAYS = labelOrder.map(lbl => labelMap[lbl]);
+
+  if (!DAYS.length) {
+    document.getElementById('dayPanels').innerHTML = `<div class="empty">Noch keine Schichten erfasst. (CONFIG: ${CONFIG.length} Zeilen geladen)</div>`;
+    return;
+  }
+
+  document.getElementById('tabBar').innerHTML = DAYS.map((d, i) => `
+    <button class="tab-btn ${i===0?'active':''}" onclick="switchDay(${i})">
+      ${esc(tabLabel(d.label))}
+      ${d.type ? `<span class="tab-type" style="${d.type.toLowerCase().includes('chilbi')?'background:var(--red-light);color:var(--red);border-color:var(--red);':'background:#e8f0fe;color:#1a73e8;border-color:#1a73e8;'} font-size:10px;padding:1px 5px;margin-left:5px;font-weight:700;letter-spacing:.04em;border:1px solid;display:inline-block;vertical-align:middle">${esc(d.type)}</span>` : ""}
+    </button>
+  `).join('');
+
+  document.getElementById('dayPanels').innerHTML = DAYS.map((d, i) => `
+    <div class="day-panel ${i===0?'active':''}" id="panel-${i}">
+      ${buildTimeline(d)}
+    </div>
+  `).join('');
+}
+
+// dayType/typeName nicht mehr verwendet - Typ kommt direkt aus TAGE-Sheet
+
+// Tabs: nur Wochentag anzeigen (kein Datum)
+const WEEKDAYS = ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'];
+function tabLabel(label) {
+  // Hat Label bereits einen Wochentag?
+  const existing = WEEKDAYS.find(w => label.includes(w));
+  if (existing) return existing;
+  // Datum parsen und Wochentag zurückgeben
+  const m = label.match(/(\d{1,2})\.(\d{1,2})\.(\d{4})?/);
+  if (m) {
+    const d = new Date(m[3]?parseInt(m[3]):new Date().getFullYear(), parseInt(m[2])-1, parseInt(m[1]));
+    if (!isNaN(d.getTime())) return WEEKDAYS[d.getDay()];
+  }
+  return label; // Fallback
+}
+
+// Tagesheader: Wochentag gross + Datum darunter (kein Duplikat)
+function buildDayHeader(label) {
+  const m = label.match(/(\d{1,2})\.(\d{1,2})\.(\d{4})?/);
+  if (m) {
+    const day   = parseInt(m[1]);
+    const month = parseInt(m[2]) - 1;
+    const year  = m[3] ? parseInt(m[3]) : new Date().getFullYear();
+    const date  = new Date(year, month, day);
+    if (!isNaN(date.getTime())) {
+      const wd  = WEEKDAYS[date.getDay()];
+      const dateStr = `${String(day).padStart(2,'0')}.${String(month+1).padStart(2,'0')}.${year}`;
+      const existing = WEEKDAYS.find(w => label.includes(w));
+      const titleStr = existing ? label : `${wd}, ${dateStr}`;
+      return `<div class="day-title">${esc(titleStr)}</div>`;
+    }
+  }
+  return `<div class="day-title">${esc(label)}</div>`;
+}
+
+function switchDay(i) {
+  activeDay = i;
+  document.querySelectorAll('.tab-btn').forEach((b,j) => b.classList.toggle('active', i===j));
+  document.querySelectorAll('.day-panel').forEach((p,j) => p.classList.toggle('active', i===j));
+}
+
+// ── TIMELINE ─────────────────────────────────────────────────
+const PX_PER_MIN = 2; // 2px pro Minute = 1h→120px
+
+function buildTimeline(day) {
+  const tagLabel = day.label;
+  const rows = day.rows || [];
+  if (!rows.length) return '<div class="empty">Keine Schichten geplant.</div>';
+
+  const allTimes = rows.flatMap(r => { const v = parseTime(r.Von); return [v, parseTime(r.Bis, v)]; });
+  const minT = Math.min(...allTimes);
+  const maxT = Math.max(...allTimes);
+  const totalPx = (maxT - minT) * PX_PER_MIN;
+
+  const schichtMap = {};
+  rows.forEach(r => {
+    if (!schichtMap[r.Schicht]) schichtMap[r.Schicht] = [];
+    schichtMap[r.Schicht].push(r);
+  });
+
+  // Ruler ticks
+  const startH = Math.floor(minT / 60);
+  const endH   = Math.ceil(maxT / 60);
+  let ticks = '';
+  for (let h = startH; h <= endH; h++) {
+    const px = (h * 60 - minT) * PX_PER_MIN;
+    ticks += `<div class="hour-tick" style="left:${px}px">${(h%24)}:00</div>`;
+  }
+
+  let html = `<div class="tl-ruler">
+    <div class="tl-ruler-spacer"></div>
+    <div class="tl-ruler-ticks" style="width:${totalPx}px">${ticks}</div>
+  </div>`;
+
+  Object.entries(schichtMap).forEach(([sch, tasks]) => {
+    html += `<div class="tl-schicht">
+      <div class="tl-schicht-label">${esc(sch)}</div>
+      <div style="flex:0 0 auto;width:${totalPx}px;border-bottom:1px solid var(--gray-mid);"></div>
+    </div>`;
+
+    tasks.forEach(r => {
+      const vonM   = parseTime(r.Von);
+      const bisM   = parseTime(r.Bis, vonM);
+      const leftPx = (vonM - minT) * PX_PER_MIN;
+      const widePx = (bisM - vonM) * PX_PER_MIN;
+      const color  = r.Farbe || '#CC0000';
+      const rowId  = r.Tag;
+      const taken  = signupsFor(rowId, sch, r.Aufgabe);
+      const max    = parseInt(r.MaxPersonen) || 1;
+      const isFull = taken.length >= max;
+      const isMine = !!myName() && taken.some(s => s.Name === myName());
+      const hasOther = taken.length > 0 && !isMine;
+
+      let cls = '', blockColor = color;
+      const isClosed = !!r.Geschlossen;
+      const useColor = showColors();
+      if      (isClosed) { cls = 'voll'; blockColor = '#888'; }
+      else if (isMine)   { cls = 'mine'; blockColor = '#1a1a1a'; }
+      else if (isFull)   { cls = 'voll'; blockColor = '#aaa'; }
+      else if (hasOther) { cls = 'andere'; blockColor = useColor ? color : '#e0e0e0'; }
+      else               { blockColor = useColor ? color : '#f0f0f0'; }
+
+      const fgColor = (cls==='mine'||cls==='voll') ? '#ffffff' : (useColor ? textColor(blockColor) : '#1a1a1a');
+      const dots = Array.from({length: max}, (_,i) =>
+        `<div class="slot-dot${i < taken.length?' taken':''}">${i < taken.length ? '✓' : ''}</div>`
+      ).join('');
+
+      // Namen inline rechts vom Block – einheitliche Chip-Grösse
+      const nameChip = s => `<span class="tl-chip tl-chip--name ${s.Name===myName()?'is-mine':''}">${esc(displayName(s.Name))}</span>`;
+      const lockChip = '<span class="tl-chip tl-chip--locked"><span class="lock-ico">🔒</span>Gesperrt</span>';
+      const nameStr = (isClosed && taken.length > 0)
+        ? taken.map(nameChip).join('') + lockChip
+        : isClosed
+        ? lockChip
+        : taken.map(nameChip).join('');
+
+      html += `<div class="tl-row">
+        <div class="tl-label">${showLabels()?esc(r.Aufgabe):''}</div>
+        <div class="tl-track" style="width:${totalPx}px">
+          <div class="task-block ${cls}"
+            style="left:${leftPx}px;width:${widePx}px;background:${blockColor};color:${fgColor};${!useColor&&cls!=='mine'&&cls!=='voll'?'border:2px solid #333;':''}"
+            onclick="if(!${isClosed?'true':'false'})openPopup('${esc(rowId)}','${esc(sch)}','${esc(r.Aufgabe)}','${esc(r.Von)}','${esc(r.Bis)}',${max},'${esc(r.Informationen||'')}');"
+            title="${esc(r.Aufgabe)} | ${esc(r.Von)}–${esc(r.Bis)}">
+            <span class="block-time">${esc(r.Von)}–${esc(r.Bis)}${!showLabels()?` <strong style="margin-left:4px">${esc(r.Aufgabe)}</strong>`:''}</span>
+            <div class="block-slots">${dots}</div>
+          </div>
+          ${(taken.length || isClosed) ? `<div style="position:absolute;left:${leftPx+widePx+6}px;top:50%;transform:translateY(-50%);display:flex;gap:4px;align-items:center;pointer-events:none;">${nameStr}</div>` : ''}
+        </div>
+      </div>`;
+    });
+  });
+
+  return `
+    <div class="day-header">${buildDayHeader(tagLabel)}</div>
+    <div class="timeline-wrap">
+      <div style="display:inline-block;min-width:100%">${html}</div>
+    </div>`;
+}
+
+// ── POPUP ─────────────────────────────────────────────────────
+function openPopup(tag, schicht, aufgabe, von, bis, max, info) {
+  const name = myName();
+  currentTarget = { tag, schicht, aufgabe, von, bis, max };
+  const taken  = signupsFor(tag, schicht, aufgabe);
+  const isFull = taken.length >= max;
+
+  document.getElementById('popupTitle').textContent = 'Schicht eintragen';
+  document.getElementById('popupMeta').textContent  = `${tag} · ${schicht}`;
+
+  const fullEl   = document.getElementById('popupFull');
+  const normalEl = document.getElementById('popupNormal');
+  if (isFull) {
+    fullEl.style.display = ''; normalEl.style.display = 'none';
+    document.getElementById('popupOverlay').classList.add('open');
+    return;
+  }
+  fullEl.style.display = 'none'; normalEl.style.display = '';
+
+  document.getElementById('popupInfo').innerHTML = `
+    <div class="pi-row"><span class="pi-label">Aufgabe</span><span class="pi-value">${esc(aufgabe)}</span></div>
+    <div class="pi-row"><span class="pi-label">Zeit</span><span class="pi-value">${esc(von)} – ${esc(bis)}</span></div>
+    <div class="pi-row"><span class="pi-label">Belegt</span><span class="pi-value">${taken.length} / ${max}</span></div>
+    ${taken.length ? `<div class="pi-row"><span class="pi-label">Eingetragen</span><span class="pi-value">${taken.map(s=>esc(s.Name)).join(', ')}</span></div>` : ''}
+  `;
+
+  const treffEl = document.getElementById('popupTreffpunkt');
+  if (info && info.trim()) {
+    treffEl.style.display = '';
+    document.getElementById('popupTreffpunktText').textContent = info;
+  } else {
+    treffEl.style.display = 'none';
+  }
+
+  const nameDisplay = document.getElementById('popupNameDisplay');
+  const nameHint    = document.getElementById('popupNameHint');
+  const btn         = document.getElementById('btnSign');
+  if (name) {
+    nameDisplay.textContent = name;
+    nameHint.style.display  = 'none';
+    btn.disabled = false;
+  } else {
+    nameDisplay.textContent = '–';
+    nameHint.style.display  = '';
+    btn.disabled = true;
+  }
+  btn.textContent = 'Eintragen';
+  document.getElementById('popupOverlay').classList.add('open');
+}
+
+function closePopup() {
+  document.getElementById('popupOverlay').classList.remove('open');
+  currentTarget = null;
+}
+
+async function doSign() {
+  const name = myName();
+  if (!name) { showToast('Bitte zuerst Namen eingeben.', 'error'); closePopup(); return; }
+  const { tag, schicht, aufgabe } = currentTarget;
+  if (signupsFor(tag, schicht, aufgabe).some(s => s.Name === name)) {
+    closePopup(); document.getElementById('alreadyOverlay').style.display='flex'; return;
+  }
+  const btn = document.getElementById('btnSign');
+  btn.disabled = true; btn.textContent = 'Speichert…';
+  try {
+    // Content-Type text/plain umgeht CORS preflight bei Apps Script
+    await fetch(SCRIPT_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify({ action: 'signup', name, tag, schicht, aufgabe })
+    });
+    // Optimistisch lokal hinzufügen
+    SIGNUPS.push({ Tag: tag, Name: name, Schicht: schicht, Aufgabe: aufgabe });
+    closePopup();
+    showToast('✓ Eingetragen: ' + name, 'success');
+    rebuildActivePanel();
+    // Nach 5s neu laden (Sheet braucht Zeit zum Speichern)
+    setTimeout(async () => {
+      const savedDay = activeDay;
+      const savedScroll = document.querySelector('.day-panel.active .timeline-wrap')?.scrollLeft || 0;
+      await silentRefresh();
+      requestAnimationFrame(() => {
+        const tw = document.querySelector('.day-panel.active .timeline-wrap');
+        if (tw) tw.scrollLeft = savedScroll;
+      });
+    }, 5000);
+  } catch(e) {
+    btn.disabled = false; btn.textContent = 'In diese Schicht eintragen';
+    showToast('Fehler: ' + e.message, 'error');
+  }
+}
+
+function rebuildActivePanel() {
+  const d = DAYS[activeDay];
+  if (d) document.getElementById(`panel-${activeDay}`).innerHTML = buildTimeline(d);
+}
+
+// ── HELPERS ───────────────────────────────────────────────────
+function parseTime(t, vonMinutes) {
+  const [h, m] = String(t).split(':').map(Number);
+  let mins = h * 60 + (m || 0);
+  if (vonMinutes !== undefined && mins <= vonMinutes && mins < 720) mins += 24 * 60;
+  return mins;
+}
+function signupsFor(tag, schicht, aufgabe) {
+  // Tag ist die eindeutige ID (A7, Sa1 etc.) - reicht zum Filtern
+  return SIGNUPS.filter(s => String(s.Tag) === String(tag));
+}
+// myName() defined above in boot section
+function esc(s) { return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function showToast(msg, type='') {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className='toast'+(type?' '+type:''); t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 3200);
+}
+</script>
+</body>
+</html>
