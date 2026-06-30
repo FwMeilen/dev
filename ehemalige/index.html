@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ehemaligen-Treffen – Chilbi Herrliberg Cl1.064-dev</title>
+<title>Ehemaligen-Treffen – Chilbi Herrliberg Cl1.065-dev</title>
 <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
@@ -89,13 +89,15 @@
     <div class="screen" id="scr-danke">
       <div class="ok-ico">🎉</div>
       <h2 style="text-align:center" id="danke-title">Danke für die Anmeldung!</h2>
-      <p style="text-align:center">Dein Gutschein für ein Getränk nach Wahl:</p>
+      <p style="text-align:center">Bitte lade Deinen Getränkegutschein herunter oder lass ihn dir zumailen und drucke ihn aus. So können wir Dich schnellstmöglich vor Ort bedienen.</p>
       <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px;">
-        <button class="btn btn-yes" style="margin-top:0;flex:1 1 150px;width:auto;" onclick="downloadGutschein()">⬇ Gutschein herunterladen</button>
-        <button class="btn btn-red" id="btn-gut-mail" style="margin-top:0;flex:1 1 150px;width:auto;" onclick="mailGutschein()">✉ Gutschein per Mail senden</button>
+        <button class="btn btn-ghost" style="margin-top:0;flex:1 1 150px;width:auto;" onclick="downloadGutschein()">Gutschein herunterladen</button>
+        <button class="btn btn-ghost" id="btn-gut-mail" style="margin-top:0;flex:1 1 150px;width:auto;" onclick="mailGutschein()">Gutschein per Mail senden</button>
       </div>
       <div id="gut-hint" style="display:none;text-align:center;color:var(--green);font-size:13px;margin-top:8px;"></div>
-      <button class="btn btn-ghost" onclick="downloadICS()">📅 In meinen Kalender eintragen</button>
+      <p style="text-align:center;margin-top:18px;">Wir freuen uns auf Dich!</p>
+      <p style="text-align:center;margin-top:18px;">Gerne kannst Du Dir auch einen Kalendereintrag für das Treffen machen:</p>
+      <button class="btn btn-ghost" onclick="downloadICS()">Kalendereintrag Ehemaligentreffen</button>
     </div>
 
     <!-- ABSAGE -->
@@ -129,7 +131,7 @@
     </div>
 
   </div>
-  <div class="foot">© Stützpunktfeuerwehr Meilen / LOL &nbsp;·&nbsp; Chilbi Herrliberg &nbsp;·&nbsp; Cl1.064-dev</div>
+  <div class="foot">© Stützpunktfeuerwehr Meilen / LOL &nbsp;·&nbsp; Chilbi Herrliberg &nbsp;·&nbsp; Cl1.065-dev</div>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -204,11 +206,11 @@ async function mailGutschein(){
     const doc = await buildGutscheinDoc(GUT.vorname, GUT.name);
     const b64 = doc.output('datauristring').split(',')[1];
     await post({ action:'gutscheinMail', vorname:GUT.vorname, name:GUT.name, mail:GUT.mail, pdf:b64 });
-    btn.textContent='✓ Gutschein gesendet';
+    btn.textContent='Gutschein gesendet';
     const h=document.getElementById('gut-hint');
     h.textContent='Gutschein wurde an '+GUT.mail+' gesendet.'; h.style.display='block';
   }catch(e){
-    btn.disabled=false; btn.textContent='✉ Gutschein per Mail senden';
+    btn.disabled=false; btn.textContent='Gutschein per Mail senden';
     alert('Versand fehlgeschlagen: '+e.message);
   }
 }
@@ -265,7 +267,7 @@ function submitZusage(){
   GUT = { vorname, name, mail };
   document.getElementById('danke-title').textContent = `Danke für die Anmeldung, lieber ${vorname}!`;
   document.getElementById('btn-gut-mail').disabled = false;
-  document.getElementById('btn-gut-mail').textContent = '✉ Gutschein per Mail senden';
+  document.getElementById('btn-gut-mail').textContent = 'Gutschein per Mail senden';
   document.getElementById('gut-hint').style.display = 'none';
   show('scr-danke');
 }
