@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ehemaligen-Treffen – Chilbi Herrliberg Cl1.063-dev</title>
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --red:#CC0000;--red-dark:#990000;--black:#1a1a1a;
+    --gray-mid:#e0e0e0;--bg2:#f4f4f4;--bg3:#e8e8e8;
+    --text:#1a1a1a;--text2:#555;--text3:#888;--green:#2d6a1f;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Open Sans',Arial,sans-serif;background:var(--bg3);color:var(--text);min-height:100vh;font-size:15px;line-height:1.6;display:flex;flex-direction:column;align-items:center;padding:20px;}
+  .wrap{background:#fff;max-width:560px;width:100%;box-shadow:0 6px 30px rgba(0,0,0,.12);margin:auto;}
+  .head{background:var(--black);color:#fff;padding:18px 24px;display:flex;align-items:center;gap:12px;}
+  .head img{height:38px;}
+  .head .t{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;line-height:1.3;}
+  .head .t span{display:block;font-size:10px;font-weight:400;color:#999;text-transform:none;}
+  .body{padding:26px 24px;}
+  .screen{display:none;}
+  .screen.active{display:block;animation:fade .25s ease;}
+  @keyframes fade{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:none;}}
+  h2{font-size:18px;font-weight:700;margin-bottom:14px;color:var(--black);}
+  p{margin-bottom:14px;color:var(--text2);}
+  .highlight{background:var(--bg2);border-left:3px solid var(--red);padding:14px 16px;margin:18px 0;font-size:16px;}
+  .highlight strong{color:var(--black);font-size:18px;}
+  .btn{display:block;width:100%;border:none;padding:14px 16px;font-family:inherit;font-size:15px;font-weight:700;cursor:pointer;margin-top:12px;text-align:center;}
+  .btn-yes{background:var(--green);color:#fff;}
+  .btn-yes:hover{background:#245417;}
+  .btn-no{background:var(--bg2);color:var(--text2);border:1px solid var(--gray-mid);}
+  .btn-no:hover{background:var(--bg3);}
+  .btn-red{background:var(--red);color:#fff;}
+  .btn-red:hover{background:var(--red-dark);}
+  .btn-ghost{background:none;border:1px solid var(--gray-mid);color:var(--text2);}
+  .btn-ghost:hover{background:var(--bg2);}
+  .field{margin-bottom:12px;}
+  .field label{display:block;font-size:13px;font-weight:600;margin-bottom:4px;}
+  .field label .opt{font-weight:400;color:var(--text3);}
+  .field input{width:100%;height:42px;padding:0 12px;border:1px solid var(--gray-mid);font-family:inherit;font-size:15px;background:#fff;}
+  .field input:focus{outline:none;border-color:var(--red);}
+  .err{color:var(--red);font-size:13px;margin-top:-6px;margin-bottom:10px;display:none;}
+  .back{background:none;border:none;color:var(--text3);font-size:13px;cursor:pointer;margin-top:14px;text-decoration:underline;padding:0;}
+  .foot{font-size:11px;color:var(--text3);text-align:center;padding:14px;}
+  .ok-ico{font-size:40px;text-align:center;margin-bottom:6px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="head">
+    <img src="https://www.feuerwehr-meilen.ch/fileadmin/Public/Website/Templates/Images/Logo-FeuerwehrMeilen.png" alt="Feuerwehr Meilen">
+    <div class="t">Chilbi Herrliberg<span>Ehemaligen-Treffen</span></div>
+  </div>
+  <div class="body">
+
+    <!-- WILLKOMMEN -->
+    <div class="screen active" id="scr-welcome">
+      <p>Liebe ehemaligen FeuerwehrkameradInnen,<br>Liebe Feuerwehrfreunde aus Nah und Fern,</p>
+      <p>Wie in den letzten Jahren würden wir uns sehr freuen, Euch am</p>
+      <div class="highlight">
+        <strong>Sonntag, 16.08.26</strong><br>
+        zwischen <strong>14:00 und 16:00</strong> Uhr
+      </div>
+      <p>bei uns im Füürwehrbeizli der Chilbi Herrliberg willkommen zu heissen – einfach um uns wieder einmal zu sehen und Geschichten auszutauschen.</p>
+      <p>Gerne laden wir Euch zu dieser Zeit auf ein Getränk an unserem Stammtisch ein.</p>
+      <p style="margin-top:18px;font-weight:600;color:var(--black);">Euer Chilbi-OK</p>
+      <div style="height:22px;"></div>
+      <button class="btn btn-yes" onclick="show('scr-zusage')">Ja, ich komme gerne</button>
+      <button class="btn btn-no" onclick="show('scr-absage')">Nein, ich bin leider verhindert</button>
+    </div>
+
+    <!-- ZUSAGE FORMULAR -->
+    <div class="screen" id="scr-zusage">
+      <h2>Schön, dass Du kommst!</h2>
+      <p>Bitte trag Dich kurz ein, damit wir wissen, wer dabei ist.</p>
+      <div class="field"><label>Vorname</label><input id="z-vorname" type="text" autocomplete="given-name"></div>
+      <div class="field"><label>Name</label><input id="z-name" type="text" autocomplete="family-name"></div>
+      <div class="err" id="z-err">Bitte Vorname und Name ausfüllen.</div>
+      <div class="field"><label>E-Mail</label><input id="z-mail" type="email" autocomplete="email"></div>
+      <div class="field"><label>Telefon</label><input id="z-tel" type="tel" autocomplete="tel" placeholder="+41 79 123 45 67"></div>
+      <div class="err" id="z-tel-err">Bitte eine gültige Telefonnummer eingeben.</div>
+      <button class="btn btn-yes" onclick="submitZusage()">Anmelden</button>
+      <button class="back" onclick="show('scr-welcome')">← zurück</button>
+    </div>
+
+    <!-- ZUSAGE DANKE -->
+    <div class="screen" id="scr-danke">
+      <div class="ok-ico">🎉</div>
+      <h2 style="text-align:center" id="danke-title">Danke für die Anmeldung!</h2>
+      <p style="text-align:center">Wir freuen uns auf Dich!</p>
+      <button class="btn btn-red" onclick="downloadICS()">📅 In meinen Kalender eintragen</button>
+    </div>
+
+    <!-- ABSAGE -->
+    <div class="screen" id="scr-absage">
+      <h2>Schade!</h2>
+      <p>Wir würden uns aber natürlich freuen, wenn wir Dich und Deine Liebsten sonst an der Chilbi antreffen würden …</p>
+      <p style="margin-top:20px">Möchtest Du uns Deine Kontaktdaten dalassen, damit wir Dich erreichen können?</p>
+      <button class="btn btn-ghost" onclick="show('scr-absage-form')">Ja, Kontaktdaten angeben</button>
+      <button class="btn btn-no" onclick="showBye('nodata')">Nein danke</button>
+    </div>
+
+    <!-- ABSAGE KONTAKTFORMULAR -->
+    <div class="screen" id="scr-absage-form">
+      <h2>Deine Kontaktdaten</h2>
+      <p>Danke! So bleiben wir in Kontakt.</p>
+      <div class="field"><label>Vorname</label><input id="a-vorname" type="text" autocomplete="given-name"></div>
+      <div class="field"><label>Name</label><input id="a-name" type="text" autocomplete="family-name"></div>
+      <div class="err" id="a-err">Bitte Vorname und Name ausfüllen.</div>
+      <div class="field"><label>E-Mail</label><input id="a-mail" type="email" autocomplete="email"></div>
+      <div class="field"><label>Telefon</label><input id="a-tel" type="tel" autocomplete="tel" placeholder="+41 79 123 45 67"></div>
+      <div class="err" id="a-tel-err">Bitte eine gültige Telefonnummer eingeben.</div>
+      <button class="btn btn-red" onclick="submitAbsage()">Absenden</button>
+      <button class="back" onclick="show('scr-absage')">← zurück</button>
+    </div>
+
+    <!-- ABSAGE DANKE -->
+    <div class="screen" id="scr-bye">
+      <div class="ok-ico">👋</div>
+      <h2 style="text-align:center" id="bye-title">Bis bald!</h2>
+      <p style="text-align:center" id="bye-text">Vielleicht sieht man sich ja trotzdem an der Chilbi. Wir freuen uns!</p>
+    </div>
+
+  </div>
+  <div class="foot">© Stützpunktfeuerwehr Meilen / LOL &nbsp;·&nbsp; Chilbi Herrliberg &nbsp;·&nbsp; Cl1.063-dev</div>
+</div>
+
+<script>
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbztZ9C8RapYojQAb0U4fkY6xc_7JVsDMPsQEao4T1z_ObspHSeGB_X0ZONgqLANoyEbzQ/exec';
+
+function show(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function post(data){
+  // no-cors: Antwort ist opak, daher optimistisch weiter
+  return fetch(SCRIPT_URL, {method:'POST', mode:'no-cors', headers:{'Content-Type':'text/plain'}, body: JSON.stringify(data)});
+}
+
+// Telefonnummer normalisieren: CH schön als "+41 XX XXX XX XX",
+// international als "+<Nummer>". Leer erlaubt. Müll/zu kurz -> null.
+function normPhone(raw){
+  raw = String(raw).trim();
+  if(raw === '') return '';
+  if(!/^[+0-9 ()\/.\-]+$/.test(raw)) return null;            // nur Telefon-Zeichen
+  const digits = raw.replace(/\D/g,'');
+  if(digits.length < 7 || digits.length > 15) return null;   // grobe Plausibilität (E.164)
+  // CH erkennen und schön formatieren
+  let ch = digits;
+  if(ch.startsWith('0041')) ch = ch.slice(2);
+  else if(ch.startsWith('0') && ch.length === 10) ch = '41' + ch.slice(1);
+  else if(ch.length === 9) ch = '41' + ch;
+  if(/^41[1-9]\d{8}$/.test(ch)){
+    const n = ch.slice(2);
+    return `+41 ${n.slice(0,2)} ${n.slice(2,5)} ${n.slice(5,7)} ${n.slice(7,9)}`;
+  }
+  // international: führende 00 -> +, sonst + voranstellen
+  const intl = digits.startsWith('00') ? digits.slice(2) : digits;
+  return '+' + intl;
+}
+
+function validateTel(inputId, errId){
+  const el = document.getElementById(inputId);
+  const errEl = document.getElementById(errId);
+  errEl.style.display = 'none';
+  const raw = el.value.trim();
+  if(!raw) return '';                 // freiwillig: leer ist ok
+  const norm = normPhone(raw);
+  if(!norm){ errEl.style.display = 'block'; el.focus(); return false; }
+  el.value = norm;                    // normalisiert anzeigen
+  return norm;
+}
+
+function submitZusage(){
+  const name = document.getElementById('z-name').value.trim();
+  const vorname = document.getElementById('z-vorname').value.trim();
+  const mail = document.getElementById('z-mail').value.trim();
+  if(!name || !vorname){ document.getElementById('z-err').style.display='block'; return; }
+  document.getElementById('z-err').style.display='none';
+  const tel = validateTel('z-tel','z-tel-err');
+  if(tel === false) return;
+  post({action:'ehemaligeSignup', anmeldung:'Zusage', name, vorname, mail, tel});
+  document.getElementById('danke-title').textContent = `Danke für die Anmeldung, lieber ${vorname}!`;
+  show('scr-danke');
+}
+
+function submitAbsage(){
+  const name = document.getElementById('a-name').value.trim();
+  const vorname = document.getElementById('a-vorname').value.trim();
+  const mail = document.getElementById('a-mail').value.trim();
+  if(!name || !vorname){ document.getElementById('a-err').style.display='block'; return; }
+  document.getElementById('a-err').style.display='none';
+  const tel = validateTel('a-tel','a-tel-err');
+  if(tel === false) return;
+  post({action:'ehemaligeSignup', anmeldung:'Absage', name, vorname, mail, tel});
+  showBye('data');
+}
+
+function showBye(mode){
+  const t = document.getElementById('bye-title');
+  const p = document.getElementById('bye-text');
+  if(mode === 'data'){
+    t.textContent = 'Danke und bis bald!';
+    p.textContent = 'Danke für Deine Rückmeldung – vielleicht sieht man sich ja trotzdem an der Chilbi!';
+  } else {
+    t.textContent = 'Bis bald!';
+    p.textContent = 'Vielleicht sieht man sich ja trotzdem an der Chilbi. Wir freuen uns!';
+  }
+  show('scr-bye');
+}
+
+function downloadICS(){
+  const dtstamp = new Date().toISOString().replace(/[-:]/g,'').split('.')[0]+'Z';
+  const uid = 'ehemalige-' + Date.now() + '@chilbi.feuerwehrmeilen.ch';
+  // 16.08.2026 14:00–16:00 (CEST = UTC+2) -> 12:00–14:00 UTC
+  const ics = [
+    'BEGIN:VCALENDAR',
+    'VERSION:2.0',
+    'PRODID:-//Stuetzpunktfeuerwehr Meilen//Chilbi Ehemalige//DE',
+    'CALSCALE:GREGORIAN',
+    'METHOD:PUBLISH',
+    'BEGIN:VEVENT',
+    'UID:' + uid,
+    'DTSTAMP:' + dtstamp,
+    'DTSTART:20260816T120000Z',
+    'DTEND:20260816T140000Z',
+    'SUMMARY:Feuerwehrtreffen an der Chilbi Herrliberg',
+    'LOCATION:Primarschule Rebacker\\, Schulhausstrasse 23\\, 8704 Herrliberg',
+    'DESCRIPTION:Ehemaligen-Treffen im Füürwehrbeizli der Chilbi Herrliberg. Wir freuen uns auf Dich!',
+    'END:VEVENT',
+    'END:VCALENDAR'
+  ].join('\r\n');
+  const blob = new Blob([ics], {type:'text/calendar;charset=utf-8'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'Feuerwehrtreffen_Chilbi_Herrliberg.ics';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+}
+</script>
+</body>
+</html>

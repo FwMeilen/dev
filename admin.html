@@ -1,0 +1,1967 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chilbi Admin – Schichtverwaltung Cl1.063-dev</title>
+<meta property="og:title" content="Chilbi Herrliberg – Admin">
+<meta property="og:description" content="Schichtverwaltung Chilbi Herrliberg – Stützpunktfeuerwehr Meilen">
+<meta property="og:image" content="https://www.feuerwehr-meilen.ch/fileadmin/Public/Website/Templates/Images/Logo-FeuerwehrMeilen.png">
+<meta property="og:url" content="https://chilbi.feuerwehrmeilen.ch/admin.html">
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --red:#CC0000;--red-dark:#990000;--red-light:#FDEAEA;
+  --black:#1a1a1a;--gray:#666;--gray-mid:#e0e0e0;
+  --bg:#fff;--bg2:#f4f4f4;--bg3:#e8e8e8;
+  --text:#1a1a1a;--text2:#555;--text3:#888;
+  --green:#2d6a1f;--green-light:#eaf3e6;
+}
+body{font-family:'Open Sans',Arial,sans-serif;background:var(--bg3);color:var(--text);min-height:100vh;font-size:14px;}
+
+/* ── HEADER ─────────────────────────────────────────────── */
+.site-header{background:var(--black);}
+.site-header-inner{width:100%;padding:0 1.5rem;display:flex;align-items:center;height:54px;gap:12px;}
+.logo-text{color:white;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:0.04em;line-height:1.2;}
+.logo-text span{display:block;font-size:10px;font-weight:400;color:#999;text-transform:none;letter-spacing:0;}
+.red-stripe{height:4px;background:var(--red);}
+.header-right{margin-left:auto;display:flex;gap:8px;align-items:center;}
+.header-version{font-size:11px;color:#666;margin-right:8px;}
+
+/* ── LOGIN ───────────────────────────────────────────────── */
+.login-overlay{position:fixed;inset:0;background:var(--bg3);z-index:999;display:flex;align-items:center;justify-content:center;}
+.login-box{background:var(--bg);border-top:3px solid var(--red);padding:32px;max-width:340px;width:100%;box-shadow:0 4px 24px rgba(0,0,0,.12);}
+.login-box h2{font-size:15px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px;}
+.login-box p{font-size:12px;color:var(--text3);margin-bottom:20px;}
+.login-box input{width:100%;height:36px;padding:0 12px;border:1px solid var(--gray-mid);font-family:inherit;font-size:13px;text-align:center;letter-spacing:.1em;margin-bottom:12px;border-radius:0;}
+.login-box input:focus{outline:none;border-color:var(--black);}
+.login-error{color:var(--red);font-size:12px;min-height:18px;margin-bottom:8px;}
+
+/* ── CONTAINER ───────────────────────────────────────────── */
+.container{width:100%;padding:1.5rem 1.5rem 4rem;}
+
+/* ── ADMIN TABS ──────────────────────────────────────────── */
+.admin-tabs{display:flex;border-bottom:2px solid var(--black);margin-bottom:1.5rem;background:var(--bg);}
+.admin-tab{padding:12px 20px;border:none;background:none;font-family:inherit;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text);opacity:.4;cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;transition:all .15s;}
+.admin-tab:hover{opacity:.7;}
+.admin-tab.active{opacity:1;border-bottom-color:var(--red);}
+.admin-section{display:none;}
+.admin-section.active{display:block;}
+
+/* ── CARD ────────────────────────────────────────────────── */
+.card{background:var(--bg);border-top:3px solid var(--red);padding:1.5rem;margin-bottom:1.5rem;box-shadow:0 2px 8px rgba(0,0,0,.06);}
+.card-title{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:1rem;display:flex;align-items:center;gap:12px;}
+.card-title small{font-family:inherit;font-size:11px;text-transform:none;letter-spacing:0;color:var(--text3);font-weight:400;}
+
+/* ── STATS ───────────────────────────────────────────────── */
+.stats{display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:1.5rem;}
+.stat{background:var(--bg);border-top:3px solid var(--black);padding:14px 18px;flex:1;min-width:130px;box-shadow:0 2px 8px rgba(0,0,0,.06);}
+.stat-num{font-size:28px;font-weight:700;line-height:1;}
+.stat-lbl{font-size:11px;color:var(--text3);margin-top:4px;text-transform:uppercase;letter-spacing:.05em;}
+
+/* ── TABLE ───────────────────────────────────────────────── */
+.table-wrap{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;font-size:12px;min-width:800px;}
+thead th{text-align:left;padding:8px 10px;background:var(--black);color:white;font-weight:700;font-size:10px;text-transform:uppercase;letter-spacing:.06em;white-space:nowrap;}
+tbody tr{border-bottom:1px solid var(--gray-mid);}
+tbody tr:hover{background:var(--bg2);}
+#ehFilterBtns .btn.active{background:var(--black);color:#fff;border-color:var(--black);}
+td{padding:6px 8px;vertical-align:middle;}
+td input,td select{width:100%;padding:4px 6px;border:1px solid transparent;font-family:inherit;font-size:12px;background:transparent;color:var(--text);transition:border-color .15s;border-radius:0;}
+td input:hover,td select:hover{border-color:var(--gray-mid);background:white;}
+td input:focus,td select:focus{outline:none;border-color:var(--black);background:white;}
+td input[type=color]{width:36px;height:26px;padding:1px;cursor:pointer;border:1px solid var(--gray-mid);}
+.td-del button{border:none;background:none;color:var(--red);cursor:pointer;font-size:14px;opacity:.5;transition:opacity .15s;}
+.td-del button:hover{opacity:1;}
+
+/* ── BUTTONS ─────────────────────────────────────────────── */
+.btn{height:34px;padding:0 16px;border:2px solid var(--black);background:var(--bg);color:var(--black);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;cursor:pointer;display:inline-flex;align-items:center;gap:6px;font-family:inherit;border-radius:0;}
+.btn:hover{background:var(--black);color:#fff;}
+.btn-sm{height:30px;padding:0 12px;font-size:10px;}
+.btn-red{background:var(--red);color:#fff;border-color:var(--red);}
+.btn-red:hover{background:var(--red-dark);border-color:var(--red-dark);}
+.btn-green{background:var(--green);color:#fff;border-color:var(--green);}
+.btn-green:hover{background:#1b5220;}
+.btn-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:1rem;}
+
+/* ── FILTER ──────────────────────────────────────────────── */
+.filter-bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:1rem;align-items:center;}
+.filter-bar input,.filter-bar select{height:32px;padding:0 8px;border:1px solid var(--gray-mid);font-family:inherit;font-size:12px;border-radius:0;background:white;}
+.filter-bar input:focus,.filter-bar select:focus{outline:none;border-color:var(--black);}
+
+/* ── OVERVIEW ────────────────────────────────────────────── */
+.ov-task{border:1px solid var(--gray-mid);border-left:3px solid var(--red);padding:10px 14px;margin-bottom:6px;background:white;display:flex;align-items:center;gap:12px;}
+.ov-task-name{font-weight:700;font-size:12px;min-width:140px;}
+.ov-task-time{font-size:11px;color:var(--text3);min-width:90px;}
+.ov-bar-wrap{flex:1;height:6px;background:var(--bg3);}
+.ov-bar{height:100%;transition:width .3s;}
+.ov-persons{font-size:11px;min-width:80px;text-align:right;}
+
+/* ── MISC ────────────────────────────────────────────────── */
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--black);color:white;padding:10px 22px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;z-index:999;transition:transform .3s;pointer-events:none;}
+.toast.show{transform:translateX(-50%) translateY(0);}
+.toast.success{background:var(--green);}
+.toast.error{background:var(--red);}
+.site-footer{background:var(--black);color:#666;font-size:11px;text-align:center;padding:1rem;}
+.help-text{font-size:11px;color:var(--text3);line-height:1.6;margin-top:12px;padding:10px;background:var(--bg2);border-left:2px solid var(--gray-mid);}
+
+/* ── COLOR PICKER ────────────────────────────────────────── */
+.color-picker-wrap{position:relative;display:inline-block;}
+.color-preview{width:32px;height:26px;border:1px solid var(--gray-mid);cursor:pointer;display:block;}
+.color-dropdown{
+  display:none;position:absolute;top:30px;left:0;z-index:100;
+  background:white;border:1px solid var(--gray-mid);
+  box-shadow:0 4px 16px rgba(0,0,0,.15);
+  padding:8px;width:148px;
+}
+.color-dropdown.open{display:block;}
+.color-swatches{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-bottom:6px;}
+.color-swatch{
+  width:28px;height:28px;cursor:pointer;border:2px solid transparent;
+  transition:transform .1s;
+}
+.color-swatch:hover{transform:scale(1.15);border-color:var(--black);}
+.color-swatch.selected{border-color:var(--black);}
+.color-custom-row{display:flex;align-items:center;gap:6px;border-top:1px solid var(--gray-mid);padding-top:6px;}
+.color-custom-row label{font-size:10px;color:var(--text3);white-space:nowrap;}
+.color-custom-input{width:28px;height:24px;padding:1px;border:1px solid var(--gray-mid);cursor:pointer;}
+
+/* ── ACCORDION ───────────────────────────────────────────── */
+.accordion-card{border-top:3px solid var(--red);background:white;box-shadow:0 1px 4px rgba(0,0,0,.08);margin-bottom:1rem;}
+.accordion-header{padding:16px 20px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;user-select:none;}
+.accordion-header:hover{background:var(--bg2);}
+.accordion-title{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;}
+.accordion-arrow{font-size:12px;transition:transform .2s;color:var(--text3);}
+.accordion-body{display:none;padding:0 20px 20px;}
+.accordion-body.open{display:block;}
+
+/* ── PRINT ───────────────────────────────────────────────── */
+@media print {
+  body{background:white;}
+  .site-header,.red-stripe,.admin-tabs,.filter-bar,.btn-row,.stats,.card-title .btn,
+  .login-overlay,.toast,.site-footer,.header-right{display:none!important;}
+  .card{box-shadow:none;border:none;padding:0;}
+  .container{padding:0;}
+  .print-day{page-break-after:always;}
+  .print-day:last-child{page-break-after:auto;}
+  @page{size:A3 landscape;margin:15mm;}
+}
+.print-btn{height:30px;padding:0 12px;border:2px solid var(--black);background:var(--bg);color:var(--black);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;cursor:pointer;font-family:inherit;border-radius:0;margin-right:6px;}
+.print-btn:hover{background:var(--black);color:white;}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div class="login-overlay" id="loginOverlay">
+  <div class="login-box">
+    <h2>Admin – Chilbi Herrliberg</h2>
+    <p>Schichtverwaltung · Zugang nur für Organisatoren</p>
+    <input type="password" id="loginPw" placeholder="Passwort" autocomplete="current-password">
+    <div class="login-error" id="loginError"></div>
+    <button class="btn btn-red" style="width:100%" onclick="doLogin()">Einloggen</button>
+    <div style="margin-top:16px;padding-top:12px;border-top:1px solid var(--gray-mid);text-align:center;font-size:11px;color:var(--text3);">
+      © Stützpunktfeuerwehr Meilen / LOL &nbsp;·&nbsp; <strong>Cl1.063-dev</strong>
+    </div>
+  </div>
+</div>
+
+<!-- HEADER -->
+<div class="site-header">
+  <div class="site-header-inner">
+    <img src="https://www.feuerwehr-meilen.ch/fileadmin/Public/Website/Templates/Images/Logo-FeuerwehrMeilen.png" alt="Feuerwehr Meilen" style="height:38px;width:auto;object-fit:contain;">
+    <div class="logo-text">Chilbi Herrliberg<span>Admin – Schichtverwaltung</span></div>
+    <div class="header-right">
+      <span class="header-version">Cl1.063-dev</span>
+      <button class="help-btn" onclick="document.getElementById('helpOverlay').style.display='flex'" title="Bedienungsanleitung" style="background:none;border:1.5px solid rgba(255,255,255,.5);color:white;width:22px;height:22px;border-radius:50%;font-size:12px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;margin-left:4px;">?</button>
+      <button class="btn btn-sm" onclick="window.open('index.html','_blank')">Zu Schichtplan Signup</button>
+      <button class="btn btn-sm btn-red" onclick="loadData()">↺ Aktualisieren</button>
+    </div>
+  </div>
+</div>
+<div class="red-stripe"></div>
+
+<div class="container">
+  <div class="admin-tabs">
+    <button class="admin-tab active" onclick="switchSection('anmeldungen',this)">Anmeldungen</button>
+    <button class="admin-tab" onclick="switchSection('uebersicht',this)">Übersicht</button>
+    <button class="admin-tab" onclick="switchSection('schichtplan',this)">Schichten bearbeiten</button>
+    <button class="admin-tab" onclick="switchSection('ehemalige',this)">Ehemaligen Treff</button>
+    <button class="admin-tab" onclick="switchSection('einstellungen',this)">Einstellungen</button>
+  </div>
+
+  <!-- ANMELDUNGEN -->
+  <div class="admin-section active" id="sec-anmeldungen">
+    <div class="stats" id="statsBar"></div>
+    <div class="card">
+      <div class="card-title">Alle Anmeldungen</div>
+      <div style="font-size:12px;color:var(--text3);margin:-4px 0 12px;">CSV-Import/-Export der Anmeldungen – eingetragene Personen je Schicht. <strong>Import ersetzt alle bestehenden Anmeldungen.</strong></div>
+      <div class="filter-bar">
+        <input type="text" id="filterName" placeholder="ID suchen…" oninput="renderSignups()">
+        <select id="filterTag" onchange="renderSignups()"><option value="">Alle Tage</option></select>
+        <select id="filterSchicht" onchange="renderSignups()"><option value="">Alle Schichten</option></select>
+        <select id="filterAufgabe" onchange="renderSignups()"><option value="">Alle Aufgaben</option></select>
+        <select id="sortColSel" onchange="sortCol=this.value;renderSignups()">
+          <option value="TagLabel">Sortierung: Tag</option>
+          <option value="Tag">Sortierung: ID</option>
+          <option value="Schicht">Sortierung: Schicht</option>
+          <option value="Aufgabe">Sortierung: Aufgabe</option>
+          <option value="Name">Sortierung: Name</option>
+        </select>
+        <label class="btn btn-sm" style="cursor:pointer">📂 CSV Import<input type="file" accept=".csv" onchange="importSignupsCSV(this)" style="display:none"></label>
+        <button class="btn btn-sm" onclick="exportCSV()">⬇ CSV Export</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr>
+  <th>Tag</th><th>ID</th><th>Schicht</th><th>Aufgabe</th><th>Name</th><th>Timestamp</th><th></th>
+</tr></thead>
+          <tbody id="signupBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCHICHTEN BEARBEITEN -->
+  <div class="admin-section" id="sec-schichtplan">
+    <div class="card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+        <div class="card-title" style="margin-bottom:0">Schichten bearbeiten</div>
+        <div style="display:flex;gap:8px;">
+          <label class="btn btn-sm" style="cursor:pointer">📂 CSV Import<input type="file" accept=".csv" onchange="importCSV(this)" style="display:none"></label>
+          <button class="btn btn-sm" onclick="exportConfigCSV()">⬇ CSV Export</button>
+          <button class="btn btn-green btn-sm" onclick="openNewSchicht()">+ Neue Schicht</button>
+        </div>
+      </div>
+      <div style="font-size:12px;color:var(--text3);margin:0 0 1rem;">CSV-Import/-Export betrifft nur die Schichtdefinitionen (Zeiten, Aufgaben, Max-Personen) – ohne eingetragene Personen.</div>
+      <div id="schichtplanContent"></div>
+    </div>
+  </div>
+
+  <!-- EHEMALIGEN TREFF -->
+  <div class="admin-section" id="sec-ehemalige">
+    <div class="stats" id="ehStats"></div>
+    <div class="card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
+        <div class="card-title" style="margin-bottom:0">Ehemaligen-Treff – Rückmeldungen</div>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+          <div style="display:flex;gap:4px;" id="ehFilterBtns">
+            <button class="btn btn-sm active" data-f="all" onclick="setEhFilter('all',this)">Alle</button>
+            <button class="btn btn-sm" data-f="Zusage" onclick="setEhFilter('Zusage',this)">Zusagen</button>
+            <button class="btn btn-sm" data-f="Absage" onclick="setEhFilter('Absage',this)">Absagen</button>
+          </div>
+          <button class="btn btn-sm" onclick="exportEhemaligeCSV()">⬇ CSV Export</button>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Timestamp</th><th>Anmeldung</th><th>Name</th><th>Vorname</th><th>Mail</th><th>Tel</th></tr></thead>
+          <tbody id="ehBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- EINSTELLUNGEN -->
+  <div class="admin-section" id="sec-einstellungen">
+
+    <!-- 1. TAGE -->
+    <div class="accordion-card">
+      <div class="accordion-header" onclick="toggleAccordion('acc-tage')">
+        <span class="accordion-title">Tage &amp; Typen</span>
+        <span class="accordion-arrow" id="arr-acc-tage">▼</span>
+      </div>
+      <div class="accordion-body" id="acc-tage">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Datum</th><th>Typ</th></tr></thead>
+            <tbody id="tageBody"></tbody>
+          </table>
+        </div>
+        <div class="btn-row" style="margin-top:12px">
+          <button class="btn btn-sm" onclick="saveTage()">💾 Tage speichern</button>
+        </div>
+        <div class="help-text">Daten werden automatisch aus den Schichten gelesen.</div>
+      </div>
+    </div>
+
+    <!-- 2b. GÄSTE VERWALTEN -->
+    <div class="accordion-card">
+      <div class="accordion-header" onclick="toggleAccordion('acc-gaeste')">
+        <span class="accordion-title">Gäste verwalten</span>
+        <span class="accordion-arrow" id="arr-acc-gaeste">▼</span>
+      </div>
+      <div class="accordion-body" id="acc-gaeste">
+        <div id="gaesteliste"></div>
+      </div>
+    </div>
+
+    <!-- 3. FARBEN -->
+    <div class="accordion-card">
+      <div class="accordion-header" onclick="toggleAccordion('acc-farben')">
+        <span class="accordion-title">Farb-Einstellungen</span>
+        <span class="accordion-arrow" id="arr-acc-farben">▼</span>
+      </div>
+      <div class="accordion-body" id="acc-farben">
+      <table style="width:100%;border-collapse:collapse;font-size:13px;">
+        <tr style="border-bottom:1px solid var(--gray-mid);">
+          <td style="padding:14px 0;font-weight:600;">Farb-Modus</td>
+          <td style="padding:14px 0;color:var(--text3);font-size:12px;">Nach Aufgaben: Farbe wird nach Aufgabenname vergeben. Pro Schicht: individuelle Farbe pro Eintrag.</td>
+          <td style="padding:14px 0;text-align:right;white-space:nowrap;">
+            <label style="display:inline-flex;align-items:center;gap:8px;cursor:pointer;font-size:12px;">
+              <span>Pro Schicht</span>
+              <span style="position:relative;display:inline-block;width:44px;height:24px;">
+                <input type="checkbox" id="settingAutoColor" onchange="toggleAutoColor(this.checked)" checked style="opacity:0;position:absolute;width:100%;height:100%;cursor:pointer;margin:0;z-index:1;">
+                <span id="autoColorTrack" style="position:absolute;inset:0;background:var(--red);border-radius:24px;transition:.2s;"></span>
+                <span id="autoColorKnob" style="position:absolute;height:18px;width:18px;left:23px;top:3px;background:white;border-radius:50%;transition:.2s;box-shadow:0 1px 3px rgba(0,0,0,.3);"></span>
+              </span>
+              <span>Nach Aufgaben</span>
+            </label>
+          </td>
+        </tr>
+      </table>
+      <div id="autoColorSection" style="margin-top:16px;">
+        <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px;">Farben nach Aufgabe</div>
+        <div id="aufgabenColorList"></div>
+        <div style="margin-top:12px;display:flex;gap:8px;">
+          <button class="btn btn-red btn-sm" onclick="applyAutoColors()">Farben auf alle Schichten anwenden</button>
+        </div>
+        <div style="margin-top:8px;font-size:12px;color:var(--text3);">⚠ Achtung: Bestehende Farben werden beim Anwenden überschrieben.</div>
+      </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ÜBERSICHT -->
+  <div class="admin-section" id="sec-uebersicht">
+    <div class="card" style="border-top-color:var(--black)">
+      <div class="card-title">Tage drucken</div>
+      <div id="printBtns" style="display:flex;flex-wrap:wrap;gap:8px;"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Belegungsübersicht</div>
+      <div class="filter-bar" style="margin-bottom:12px;">
+        <select id="ovFilterTag" onchange="renderOverview()"><option value="">Alle Tage</option></select>
+        <select id="ovFilterSchicht" onchange="renderOverview()"><option value="">Alle Schichten</option></select>
+        <select id="ovFilterAufgabe" onchange="renderOverview()"><option value="">Alle Aufgaben</option></select>
+        <button class="btn btn-sm" onclick="clearOvFilters()">✕ Filter zurücksetzen</button>
+      </div>
+      <div id="overviewContent"></div>
+    </div>
+  </div>
+</div>
+
+
+<!-- EDIT SIGNUP POPUP -->
+<div id="editPopupOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:500;align-items:center;justify-content:center;padding:20px;">
+  <div style="background:white;max-width:440px;width:100%;box-shadow:0 8px 40px rgba(0,0,0,.25);">
+    <div style="background:var(--black);color:white;padding:16px 20px;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;">Eintrag bearbeiten</div>
+    <div style="padding:20px;">
+      <table style="width:100%;font-size:13px;border-collapse:collapse;">
+        <tr><td style="padding:6px 0;font-weight:600;width:80px">Tag (ID)</td><td><input id="editTag" style="width:100%;height:32px;padding:0 8px;border:1px solid var(--gray-mid);font-family:inherit;font-size:13px;"></td></tr>
+        <tr><td style="padding:6px 0;font-weight:600">Name</td><td><input id="editName" style="width:100%;height:32px;padding:0 8px;border:1px solid var(--gray-mid);font-family:inherit;font-size:13px;"></td></tr>
+        <tr><td style="padding:6px 0;font-weight:600">Schicht</td><td><input id="editSchicht" style="width:100%;height:32px;padding:0 8px;border:1px solid var(--gray-mid);font-family:inherit;font-size:13px;"></td></tr>
+        <tr><td style="padding:6px 0;font-weight:600">Aufgabe</td><td><input id="editAufgabe" style="width:100%;height:32px;padding:0 8px;border:1px solid var(--gray-mid);font-family:inherit;font-size:13px;"></td></tr>
+      </table>
+      <div style="display:flex;gap:8px;justify-content:space-between;margin-top:20px;">
+        <button class="btn btn-red btn-sm" onclick="confirmDeleteSignup()" style="margin-right:auto">&#128465; Löschen</button>
+        <button class="btn btn-sm" onclick="closeEditPopup()">Abbrechen</button>
+        <button class="btn btn-green btn-sm" onclick="saveEditSignup()">&#128190; Speichern</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- CONFIRM DELETE POPUP -->
+<div id="confirmPopupOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:600;align-items:center;justify-content:center;padding:20px;">
+  <div style="background:white;max-width:380px;width:100%;box-shadow:0 8px 40px rgba(0,0,0,.3);">
+    <div style="background:var(--red);color:white;padding:16px 20px;font-size:14px;font-weight:700;text-transform:uppercase;">⚠ Wirklich löschen?</div>
+    <div style="padding:20px;">
+      <p style="font-size:13px;margin-bottom:16px;line-height:1.5;color:var(--text2)">Willst du diesen Eintrag wirklich löschen?<br><strong style="color:var(--red)">Daten können nicht mehr wiederhergestellt werden.</strong></p>
+      <div style="display:flex;gap:8px;justify-content:flex-end;">
+        <button class="btn btn-sm" onclick="closeConfirmPopup()">Abbrechen</button>
+        <button class="btn btn-red btn-sm" onclick="doDeleteSignup()">Definitiv löschen</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CONFIRM DELETE SCHICHT POPUP -->
+<div id="confirmDeleteSchichtOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:650;align-items:center;justify-content:center;padding:20px;">
+  <div style="background:white;max-width:430px;width:100%;box-shadow:0 8px 40px rgba(0,0,0,.3);">
+    <div style="background:var(--red);color:white;padding:16px 20px;font-size:14px;font-weight:700;text-transform:uppercase;">⚠ Schicht wirklich löschen?</div>
+    <div style="padding:20px;">
+      <p id="deleteSchichtMsg" style="font-size:13px;margin-bottom:16px;line-height:1.5;color:var(--text2)"></p>
+      <div style="display:flex;gap:8px;justify-content:flex-end;">
+        <button class="btn btn-sm" onclick="closeDeleteSchicht()">Abbrechen</button>
+        <button class="btn btn-red btn-sm" onclick="doDeleteSchicht()">Definitiv löschen</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DOPPELTE ID WARNUNG -->
+<div id="dupIdOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:700;align-items:center;justify-content:center;padding:20px;" onclick="if(event.target===this)closeDupId()">
+  <div style="background:white;max-width:560px;width:100%;max-height:85vh;overflow-y:auto;box-shadow:0 8px 40px rgba(0,0,0,.3);">
+    <div style="background:var(--red);color:white;padding:16px 20px;font-size:14px;font-weight:700;text-transform:uppercase;">⚠ Doppelte ID(s) gefunden</div>
+    <div style="padding:20px;">
+      <p style="font-size:13px;margin-bottom:14px;line-height:1.5;color:var(--text2)">Folgende ID(s) kommen mehrfach vor. Bitte im Sheet oder per CSV-Export/Import korrigieren – im Schicht-Editor lassen sich gleiche IDs nicht eindeutig bearbeiten.</p>
+      <div id="dupIdList"></div>
+      <div style="display:flex;justify-content:flex-end;margin-top:16px;">
+        <button class="btn btn-sm" onclick="closeDupId()">Schliessen</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- EDIT SCHICHT POPUP -->
+<div id="editSchichtOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:500;align-items:center;justify-content:center;padding:20px;overflow-y:auto;">
+  <div style="background:white;max-width:520px;width:100%;box-shadow:0 8px 40px rgba(0,0,0,.25);box-sizing:border-box;margin:auto;">
+    <div style="background:var(--black);color:white;padding:16px 20px;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;">Schicht bearbeiten</div>
+    <div style="padding:20px;box-sizing:border-box;">
+      <input type="hidden" id="esTag">
+      <div style="display:grid;grid-template-columns:130px 1fr;gap:8px;font-size:13px;align-items:center;">
+        <label style="font-weight:600">Datum</label>
+        <input id="esDatum" style="box-sizing:border-box;width:100%;height:32px;padding:0 8px;border:1px solid var(--gray-mid);font-family:inherit;font-size:13px;">
+        <label style="font-weight:600">Schicht</label>
+        <input id="esSchicht" style="box-sizing:border-box;width:100%;height:32px;padding:0 8px;border:1px solid var(--gray-mid);font-family:inherit;font-size:13px;">
+        <label style="font-weight:600">Aufgabe</label>
+        <input id="esAufgabe" style="box-sizing:border-box;width:100%;height:32px;padding:0 8px;border:1px solid var(--gray-mid);font-family:inherit;font-size:13px;">
+        <label style="font-weight:600">Von</label>
+        <input id="esVon" placeholder="08:00" style="box-sizing:border-box;width:100%;height:32px;padding:0 8px;border:1px solid var(--gray-mid);font-family:inherit;font-size:13px;">
+        <label style="font-weight:600">Bis</label>
+        <input id="esBis" placeholder="12:00" style="box-sizing:border-box;width:100%;height:32px;padding:0 8px;border:1px solid var(--gray-mid);font-family:inherit;font-size:13px;">
+        <label style="font-weight:600">Max Personen</label>
+        <input id="esMax" type="number" min="1" style="box-sizing:border-box;width:100%;height:32px;padding:0 8px;border:1px solid var(--gray-mid);font-family:inherit;font-size:13px;">
+        <label style="font-weight:600">Informationen</label>
+        <input id="esInfo" placeholder="Treffpunkt…" style="box-sizing:border-box;width:100%;height:32px;padding:0 8px;border:1px solid var(--gray-mid);font-family:inherit;font-size:13px;">
+        <label style="font-weight:600">Gesperrt</label>
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:12px;">
+          <input type="checkbox" id="esGeschlossen" style="width:16px;height:16px;accent-color:var(--red);">
+          Schicht für neue Einträge sperren
+        </label>
+      </div>
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:20px;">
+        <button class="btn btn-red btn-sm" id="esDeleteBtn" onclick="askDeleteSchicht()" style="margin-right:auto">🗑 Löschen</button>
+        <button class="btn btn-sm" onclick="closeEditSchicht()">Abbrechen</button>
+        <button class="btn btn-green btn-sm" onclick="saveEditSchicht()">💾 Speichern</button>
+      </div>
+
+      <!-- Anmeldungen -->
+      <div style="margin-top:20px;padding-top:16px;border-top:2px solid var(--black);">
+        <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px;">Anmeldungen</div>
+        <div id="editSchichtSignups"></div>
+        <div style="display:flex;gap:8px;margin-top:10px;">
+          <input id="newSignupName" placeholder="Name / Kürzel hinzufügen…"
+            style="flex:1;height:32px;padding:0 8px;border:1px solid var(--gray-mid);font-family:inherit;font-size:13px;"
+            onkeydown="if(event.key==='Enter')addSignupToSchicht()">
+          <button class="btn btn-green btn-sm" onclick="addSignupToSchicht()">+ Hinzufügen</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- HILFE POPUP -->
+<div style="position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:800;align-items:center;justify-content:center;padding:20px;display:none;" id="helpOverlay" onclick="if(event.target===this)this.style.display='none'">
+  <div style="background:white;max-width:540px;width:100%;max-height:85vh;overflow-y:auto;box-shadow:0 8px 40px rgba(0,0,0,.3);">
+    <div style="background:var(--black);color:white;padding:14px 20px;display:flex;justify-content:space-between;align-items:center;">
+      <span style="font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;">Bedienungsanleitung – Admin</span>
+      <button onclick="document.getElementById('helpOverlay').style.display='none'" style="background:none;border:none;color:white;font-size:18px;cursor:pointer;">✕</button>
+    </div>
+    <div style="padding:20px;font-size:12px;color:var(--text2);line-height:1.6;">
+      <div style="margin-bottom:16px;">
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--red);margin-bottom:6px;border-bottom:1px solid var(--gray-mid);padding-bottom:4px;">Anmeldungen</div>
+        <ul style="padding-left:16px;"><li>Übersicht aller eingetragenen Personen, mit Statistik oben.</li><li>Filtern nach Tag, Schicht, Aufgabe oder ID-/Namens-Suche.</li><li>Stift-Icon zum Bearbeiten oder Löschen eines Eintrags.</li><li><strong>📂 CSV Import / ⬇ CSV Export</strong> der Anmeldungen. Reihenfolge wie im Sheet: <code>ID,Name,Schicht,Aufgabe,Timestamp</code>. Der <strong>Import ersetzt alle</strong> bestehenden Anmeldungen (mit Sicherheitsabfrage) und prüft jede Zeile gegen die vorhandenen Schichten.</li></ul>
+      </div>
+      <div style="margin-bottom:16px;">
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--red);margin-bottom:6px;border-bottom:1px solid var(--gray-mid);padding-bottom:4px;">Übersicht</div>
+        <ul style="padding-left:16px;"><li>Belegungsübersicht pro Tag und Schicht, filterbar.</li><li>Druckbuttons pro Tag: A3 quer, füllt die Seite automatisch (1 Tag = 1 Seite).</li></ul>
+      </div>
+      <div style="margin-bottom:16px;">
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--red);margin-bottom:6px;border-bottom:1px solid var(--gray-mid);padding-bottom:4px;">Schichten bearbeiten</div>
+        <ul style="padding-left:16px;"><li>Timeline aller Schichten mit <strong>gemeinsamem Zeitraster über alle Tage</strong> – gleiche Uhrzeiten stehen untereinander.</li><li>Klick auf einen Block → Schicht bearbeiten (Zeit, Aufgabe, Max-Personen, Farbe, Gesperrt …).</li><li><strong>+ Neue Schicht</strong> zum Anlegen. Im Editor entfernt <strong>🗑 Löschen</strong> die Schicht (mit Bestätigung; eingetragene Personen werden mitgelöscht).</li><li><strong>📂 CSV Import / ⬇ CSV Export</strong> der Schichten. Der <strong>Import ersetzt alle</strong> bestehenden Schichten (mit Sicherheitsabfrage).</li>
+          <li>CSV-Format: <code>ID,Datum,Von,Bis,Schicht,Aufgabe,Max Personen,Farbe,Informationen,Geschlossen</code><br>
+          Beispiel: <code>1,14.08.2026,10:00,14:00,GVH-Lunch,Service,2,#004cff,Treffpunkt Haupteingang,0</code></li></ul>
+      </div>
+      <div style="margin-bottom:16px;">
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--red);margin-bottom:6px;border-bottom:1px solid var(--gray-mid);padding-bottom:4px;">Einstellungen</div>
+        <ul style="padding-left:16px;"><li><strong>Tage &amp; Typen:</strong> Datum aus Konfiguration, Typ frei definierbar (z.B. Chilbi, Vorbereitung).</li><li><strong>Farb-Einstellungen:</strong> Manuell (Farbe pro Schicht) oder Nach Aufgaben (automatisch).</li></ul>
+      </div>
+      <div style="margin-bottom:16px;">
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--red);margin-bottom:6px;border-bottom:1px solid var(--gray-mid);padding-bottom:4px;">Gut zu wissen</div>
+        <ul style="padding-left:16px;"><li><strong>↺ Aktualisieren</strong> (oben rechts) lädt alle Daten neu, inklusive der Schichten-Timeline.</li><li><strong>ID-Prüfung:</strong> Bei jedem Laden werden doppelte Schicht-IDs erkannt; ein Warnfenster listet die betroffenen Schichten. Doppelte IDs im Sheet bzw. per CSV korrigieren, da der Editor sie sonst nicht eindeutig zuordnen kann.</li></ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- EDIT GAST POPUP -->
+<div id="editGastOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:500;align-items:center;justify-content:center;padding:20px;">
+  <div style="background:white;max-width:440px;width:100%;box-shadow:0 8px 40px rgba(0,0,0,.25);">
+    <div style="background:var(--black);color:white;padding:16px 20px;font-size:14px;font-weight:700;text-transform:uppercase;">Gast bearbeiten</div>
+    <div style="padding:20px;">
+      <input type="hidden" id="editGastOldKuerzel">
+      <div style="display:grid;grid-template-columns:110px 1fr;gap:8px;font-size:13px;align-items:center;">
+        <label style="font-weight:600">Kürzel</label>
+        <input id="editGastKuerzel" style="box-sizing:border-box;width:100%;height:32px;padding:0 8px;border:1px solid var(--gray-mid);font-family:inherit;font-size:13px;">
+        <label style="font-weight:600">Vorname</label>
+        <input id="editGastVorname" style="box-sizing:border-box;width:100%;height:32px;padding:0 8px;border:1px solid var(--gray-mid);font-family:inherit;font-size:13px;">
+        <label style="font-weight:600">Name</label>
+        <input id="editGastName" style="box-sizing:border-box;width:100%;height:32px;padding:0 8px;border:1px solid var(--gray-mid);font-family:inherit;font-size:13px;">
+        <label style="font-weight:600">Email</label>
+        <input id="editGastEmail" type="email" style="box-sizing:border-box;width:100%;height:32px;padding:0 8px;border:1px solid var(--gray-mid);font-family:inherit;font-size:13px;">
+        <label style="font-weight:600">Tel</label>
+        <input id="editGastTel" style="box-sizing:border-box;width:100%;height:32px;padding:0 8px;border:1px solid var(--gray-mid);font-family:inherit;font-size:13px;">
+      </div>
+      <div style="display:flex;gap:8px;justify-content:space-between;margin-top:20px;">
+        <button class="btn btn-red btn-sm" onclick="deleteGast()" style="margin-right:auto">🗑 Löschen</button>
+        <button class="btn btn-sm" onclick="closeEditGast()">Abbrechen</button>
+        <button class="btn btn-green btn-sm" onclick="saveEditGast()">💾 Speichern</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+<div class="site-footer" style="position:relative;z-index:1;">© Stützpunktfeuerwehr Meilen / LOL &nbsp;·&nbsp; Admin &nbsp;·&nbsp; Cl1.063-dev</div>
+
+<script>
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbztZ9C8RapYojQAb0U4fkY6xc_7JVsDMPsQEao4T1z_ObspHSeGB_X0ZONgqLANoyEbzQ/exec';
+const ADMIN_PW   = 'chilbi2025';
+const PALETTE    = ['#c0392b','#1565c0','#2e7d32','#6a1b9a','#00695c','#e65100','#4527a0','#00838f','#558b2f'];
+
+let CONFIG  = [];
+let SIGNUPS = [];
+let EHEMALIGE = [];
+let ehFilter = 'all';
+let authed  = false;
+
+document.getElementById('loginPw').addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });
+
+function doLogin() {
+  if (document.getElementById('loginPw').value === ADMIN_PW) {
+    authed = true;
+    document.getElementById('loginOverlay').style.display = 'none';
+    loadData();
+  } else {
+    document.getElementById('loginError').textContent = 'Falsches Passwort.';
+  }
+}
+
+async function loadData() {
+  if (!authed) return;
+  try {
+    const r = await fetch(`${SCRIPT_URL}?action=all&_=${Date.now()}`);
+    const text = await r.text();
+    const d = JSON.parse(text);
+    CONFIG  = (d.config || []).map(row => {
+      if (row['Max Personen'] !== undefined && row.MaxPersonen === undefined) row.MaxPersonen = row['Max Personen'];
+      if (row['ID'] !== undefined) row.Tag = String(row['ID']);
+      return row;
+    });
+    SIGNUPS = (d.signups || []).map(s => {
+      s.Tag = String(s.ID || s.Tag || ''); // Spalte heisst neu ID
+      return s;
+    });
+    renderConfig();
+    renderSignups();
+    renderStats();
+    renderOverview();
+    loadSettings();
+    loadTage();
+    buildSchichtplan();
+    checkDuplicateIds();
+    if(localStorage.getItem('chilbi_autoColor')!=='false') buildAufgabenColorList();
+    try { EHEMALIGE = await fetchGvizSheet('Ehemalige'); } catch(e){ EHEMALIGE = []; }
+    renderEhemalige();
+  } catch(e) { showToast('Ladefehler: ' + e.message, 'error'); }
+}
+
+function switchSection(id, btn) {
+  document.querySelectorAll('.admin-section').forEach(s => s.classList.remove('active'));
+  if (id === 'schichtplan') { if (CONFIG && CONFIG.length) buildSchichtplan(); else setTimeout(buildSchichtplan, 1000); }
+  document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('sec-'+id).classList.add('active');
+  btn.classList.add('active');
+}
+
+
+// Auto-ID Vergabe
+const idCounters = {V:0, A:0, N:0};
+function getNextId(prefix) {
+  const existing = [...document.querySelectorAll('#configBody tr')]
+    .map(tr => tr.querySelector('input[type=hidden]')?.value || '')
+    .filter(id => id.startsWith(prefix));
+  const nums = existing.map(id => parseInt(id.slice(prefix.length))||0);
+  const max = nums.length ? Math.max(...nums) : 0;
+  return prefix + (max + 1);
+}
+
+function updateRowId(i) {
+  const sel = document.getElementById('rowtype-' + i);
+  const hidden = document.getElementById('rowtag-' + i);
+  if (!hidden || !sel) return;
+  if (!hidden.value || !hidden.value.startsWith(sel.value)) {
+    hidden.value = getNextId(sel.value);
+  }
+}
+
+function initRowId(i, existingTag) {
+  const hidden = document.getElementById('rowtag-' + i);
+  const sel = document.getElementById('rowtype-' + i);
+  if (!hidden || !sel) return;
+  if (existingTag) {
+    hidden.value = existingTag;
+  } else {
+    hidden.value = getNextId(sel.value);
+  }
+}
+
+// ── CONFIG TABLE ───────────────────────────────────────────────
+function renderConfig() {
+  const cb = document.getElementById('configBody'); if (!cb) return; cb.innerHTML = '';
+  CONFIG.forEach(r => addRow(r));
+}
+
+// ── ID-Check: doppelte Schicht-IDs bei jedem Reload prüfen ──
+function checkDuplicateIds() {
+  const groups = {};
+  CONFIG.forEach(r => {
+    const id = String(r.Tag || r.ID || '').trim();
+    if (!id) return;
+    (groups[id] = groups[id] || []).push(r);
+  });
+  const dups = Object.keys(groups).filter(id => groups[id].length > 1);
+  const listEl = document.getElementById('dupIdList');
+  const overlay = document.getElementById('dupIdOverlay');
+  if (!listEl || !overlay) return;
+  if (!dups.length) { overlay.style.display = 'none'; return; }
+  listEl.innerHTML = dups.map(id => {
+    const rows = groups[id].map(r => `
+      <div style="font-size:12px;padding:5px 8px;border-bottom:1px solid var(--gray-mid);">
+        <strong>${esc(r.Datum||r.TagLabel||'—')}</strong> · ${esc(r.Schicht||'—')} · ${esc(r.Aufgabe||'—')} · ${esc(r.Von||'?')}–${esc(r.Bis||'?')}
+      </div>`).join('');
+    return `<div style="margin-bottom:14px;border:1px solid var(--gray-mid);">
+      <div style="background:var(--bg2);padding:6px 8px;font-weight:700;font-size:13px;">ID <span style="color:var(--red)">${esc(id)}</span> &nbsp;–&nbsp; ${groups[id].length}× vergeben</div>
+      ${rows}
+    </div>`;
+  }).join('');
+  overlay.style.display = 'flex';
+}
+
+function closeDupId() {
+  document.getElementById('dupIdOverlay').style.display = 'none';
+}
+
+function importCSV(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = async e => {
+    input.value = '';
+    const rows = parseCSVrows(e.target.result);
+    if (rows.length < 2) { showToast('CSV leer oder ohne Datenzeilen', 'error'); return; }
+    const headers = rows[0].map(h => String(h).trim().replace(/^\ufeff/,''));
+    const idx = n => headers.findIndex(h => h.toLowerCase() === n.toLowerCase());
+    const iId = idx('ID') >= 0 ? idx('ID') : idx('Tag');
+    const iDat = idx('Datum'), iVon = idx('Von'), iBis = idx('Bis');
+    const iSch = idx('Schicht'), iAuf = idx('Aufgabe');
+    const iMax = idx('Max Personen') >= 0 ? idx('Max Personen') : idx('MaxPersonen');
+    const iFarbe = idx('Farbe'), iInfo = idx('Informationen'), iGes = idx('Geschlossen');
+    if (iId < 0 || iAuf < 0 || iVon < 0 || iBis < 0) {
+      showToast('CSV-Header unvollständig (erwartet: ID, Datum, Von, Bis, Schicht, Aufgabe, Max Personen, …)', 'error');
+      return;
+    }
+    const get = (r, i, def='') => (i >= 0 && r[i] != null ? String(r[i]).trim() : def);
+    const mapped = [];
+    rows.slice(1).forEach(r => {
+      const tag = get(r, iId);
+      const aufgabe = get(r, iAuf);
+      if (!tag || !aufgabe) return; // unvollständige Zeile überspringen
+      mapped.push({
+        Tag: tag,
+        Datum: get(r, iDat),
+        Von: get(r, iVon),
+        Bis: get(r, iBis),
+        Schicht: get(r, iSch),
+        Aufgabe: aufgabe,
+        MaxPersonen: get(r, iMax, '2') || '2',
+        Farbe: get(r, iFarbe, '#CC0000') || '#CC0000',
+        Informationen: get(r, iInfo),
+        Geschlossen: get(r, iGes, '0') || '0'
+      });
+    });
+    if (!mapped.length) { showToast('Keine gültigen Zeilen gefunden', 'error'); return; }
+    // ID-Dublettencheck im Import-File
+    const seen = {}, dups = [];
+    mapped.forEach(m => { if (seen[m.Tag]) dups.push(m.Tag); else seen[m.Tag] = true; });
+    if (dups.length) {
+      if (!confirm(`Achtung: die Import-Datei enthält doppelte ID(s): ${[...new Set(dups)].join(', ')}.\n\nTrotzdem importieren?`)) return;
+    }
+    if (!confirm(`${mapped.length} Schicht(en) werden importiert und ersetzen ALLE ${(CONFIG||[]).length} bestehenden Schichten.\n\nAnmeldungen bleiben bestehen, können dadurch aber verwaisen.\n\nFortfahren?`)) return;
+    try {
+      await fetch(SCRIPT_URL, { method:'POST', mode:'no-cors', headers:{'Content-Type':'text/plain'}, body: JSON.stringify({ action:'saveConfig', password:ADMIN_PW, rows: mapped }) });
+      showToast(`✓ ${mapped.length} Schichten importiert – lade neu…`, 'success');
+      setTimeout(async () => { await loadData(); buildSchichtplan(); }, 1500);
+    } catch(err) { showToast('Fehler: ' + err.message, 'error'); }
+  };
+  reader.readAsText(file);
+}
+
+function addRow(data={}) {
+  const tbody = document.getElementById('configBody');
+  const i = tbody.rows.length;
+  const color = rgbToHex(data.Farbe) || PALETTE[i % PALETTE.length];
+  const tr = document.createElement('tr');
+  tr.innerHTML = `
+    <td><select id="rowtype-${i}" style="width:110px;padding:4px 6px;border:1px solid var(--gray-mid);font-family:inherit;font-size:12px;" onchange="updateRowId(${i})">
+      <option value="V" ${(data.Tag||'').startsWith('V')?'selected':''}>Vorbereitung</option>
+      <option value="A" ${(data.Tag||'').startsWith('A')||!(data.Tag||'').match(/^[VN]/)?'selected':''}>Chilbi</option>
+      <option value="N" ${(data.Tag||'').startsWith('N')?'selected':''}>Aufräumen</option>
+    </select><input type="hidden" id="rowtag-${i}" value="${esc(data.Tag||'')}"></td>
+    <td><input value="${esc(data.Datum||data.TagLabel||'')}" placeholder="z.B. 14.08.2026"></td>
+    <td><input value="${esc(data.Schicht||'')}" placeholder="Morgen"></td>
+    <td><input value="${esc(data.Aufgabe||'')}" placeholder="Kasse"></td>
+    <td><input value="${esc(data.Von||'')}" placeholder="08:00" style="width:58px"></td>
+    <td><input value="${esc(data.Bis||'')}" placeholder="12:00" style="width:58px"></td>
+    <td><input type="number" value="${data.MaxPersonen||2}" min="1" max="30" style="width:48px"></td>
+    <td class="td-color-cell"><div class="color-picker-wrap" id="cpw-${i}">
+      <div class="color-preview" id="cprev-${i}" style="background:${normalizeColor(color)}" onclick="toggleColorPicker(${i})"></div>
+      <div class="color-dropdown" id="cpdrop-${i}">
+        <div class="color-swatches" id="cpswatches-${i}"></div>
+        <div class="color-custom-row">
+          <label>🎨</label>
+          <input type="color" class="color-custom-input" id="cpcustom-${i}" value="${color!=='none'?color:'#CC0000'}" oninput="setRowColor(${i},this.value)">
+        </div>
+        <div style="border-top:1px solid var(--gray-mid);padding-top:5px;margin-top:2px;">
+          <div class="color-swatch${color==='none'?' selected':''}" style="background:white;border:2px solid #333;width:100%;border-radius:0;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#333;height:22px;"
+            onclick="setRowColor(${i},'none')">Ohne</div>
+        </div>
+      </div>
+    </div></td>
+    <td><input value="${esc(data.Informationen||'')}" placeholder="Treffpunkt / Hinweise…" style="min-width:200px"></td>
+    <td style="text-align:center;padding:0 8px;">
+      <label style="display:inline-flex;align-items:center;cursor:pointer;">
+        <input type="checkbox" class="row-closed" ${data.Geschlossen==='1'||data.Geschlossen===1?'checked':''} style="width:16px;height:16px;cursor:pointer;accent-color:var(--red);">
+      </label>
+    </td>
+    <td class="td-del"><button onclick="this.closest('tr').remove()" title="Löschen">✕</button></td>
+  `;
+  tbody.appendChild(tr);
+  // Init color picker after DOM insert
+  requestAnimationFrame(() => { initColorPicker(i, color); initRowId(i, data.Tag||''); });
+}
+
+function addSampleRows() {
+  const sample = [
+    ['V1','Freitag 06.06.','Vormittag','Aufbau Festzelt','08:00','12:00',4,'#1565c0','Treffpunkt: Festgelände Herrliberg, Eingang Seestrasse'],
+    ['V1','Freitag 06.06.','Nachmittag','Dekoration','13:00','17:00',3,'#6a1b9a','Treffpunkt: Festgelände Herrliberg, Eingang Seestrasse'],
+    ['V2','Samstag 07.06.','Vormittag','Endaufbau','08:00','11:00',6,'#1565c0','Treffpunkt: Festgelände Herrliberg'],
+    ['V2','Samstag 07.06.','Vormittag','Küche vorbereiten','08:00','11:00',3,'#e65100','Treffpunkt: Küchenzelt, Hintereingang'],
+    ['A1','Sonntag 08.06.','Morgen','Kasse','10:00','14:00',2,'#c0392b','Treffpunkt: Kassenstand, Haupteingang'],
+    ['A1','Sonntag 08.06.','Morgen','Festwirtschaft','10:00','14:00',4,'#e65100','Treffpunkt: Festzelt, Theke'],
+    ['A1','Sonntag 08.06.','Abend','Kasse','14:00','20:00',2,'#c0392b','Treffpunkt: Kassenstand, Haupteingang'],
+    ['A1','Sonntag 08.06.','Abend','Bar','16:00','22:00',3,'#00695c','Treffpunkt: Festzelt, Barbereich'],
+    ['A2','Montag 09.06.','Morgen','Kasse','10:00','14:00',2,'#c0392b','Treffpunkt: Kassenstand, Haupteingang'],
+    ['A2','Montag 09.06.','Abend','Bar','14:00','22:00',3,'#00695c','Treffpunkt: Festzelt, Barbereich'],
+    ['A3','Dienstag 10.06.','Morgen','Festwirtschaft','10:00','14:00',4,'#e65100','Treffpunkt: Festzelt, Theke'],
+    ['A3','Dienstag 10.06.','Abend','Bar','14:00','20:00',3,'#00695c','Treffpunkt: Festzelt, Barbereich'],
+    ['N1','Mittwoch 11.06.','Ganzer Tag','Abbau Festzelt','08:00','17:00',6,'#2e7d32','Treffpunkt: Festgelände Herrliberg'],
+    ['N1','Mittwoch 11.06.','Ganzer Tag','Reinigung','08:00','14:00',4,'#558b2f','Treffpunkt: Festgelände Herrliberg'],
+  ];
+  sample.forEach(r => addRow({Tag:r[0],TagLabel:r[1],Schicht:r[2],Aufgabe:r[3],Von:r[4],Bis:r[5],MaxPersonen:r[6],Farbe:r[7],Informationen:r[8]}));
+  showToast('Vorlage geladen – bitte anpassen und speichern.', 'success');
+}
+
+function readConfigRows() {
+  return [...document.querySelectorAll('#configBody tr')].map(tr => {
+    // Nur sichtbare Inputs (nicht hidden), in DOM-Reihenfolge
+    const visibleInputs = [...tr.querySelectorAll('input:not([type=hidden]),select:not(.row-closed)')];
+    const hiddenTag = tr.querySelector('input[type=hidden]');
+    // visibleInputs: [0]=Typ-Select, [1]=Datum, [2]=Schicht, [3]=Aufgabe, [4]=Von, [5]=Bis, [6]=Max, [7]=ColorCustom
+    // Informationen: letztes text-input vor der Checkbox
+    const textInputs = [...tr.querySelectorAll('input[type=text],input[type=number],input:not([type=hidden]):not([type=color]):not([type=checkbox])')];
+    // Direkte Referenz per Platzhalter
+    const datumInp   = tr.querySelector('input[placeholder="z.B. 14.08.2026"]') || visibleInputs[1];
+    const schichtInp = tr.querySelector('input[placeholder="Morgen"]')           || visibleInputs[2];
+    const aufgabeInp = tr.querySelector('input[placeholder="Kasse"]')            || visibleInputs[3];
+    const vonInp     = tr.querySelector('input[placeholder="08:00"]')            || visibleInputs[4];
+    const bisInp     = tr.querySelector('input[placeholder="12:00"]')            || visibleInputs[5];
+    const maxInp     = tr.querySelector('input[type=number]');
+    const infoInp    = tr.querySelector('input[placeholder="Treffpunkt / Hinweise…"]');
+    const closed     = tr.querySelector('.row-closed')?.checked ? '1' : '0';
+    const tag        = hiddenTag?.value.trim() || '';
+    return {
+      Tag: tag, Datum: datumInp?.value.trim()||'', TagLabel: datumInp?.value.trim()||'',
+      Schicht: schichtInp?.value.trim()||'', Aufgabe: aufgabeInp?.value.trim()||'',
+      Von: vonInp?.value.trim()||'', Bis: bisInp?.value.trim()||'',
+      MaxPersonen: maxInp?.value.trim()||'2',
+      Farbe: getRowColor(tr),
+      Informationen: infoInp?.value.trim()||'',
+      Geschlossen: closed
+    };
+  }).filter(r => r.Tag && r.Aufgabe);
+}
+
+async function saveConfig() {
+  const rows = readConfigRows();
+  try {
+    await fetch(SCRIPT_URL, { method:'POST', mode:'no-cors', headers:{'Content-Type':'text/plain'}, body: JSON.stringify({action:'saveConfig',password:ADMIN_PW,rows}) });
+    CONFIG = rows;
+    showToast('✓ Schichten gespeichert!', 'success');
+    renderOverview();
+  } catch(e) { showToast('Fehler: ' + e.message, 'error'); }
+}
+
+// ── SIGNUPS ────────────────────────────────────────────────────
+function renderSignups() {
+  const tagSel = document.getElementById('filterTag');
+  const schSel = document.getElementById('filterSchicht');
+  if (!tagSel || !schSel) return; // Tab noch nicht aktiv
+  // Datum-Gruppen: eindeutige Daten aus CONFIG, sortiert
+  function datumToWochentag(datum) {
+    const m = datum.match(/(\d{1,2})\.(\d{1,2})\.(\d{2,4})?/);
+    if (!m) return datum;
+    const day=parseInt(m[1]),month=parseInt(m[2])-1;
+    const yr=m[3]?(m[3].length===2?2000+parseInt(m[3]):parseInt(m[3])):new Date().getFullYear();
+    const d=new Date(yr,month,day);
+    if(isNaN(d.getTime())) return datum;
+    const WD=['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'];
+    return WD[d.getDay()]+', '+String(day).padStart(2,'0')+'.'+String(month+1).padStart(2,'0')+'.'+yr;
+  }
+  // Gruppiere nach Datum aus CONFIG
+  const datumMap = {}; // datum → [tag-ids]
+  SIGNUPS.forEach(s=>{ const cfg=CONFIG.find(r=>r.Tag===s.Tag)||{}; const datum=cfg.Datum||cfg.TagLabel||s.Tag; if(!datumMap[datum]) datumMap[datum]=[]; if(!datumMap[datum].includes(s.Tag)) datumMap[datum].push(s.Tag); });
+  const datums = Object.keys(datumMap).sort();
+  const schs = [...new Set(SIGNUPS.map(s=>s.Schicht))];
+  const curTag = tagSel.value, curSch = schSel.value;
+  const aufgSel = document.getElementById('filterAufgabe');
+  const curAufg = aufgSel?.value || '';
+  const aufgs = [...new Set(SIGNUPS.map(s=>s.Aufgabe))].sort();
+  // Dropdown: value = Datum-String, label = Wochentag
+  tagSel.innerHTML = '<option value="">Alle Tage</option>' + datums.map(datum=>`<option value="${esc(datum)}"${datum===curTag?' selected':''}>${esc(datumToWochentag(datum))}</option>`).join('');
+  schSel.innerHTML = '<option value="">Alle Schichten</option>' + schs.map(s=>`<option value="${esc(s)}"${s===curSch?' selected':''}>${esc(s)}</option>`).join('');
+  if(aufgSel) aufgSel.innerHTML = '<option value="">Alle Aufgaben</option>' + aufgs.map(a=>`<option value="${esc(a)}"${a===curAufg?' selected':''}>${esc(a)}</option>`).join('');
+  tagSel.value = curTag; schSel.value = curSch; if(aufgSel) aufgSel.value = curAufg;
+
+  const nameQ = document.getElementById('filterName').value.toLowerCase();
+  const aufgQ = document.getElementById('filterAufgabe')?.value || '';
+  const filtered = SIGNUPS.filter(s => {
+    const cfg=CONFIG.find(r=>r.Tag===s.Tag)||{};
+    const datum=cfg.Datum||cfg.TagLabel||s.Tag;
+    return (!nameQ || String(s.Tag||'').toLowerCase().includes(nameQ)) &&
+      (!curTag || datum===curTag) && (!curSch || s.Schicht===curSch) &&
+      (!aufgQ || s.Aufgabe===aufgQ);
+  });
+
+  const tbody = document.getElementById('signupBody');
+  if (!tbody) return;
+  if (!filtered.length) {
+    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:20px;color:var(--text3)">Keine Einträge</td></tr>`;
+    return;
+  }
+  sortSignupsData(filtered);
+  filteredSignups = filtered;
+  tbody.innerHTML = filtered.map((s,idx) => {
+    const cfg = CONFIG.find(r=>r.Tag===s.Tag)||{};
+    return `<tr>
+      <td>${esc(cfg.Datum||cfg.TagLabel||s.Tag)}</td>
+      <td>${esc(s.Tag)}</td>
+      <td>${esc(s.Schicht)}</td>
+      <td>${esc(s.Aufgabe)}</td>
+      <td style="font-weight:600">${esc(s.Name)}</td>
+      <td style="color:var(--text3);font-size:11px">${esc(formatDate(s.Timestamp))}</td>
+      <td><button onclick="openEditPopup(${idx})" style="border:none;background:none;cursor:pointer;font-size:14px;opacity:.6;padding:2px 6px;" title="Bearbeiten">&#9998;</button></td>
+    </tr>`;
+  }).join('');
+}
+
+let sortCol='TagLabel', sortAsc=true, filteredSignups=[];
+function sortSignups(col){if(sortCol===col)sortAsc=!sortAsc;else{sortCol=col;sortAsc=true;}renderSignups();}
+function sortSignupsData(arr){
+  arr.sort((a,b)=>{
+    const cfgA=CONFIG.find(r=>r.Tag===a.Tag)||{};
+    const cfgB=CONFIG.find(r=>r.Tag===b.Tag)||{};
+    let vA,vB;
+    if(sortCol==='TagLabel'){vA=cfgA.Datum||cfgA.TagLabel||a.Tag||'';vB=cfgB.Datum||cfgB.TagLabel||b.Tag||'';}
+    else{vA=String(a[sortCol]||'');vB=String(b[sortCol]||'');}
+    const c=vA.localeCompare(vB,'de',{numeric:true});
+    return sortAsc?c:-c;
+  });
+}
+
+function renderStats() {
+  const unique = new Set(SIGNUPS.map(s=>s.Name)).size;
+  const totalSlots = CONFIG.reduce((a,r) => a+(parseInt(r.MaxPersonen)||0), 0);
+  const filled = SIGNUPS.length;
+  const pct = totalSlots ? Math.round(filled/totalSlots*100) : 0;
+  const statsEl = document.getElementById('statsBar'); if (!statsEl) return;
+  statsEl.innerHTML = `
+    <div class="stat"><div class="stat-num">${filled}</div><div class="stat-lbl">Anmeldungen</div></div>
+    <div class="stat"><div class="stat-num">${unique}</div><div class="stat-lbl">Personen</div></div>
+    <div class="stat"><div class="stat-num">${filled}/${totalSlots}</div><div class="stat-lbl">Plätze belegt</div></div>
+    <div class="stat"><div class="stat-num">${pct}%</div><div class="stat-lbl">Auslastung</div></div>
+  `;
+}
+
+// ── Ehemaligen-Treff: Rückmeldungen (read-only) ──
+function renderEhemalige() {
+  const data = EHEMALIGE || [];
+  const norm = v => String(v||'').trim().toLowerCase();
+  const zus = data.filter(r => norm(r.Anmeldung) === 'zusage').length;
+  const abs = data.filter(r => norm(r.Anmeldung) === 'absage').length;
+  const total = data.length;
+  const statsEl = document.getElementById('ehStats');
+  if (statsEl) {
+    const zDeg = total ? (zus/total)*360 : 0;
+    const pie = total
+      ? `background:conic-gradient(var(--green) 0 ${zDeg}deg, var(--red) ${zDeg}deg 360deg);`
+      : `background:var(--gray-mid);`;
+    statsEl.innerHTML = `
+      <div class="stat"><div class="stat-num" style="color:var(--green)">${zus}</div><div class="stat-lbl">Zusagen</div></div>
+      <div class="stat"><div class="stat-num" style="color:var(--red)">${abs}</div><div class="stat-lbl">Absagen</div></div>
+      <div class="stat"><div class="stat-num">${total}</div><div class="stat-lbl">Total</div></div>
+      <div class="stat" style="display:flex;align-items:center;gap:10px;justify-content:center;">
+        <div style="width:56px;height:56px;border-radius:50%;${pie}flex:none;"></div>
+        <div style="font-size:11px;line-height:1.7;text-align:left;">
+          <div><span style="display:inline-block;width:9px;height:9px;background:var(--green);margin-right:5px;"></span>Zusagen</div>
+          <div><span style="display:inline-block;width:9px;height:9px;background:var(--red);margin-right:5px;"></span>Absagen</div>
+        </div>
+      </div>`;
+  }
+  const body = document.getElementById('ehBody');
+  if (!body) return;
+  let rows = data.slice();
+  if (ehFilter !== 'all') rows = rows.filter(r => norm(r.Anmeldung) === norm(ehFilter));
+  rows.sort((a,b) => String(b.Timestamp).localeCompare(String(a.Timestamp)));
+  if (!rows.length) {
+    body.innerHTML = `<tr><td colspan="6" style="text-align:center;color:var(--text3);padding:18px;">Keine Einträge.</td></tr>`;
+    return;
+  }
+  body.innerHTML = rows.map(r => {
+    const isZ = norm(r.Anmeldung) === 'zusage';
+    const badge = `<span style="font-size:11px;font-weight:700;padding:2px 8px;color:white;background:${isZ?'var(--green)':'var(--red)'};">${esc(r.Anmeldung||'')}</span>`;
+    return `<tr>
+      <td style="font-size:12px;color:var(--text2)">${esc(r.Timestamp||'')}</td>
+      <td>${badge}</td>
+      <td>${esc(r.Name||'')}</td>
+      <td>${esc(r.Vorname||'')}</td>
+      <td>${r.Mail ? `<a href="mailto:${esc(r.Mail)}">${esc(r.Mail)}</a>` : '<span style="color:var(--text3)">–</span>'}</td>
+      <td>${r.Tel ? esc(r.Tel) : '<span style="color:var(--text3)">–</span>'}</td>
+    </tr>`;
+  }).join('');
+}
+
+function setEhFilter(f, btn) {
+  ehFilter = f;
+  document.querySelectorAll('#ehFilterBtns .btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  renderEhemalige();
+}
+
+function exportEhemaligeCSV() {
+  const data = EHEMALIGE || [];
+  if (!data.length) { showToast('Keine Einträge zum Exportieren', 'error'); return; }
+  const headers = ['Timestamp','Anmeldung','Name','Vorname','Mail','Tel'];
+  const q = v => `"${String(v==null?'':v).replace(/"/g,'""')}"`;
+  const lines = data.map(r => [r.Timestamp, r.Anmeldung, r.Name, r.Vorname, r.Mail, r.Tel].map(q).join(','));
+  const csv = [headers.join(','), ...lines].join('\n');
+  const a = Object.assign(document.createElement('a'),{href:URL.createObjectURL(new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8'})),download:'chilbi_ehemalige.csv'});
+  a.click();
+}
+
+const WEEKDAYS = ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'];
+function dayHeaderText(label) {
+  const m = label.match(/(\d{1,2})\.(\d{1,2})\.(\d{2,4})?/);
+  if (m) {
+    const day=parseInt(m[1]),month=parseInt(m[2])-1;
+    const yr=m[3]?(m[3].length===2?2000+parseInt(m[3]):parseInt(m[3])):new Date().getFullYear();
+    const date=new Date(yr,month,day);
+    if(!isNaN(date.getTime())){
+      const wd=WEEKDAYS[date.getDay()];
+      return wd+', '+String(day).padStart(2,'0')+'.'+String(month+1).padStart(2,'0')+'.'+yr;
+    }
+  }
+  return label;
+}
+
+function clearOvFilters() {
+  ['ovFilterTag','ovFilterSchicht','ovFilterAufgabe'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  renderOverview();
+}
+
+function renderOverview() {
+  const curTag    = document.getElementById('ovFilterTag')?.value    || '';
+  const curSchicht= document.getElementById('ovFilterSchicht')?.value|| '';
+  const curAufgabe= document.getElementById('ovFilterAufgabe')?.value|| '';
+
+  // Dropdowns befüllen
+  const tagSel = document.getElementById('ovFilterTag');
+  const schSel = document.getElementById('ovFilterSchicht');
+  const aufSel = document.getElementById('ovFilterAufgabe');
+
+  if (tagSel) {
+    const datums = [...new Set(CONFIG.map(r=>r.Datum||r.TagLabel||'').filter(d=>d&&d.match(/\d/)))].sort();
+    tagSel.innerHTML = '<option value="">Alle Tage</option>' + datums.map(d=>`<option value="${esc(d)}"${d===curTag?' selected':''}>${esc(dayHeaderText(d))}</option>`).join('');
+  }
+  const filteredConfig = CONFIG.filter(r => {
+    const datum = r.Datum||r.TagLabel||'';
+    if (curTag && datum !== curTag) return false;
+    if (curSchicht && r.Schicht !== curSchicht) return false;
+    if (curAufgabe && r.Aufgabe !== curAufgabe) return false;
+    return true;
+  });
+  if (schSel) {
+    const schs = [...new Set(CONFIG.map(r=>r.Schicht).filter(Boolean))].sort();
+    schSel.innerHTML = '<option value="">Alle Schichten</option>' + schs.map(s=>`<option value="${esc(s)}"${s===curSchicht?' selected':''}>${esc(s)}</option>`).join('');
+  }
+  if (aufSel) {
+    const aufs = [...new Set(CONFIG.map(r=>r.Aufgabe).filter(Boolean))].sort();
+    aufSel.innerHTML = '<option value="">Alle Aufgaben</option>' + aufs.map(a=>`<option value="${esc(a)}"${a===curAufgabe?' selected':''}>${esc(a)}</option>`).join('');
+  }
+
+  // Originale renderOverview Logik mit gefilterten Daten
+  const labelMap={}, labelOrder=[];
+  filteredConfig.forEach(r=>{
+    const lbl=r.Datum||r.TagLabel||'';
+    if(!lbl||!lbl.match(/\d/)) return;
+    if(!labelMap[lbl]){labelMap[lbl]=[];labelOrder.push(lbl);}
+    labelMap[lbl].push(r);
+  });
+
+  // Druckbuttons pro Tag
+  const printBtns = document.getElementById('printBtns');
+  if (printBtns) {
+    // Sortiere nach Datum
+  const sortedLabels = [...labelOrder].sort((a,b)=>{
+    const parseD = s => { const m=s.match(/(\d{1,2})\.(\d{1,2})\.(\d{2,4})?/); if(!m) return 0; const yr=m[3]?(m[3].length===2?2000+parseInt(m[3]):parseInt(m[3])):2026; return new Date(yr,parseInt(m[2])-1,parseInt(m[1])).getTime(); };
+    return parseD(a)-parseD(b);
+  });
+  printBtns.innerHTML = sortedLabels.map(lbl=>{
+    const i = labelOrder.indexOf(lbl);
+    return `<button class="print-btn" onclick="printDay('day-${i}')" title="Tag drucken (A3)">🖨 ${esc(dayHeaderText(lbl).split(',')[0])}</button>`;
+  }).join('');
+  }
+
+  let html = '';
+  labelOrder.forEach((lbl,i) => {
+    const rows = labelMap[lbl];
+    const schs = [...new Set(rows.map(r=>r.Schicht))];
+    const dayTotal = rows.reduce((s,r)=>s+(parseInt(r.MaxPersonen)||0),0);
+    const dayTaken = rows.reduce((s,r)=>s+SIGNUPS.filter(sg=>String(sg.Tag)===String(r.Tag)).length,0);
+    const dayFree  = dayTotal - dayTaken;
+    html += `<div class="print-day" id="day-${i}">
+      <div style="font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;margin:24px 0 8px;padding-bottom:6px;border-bottom:2px solid var(--black);display:flex;justify-content:space-between;align-items:baseline">
+        <span>${esc(dayHeaderText(lbl))}</span>
+        <span style="font-size:11px;font-weight:400;color:var(--gray)">${dayTaken}/${dayTotal} besetzt &nbsp;·&nbsp; <span style="color:${dayFree>0?'var(--green)':'var(--gray)'}">${dayFree} frei</span></span>
+      </div>`;
+    schs.forEach(sch => {
+      html += `<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--gray);margin:10px 0 5px">${esc(sch)}</div>`;
+      rows.filter(r=>r.Schicht===sch).forEach(t => {
+        const taken = SIGNUPS.filter(s=>String(s.Tag)===String(t.Tag));
+        const max   = parseInt(t.MaxPersonen)||1;
+        const pct   = Math.min(100, Math.round(taken.length/max*100));
+        const barColor = taken.length>=max ? 'var(--green)' : taken.length>0 ? 'var(--red)' : 'var(--gray-mid)';
+        const isClosed = String(t.Geschlossen)==='1'||t.Geschlossen===true;
+        html += `<div class="ov-task">
+          <div class="ov-task-name">${esc(t.Aufgabe)}${isClosed?' 🔒':''}</div>
+          <div class="ov-task-time">${esc(t.Von)}–${esc(t.Bis)}</div>
+          <div class="ov-bar-wrap"><div class="ov-bar" style="width:${pct}%;background:${isClosed?'#888':barColor}"></div></div>
+          <div class="ov-persons" style="color:${isClosed?'#888':barColor}">${taken.length}/${max} ${taken.map(s=>`<span style="font-weight:700">${esc(s.Name)}</span>`).join(', ')}</div>
+        </div>`;
+      });
+    });
+    html += '</div>';
+  });
+  document.getElementById('overviewContent').innerHTML = html || '<div style="padding:2rem;color:var(--text3);text-align:center">Noch keine Schichten definiert.</div>';
+}
+
+function printDay(dayId) {
+  const dayIdx = parseInt(dayId.split('-')[1]);
+  const labelMap={}, labelOrder=[];
+  CONFIG.forEach(r=>{
+    const lbl=r.Datum||r.TagLabel||'';
+    if(!lbl||!lbl.match(/\d/)) return;
+    if(!labelMap[lbl]){labelMap[lbl]=[];labelOrder.push(lbl);}
+    labelMap[lbl].push(r);
+  });
+  const lbl = labelOrder[dayIdx];
+  if (!lbl) return;
+  const rows = labelMap[lbl];
+
+  function parseT(t,von){
+    const[h,m]=String(t).split(':').map(Number);
+    let mins=h*60+(m||0);
+    if(von!==undefined&&mins<=von&&mins<720)mins+=24*60;
+    return mins;
+  }
+
+  // ===== Auto-Fit Print: A3 quer, volle Breite, 1 Seite pro Tag =====
+  const allT = rows.flatMap(r=>{const v=parseT(r.Von);return[v,parseT(r.Bis,v)];});
+  const minT=Math.min(...allT), maxT=Math.max(...allT);
+  const spanMin = (maxT - minT) || 1;
+
+  // Schichten gruppieren
+  const schMap={}, schOrder=[];
+  rows.forEach(r=>{
+    if(!schMap[r.Schicht]){schMap[r.Schicht]=[];schOrder.push(r.Schicht);}
+    schMap[r.Schicht].push(r);
+  });
+
+  // --- Höhe in Einheiten (U) summieren, dann U lösen → füllt 1 A3-Seite ---
+  const HEADER_U=2.6, RULER_U=1.7, SCH_U=1.9, GAP_U=0.18;
+  const rowU = r => Math.max(parseInt(r.MaxPersonen)||1, 2.1); // Block- vs. Label-Höhe
+  let units = HEADER_U + RULER_U;
+  schOrder.forEach(sch=>{
+    units += SCH_U;
+    schMap[sch].forEach(r=>{ units += rowU(r) + GAP_U; });
+  });
+  const AVAIL_H = 1010;                                   // ~277mm druckbar (A3 quer, 10mm Rand)
+  const U = Math.max(8, Math.min(20, AVAIL_H/units));     // Skalierung gedeckelt (8–20px)
+  const px = n => +(n*U).toFixed(1);
+  const labelW = Math.round(Math.max(100, Math.min(160, 8*U)));
+
+  // Ruler (Prozent → volle Breite)
+  let rulerHtml='';
+  for(let h=Math.floor(minT/60);h<=Math.ceil(maxT/60);h++){
+    const pct=((h*60-minT)/spanMin)*100;
+    if(pct<0||pct>100.5) continue;
+    rulerHtml+=`<div style="position:absolute;left:${pct.toFixed(2)}%;font-size:${px(0.6)}px;color:#555;border-left:1px solid #bbb;padding-left:2px;top:0;white-space:nowrap;height:${px(1.4)}px;line-height:${px(1.4)}px">${h%24}:00</div>`;
+  }
+
+  // Schichten + Aufgaben
+  let schHtml='';
+  schOrder.forEach(sch=>{
+    schHtml+=`<div style="font-size:${px(0.62)}px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#888;margin:${px(0.5)}px 0 ${px(0.25)}px ${labelW}px;border-bottom:1px solid #ccc;padding-bottom:2px">${sch}</div>`;
+    schMap[sch].forEach(r=>{
+      const vonM=parseT(r.Von), bisM=parseT(r.Bis,vonM);
+      const leftPct=(((vonM-minT)/spanMin)*100).toFixed(2);
+      const widePct=(((bisM-vonM)/spanMin)*100).toFixed(2);
+      const taken=SIGNUPS.filter(s=>String(s.Tag)===String(r.Tag));
+      const max=parseInt(r.MaxPersonen)||1;
+      const isClosed=String(r.Geschlossen)==='1'||r.Geschlossen===true;
+      const blockH=px(max);          // Höhe der Personen-Linien
+      const rowH=px(rowU(r));         // Zeilenhöhe = max(Block, Label) → kein Überlauf
+      const namedLines=taken.map(s=>`<div style="border-bottom:1px solid #bbb;padding:0 3px;font-size:${px(0.62)}px;font-weight:700;height:${px(1)}px;line-height:${px(1)}px;overflow:hidden">${s.Name}</div>`).join('');
+      const emptyLines=Array.from({length:Math.max(0,max-taken.length)},()=>`<div style="border-bottom:1px solid #bbb;height:${px(1)}px;"></div>`).join('');
+      schHtml+=`<div style="display:flex;align-items:flex-start;margin-bottom:${px(GAP_U)}px;height:${rowH}px;">
+        <div style="width:${labelW}px;min-width:${labelW}px;padding-right:6px;padding-top:1px;overflow:hidden">
+          <div style="font-size:${px(0.66)}px;font-weight:700;line-height:${px(0.95)}px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${r.Aufgabe}${isClosed?' 🔒':''}</div>
+          <div style="font-size:${px(0.6)}px;line-height:${px(0.95)}px;color:#666;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"><span>${r.Von}–${r.Bis}</span> · <span style="font-weight:700;color:${taken.length>=max?'#c00':'#555'}">${taken.length}/${max}</span></div>
+        </div>
+        <div style="position:relative;flex:1;height:${rowH}px;background:#f8f8f8;border:1px solid #ddd;">
+          <div style="position:absolute;left:${leftPct}%;width:${widePct}%;height:${blockH}px;border:1.5px solid #333;background:${isClosed?'#f0f0f0':'white'};overflow:hidden;">
+            ${namedLines}${emptyLines}
+          </div>
+        </div>
+      </div>`;
+    });
+  });
+
+  const titleText = dayHeaderText(lbl);
+  const win=window.open('','_blank');
+  win.document.write(`<!DOCTYPE html><html><head>
+    <meta charset="UTF-8">
+    <title>Schichtplan ${titleText}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+      *{box-sizing:border-box;margin:0;padding:0;}
+      body{font-family:'Open Sans',Arial,sans-serif;width:1500px;padding:0;}
+      @page{size:A3 landscape;margin:10mm;}
+      @media print{body{width:100%;}}
+    </style>
+  </head><body>
+    <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:${px(0.5)}px;padding-bottom:${px(0.3)}px;border-bottom:2px solid black;">
+      <div style="font-size:${px(1.3)}px;font-weight:700;text-transform:uppercase">${titleText}</div>
+      <div style="font-size:${px(0.62)}px;color:#666">Stützpunktfeuerwehr Meilen &nbsp;·&nbsp; Chilbi Herrliberg &nbsp;·&nbsp; Cl1.063-dev</div>
+    </div>
+    <div style="display:flex;margin-bottom:${px(0.2)}px;">
+      <div style="width:${labelW}px;min-width:${labelW}px;"></div>
+      <div style="position:relative;flex:1;height:${px(1.5)}px;border-bottom:1px solid #bbb;">
+        ${rulerHtml}
+      </div>
+    </div>
+    ${schHtml}
+  </body></html>`);
+  win.document.close();
+  win.focus();
+  setTimeout(()=>win.print(), 1200);
+}
+
+function exportCSV() {
+  // Reihenfolge wie im Sheet: ID | Name | Schicht | Aufgabe | Timestamp
+  const headers = ['ID','Name','Schicht','Aufgabe','Timestamp'];
+  const q = v => `"${String(v==null?'':v).replace(/"/g,'""')}"`;
+  const rows = SIGNUPS.map(s => [s.Tag||s.ID||'', s.Name, s.Schicht, s.Aufgabe, s.Timestamp].map(q).join(','));
+  const csv = [headers.join(','),...rows].join('\n');
+  const a = Object.assign(document.createElement('a'),{href:URL.createObjectURL(new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8'})),download:'chilbi_anmeldungen.csv'});
+  a.click();
+}
+
+// ── Schichten (Konfiguration) als CSV exportieren – round-trip-fähig mit importCSV ──
+function exportConfigCSV() {
+  const rows = CONFIG || [];
+  if (!rows.length) { showToast('Keine Schichten zum Exportieren', 'error'); return; }
+  const headers = ['ID','Datum','Von','Bis','Schicht','Aufgabe','Max Personen','Farbe','Informationen','Geschlossen'];
+  const q = v => `"${String(v==null?'':v).replace(/"/g,'""')}"`;
+  const lines = rows.map(r => [
+    r.Tag||r.ID, r.Datum||r.TagLabel, r.Von, r.Bis, r.Schicht, r.Aufgabe,
+    r.MaxPersonen||r['Max Personen'], r.Farbe, r.Informationen, r.Geschlossen
+  ].map(q).join(','));
+  const csv = [headers.join(','), ...lines].join('\n');
+  const a = Object.assign(document.createElement('a'),{href:URL.createObjectURL(new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8'})),download:'chilbi_schichten.csv'});
+  a.click();
+}
+
+// ── CSV-Parser (mit Anführungszeichen, "" Escapes, \r\n) ──
+function parseCSVrows(text) {
+  const rows=[]; let row=[], cur='', inQ=false;
+  text = String(text).replace(/\r\n/g,'\n').replace(/\r/g,'\n');
+  for (let i=0;i<text.length;i++){
+    const c=text[i];
+    if (inQ){
+      if (c==='"'){ if(text[i+1]==='"'){cur+='"';i++;} else inQ=false; }
+      else cur+=c;
+    } else {
+      if (c==='"') inQ=true;
+      else if (c===',') { row.push(cur); cur=''; }
+      else if (c==='\n') { row.push(cur); rows.push(row); row=[]; cur=''; }
+      else cur+=c;
+    }
+  }
+  if (cur!=='' || row.length) { row.push(cur); rows.push(row); }
+  return rows.filter(r => r.length && r.some(c => String(c).trim()!==''));
+}
+
+// ── Anmeldungen importieren: replace-all, validiert gegen CONFIG, mit Bestätigung ──
+function importSignupsCSV(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = async e => {
+    input.value = '';
+    const rows = parseCSVrows(e.target.result);
+    if (rows.length < 2) { showToast('CSV leer oder ohne Datenzeilen', 'error'); return; }
+    const headers = rows[0].map(h => String(h).trim().replace(/^\ufeff/,''));
+    const idx = n => headers.findIndex(h => h.toLowerCase() === n.toLowerCase());
+    const iTs = idx('Timestamp');
+    const iName = idx('Name');
+    const iTag = idx('Tag') >= 0 ? idx('Tag') : idx('ID');
+    const iSch = idx('Schicht');
+    const iAuf = idx('Aufgabe');
+    if (iName < 0 || iTag < 0 || iSch < 0 || iAuf < 0) {
+      showToast('CSV-Header unvollständig (erwartet: Timestamp, Name, Tag, Schicht, Aufgabe)', 'error');
+      return;
+    }
+    const data = [], invalid = [];
+    rows.slice(1).forEach((r, n) => {
+      const tag = (r[iTag]||'').trim(), name = (r[iName]||'').trim();
+      const schicht = (r[iSch]||'').trim(), aufgabe = (r[iAuf]||'').trim();
+      const timestamp = iTs >= 0 ? (r[iTs]||'').trim() : '';
+      if (!tag && !name && !schicht && !aufgabe) return; // Leerzeile
+      // Validierung: Kombination Tag + Schicht + Aufgabe muss in der Konfiguration existieren
+      const ok = CONFIG.some(c => String(c.Tag)===tag && String(c.Schicht)===schicht && String(c.Aufgabe)===aufgabe);
+      if (!ok) { invalid.push(`Zeile ${n+2}: ${tag||'—'} / ${schicht||'—'} / ${aufgabe||'—'}${name?' ('+name+')':''}`); return; }
+      data.push({ tag, name, schicht, aufgabe, timestamp });
+    });
+    if (invalid.length) {
+      alert('Import abgebrochen – diese Zeilen passen zu keiner konfigurierten Schicht (Tag / Schicht / Aufgabe):\n\n'
+        + invalid.slice(0,15).join('\n')
+        + (invalid.length>15 ? `\n… und ${invalid.length-15} weitere` : '')
+        + '\n\nBitte CSV korrigieren und erneut importieren.');
+      return;
+    }
+    if (!data.length) { showToast('Keine gültigen Zeilen gefunden', 'error'); return; }
+    if (!confirm(`${data.length} Anmeldung(en) werden importiert und ersetzen ALLE ${SIGNUPS.length} bestehenden Anmeldungen.\n\nFortfahren?`)) return;
+    try {
+      await fetch(SCRIPT_URL, { method:'POST', mode:'no-cors', headers:{'Content-Type':'text/plain'}, body: JSON.stringify({ action:'importSignups', password:ADMIN_PW, rows:data }) });
+      showToast(`✓ ${data.length} Anmeldungen importiert – lade neu…`, 'success');
+      setTimeout(loadData, 1500);
+    } catch(err) { showToast('Fehler: ' + err.message, 'error'); }
+  };
+  reader.readAsText(file);
+}
+
+
+// ── COLOR PICKER ──────────────────────────────────────────────
+const BRAND_COLORS = [
+  '#CC0000','#1a1a1a','#1565c0','#2d6a1f',
+  '#e65100','#00695c','#6a1b9a','#c68400'
+];
+
+function initColorPicker(i, initColor) {
+  initColor = rgbToHex(initColor) || '#CC0000';
+  const swatchesEl = document.getElementById('cpswatches-' + i);
+  if (!swatchesEl) return;
+  swatchesEl.innerHTML = BRAND_COLORS.map(c =>
+    `<div class="color-swatch${c===initColor?' selected':''}" style="background:${c}"
+      onclick="setRowColor(${i},'${c}')"></div>`
+  ).join('');
+  document.getElementById('cpcustom-' + i).value = initColor;
+}
+
+function setRowColor(i, color) {
+  const prev = document.getElementById('cprev-' + i);
+  const custom = document.getElementById('cpcustom-' + i);
+  if (prev) {
+    prev.style.background = color === 'none' ? 'white' : color;
+    prev.style.border = color === 'none' ? '2px solid #333' : '1px solid var(--gray-mid)';
+    prev.dataset.color = color;
+  }
+  if (custom && color !== 'none') custom.value = color;
+  // Update swatch selection
+  const swatches = document.querySelectorAll(`#cpswatches-${i} .color-swatch`);
+  swatches.forEach(s => s.classList.toggle('selected', s.style.background === hexToRgb(color) || s.style.background === color));
+  closeAllColorPickers(i);
+}
+
+function getRowColor(tr) {
+  if (!tr) return '#CC0000';
+  const prev = tr.querySelector('.color-preview');
+  if (!prev) return '#CC0000';
+  const c = prev.dataset.color || '';
+  if (c === 'none') return 'none';
+  return c || prev.style.background || '#CC0000';
+}
+
+function toggleColorPicker(i) {
+  const drop = document.getElementById('cpdrop-' + i);
+  const isOpen = drop.classList.contains('open');
+  closeAllColorPickers();
+  if (!isOpen) drop.classList.add('open');
+}
+
+function closeAllColorPickers(exceptIdx) {
+  document.querySelectorAll('.color-dropdown').forEach((d,idx) => {
+    if (exceptIdx === undefined || idx !== exceptIdx) d.classList.remove('open');
+  });
+}
+
+function hexToRgb(hex) {
+  const r = parseInt(hex.slice(1,3),16);
+  const g = parseInt(hex.slice(3,5),16);
+  const b = parseInt(hex.slice(5,7),16);
+  return `rgb(${r}, ${g}, ${b})`;
+}
+
+document.addEventListener('click', e => {
+  if (!e.target.closest('.color-picker-wrap')) closeAllColorPickers();
+});
+
+
+let editIdx=null, editOriginal=null;
+function openEditPopup(idx){
+  editIdx=idx; editOriginal={...filteredSignups[idx]};
+  const s=filteredSignups[idx];
+  document.getElementById('editTag').value=s.Tag||'';
+  document.getElementById('editName').value=s.Name||'';
+  document.getElementById('editSchicht').value=s.Schicht||'';
+  document.getElementById('editAufgabe').value=s.Aufgabe||'';
+  document.getElementById('editPopupOverlay').style.display='flex';
+}
+function closeEditPopup(){document.getElementById('editPopupOverlay').style.display='none';editIdx=null;editOriginal=null;}
+async function saveEditSignup(){
+  const updated={action:'editSignup',tag:document.getElementById('editTag').value.trim(),name:document.getElementById('editName').value.trim(),schicht:document.getElementById('editSchicht').value.trim(),aufgabe:document.getElementById('editAufgabe').value.trim(),oldTag:editOriginal.Tag,oldName:editOriginal.Name};
+  try{
+    await fetch(SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain'},body:JSON.stringify(updated)});
+    closeEditPopup();showToast('Gespeichert','success');await loadData();
+  }catch(e){showToast('Fehler: '+e.message,'error');}
+}
+function confirmDeleteSignup(){document.getElementById('confirmPopupOverlay').style.display='flex';}
+function closeConfirmPopup(){document.getElementById('confirmPopupOverlay').style.display='none';}
+async function doDeleteSignup(){
+  try{
+    await fetch(SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'unsignup',tag:editOriginal.Tag,name:editOriginal.Name})});
+    closeConfirmPopup();closeEditPopup();showToast('Gelöscht','success');await loadData();
+  }catch(e){showToast('Fehler: '+e.message,'error');}
+}
+
+function loadSettings() {
+  loadAutoColorSetting();
+  const showColors = localStorage.getItem('chilbi_showColors') !== 'false';
+  const cb = document.getElementById('settingColors');
+  if (cb) {
+    cb.checked = showColors;
+    updateSettingUI(showColors);
+  }
+}
+
+function saveSetting(key, value) {
+  localStorage.setItem('chilbi_' + key, value);
+  updateSettingUI(value);
+}
+
+function updateSettingUI(checked) {
+  const track = document.getElementById('settingTrack');
+  const knob  = document.getElementById('settingKnob');
+  if (track) track.style.background = checked ? 'var(--red)' : 'var(--gray-mid)';
+  if (knob)  knob.style.left = checked ? '23px' : '3px';
+}
+
+function toggleAutoColor(checked) {
+  localStorage.setItem('chilbi_autoColor', checked);
+  document.getElementById('autoColorSection').style.display = checked ? '' : 'none';
+  const track = document.getElementById('autoColorTrack');
+  const knob  = document.getElementById('autoColorKnob');
+  if (track) track.style.background = checked ? 'var(--red)' : 'var(--gray-mid)';
+  if (knob)  knob.style.left = checked ? '23px' : '3px';
+  // Farbpicker in Schichten ausblenden/anzeigen
+  document.querySelectorAll('.color-picker-wrap').forEach(el => {
+    el.style.display = checked ? 'none' : '';
+  });
+  if (checked) buildAufgabenColorList();
+}
+
+function buildAufgabenColorList() {
+  const aufgaben = [...new Set(CONFIG.map(r => r.Aufgabe).filter(Boolean))].sort();
+  const saved = JSON.parse(localStorage.getItem('chilbi_aufgabenColors') || '{}');
+  const list = document.getElementById('aufgabenColorList');
+  if (!list) return;
+  list.innerHTML = aufgaben.map(a => {
+    const firstEntry = CONFIG.find(r => r.Aufgabe === a && r.Farbe && r.Farbe !== 'none');
+    const defaultColor = rgbToHex(firstEntry?.Farbe) || '#CC0000';
+    const color = saved[a] !== undefined ? saved[a] : defaultColor;
+    const isNone = color === 'none';
+    return `<div style="display:flex;align-items:center;gap:12px;padding:6px 0;border-bottom:1px solid var(--gray-mid);">
+      <span style="flex:1;font-size:13px;font-weight:600">${esc(a)}</span>
+      <label style="display:flex;align-items:center;gap:4px;font-size:11px;cursor:pointer;">
+        <input type="checkbox" ${isNone?'checked':''} onchange="saveAufgabeColor('${esc(a)}',this.checked?'none':document.getElementById('afc-${esc(a)}').value)">
+        Ohne
+      </label>
+      <input type="color" id="afc-${esc(a)}" value="${isNone?'#CC0000':color}" onchange="saveAufgabeColor('${esc(a)}',this.value)"
+        style="width:36px;height:26px;padding:1px;border:1px solid var(--gray-mid);cursor:pointer;${isNone?'opacity:.3':''}">
+    </div>`;
+  }).join('');
+}
+
+function saveAufgabeColor(aufgabe, color) {
+  const saved = JSON.parse(localStorage.getItem('chilbi_aufgabenColors') || '{}');
+  saved[aufgabe] = color;
+  localStorage.setItem('chilbi_aufgabenColors', JSON.stringify(saved));
+}
+
+async function applyAutoColors() {
+  if (!confirm('Achtung: Alle bestehenden Farben in den Schichten werden mit den Aufgaben-Farben überschrieben. Fortfahren?')) return;
+  const saved = JSON.parse(localStorage.getItem('chilbi_aufgabenColors') || '{}');
+
+  // Direkt CONFIG-Array updaten (kein DOM nötig)
+  const updated = CONFIG.map(r => {
+    const color = saved[r.Aufgabe];
+    if (color !== undefined) r.Farbe = color;
+    return r;
+  });
+
+  // Direkt ins Sheet speichern
+  await fetch(SCRIPT_URL, {method:'POST', mode:'no-cors', headers:{'Content-Type':'text/plain'},
+    body: JSON.stringify({action:'saveConfig', password:ADMIN_PW, rows: updated.map(r => ({
+      Tag: r.Tag, Datum: r.Datum||r.TagLabel, Von: r.Von, Bis: r.Bis,
+      Schicht: r.Schicht, Aufgabe: r.Aufgabe, MaxPersonen: r['Max Personen']||r.MaxPersonen,
+      Farbe: r.Farbe, Informationen: r.Informationen||'', Geschlossen: r.Geschlossen||'0'
+    }))})});
+
+  showToast('✓ Farben gespeichert!', 'success');
+  setTimeout(() => loadData(), 2000);
+}
+
+// ── TAGE ──────────────────────────────────────────────────────
+let TAGE_TYPEN = {}; // {datum: 'Chilbi'|'Vorbereitung'|'Aufräumen'}
+
+async function loadTage() {
+  try {
+    const rows = await fetchGvizSheet('Tage');
+    TAGE_TYPEN = {};
+    rows.forEach(r => { if(r.Datum) TAGE_TYPEN[r.Datum] = r.Typ || 'Chilbi'; });
+  } catch(e) { console.warn('Tage nicht geladen:', e); }
+  renderTage();
+}
+
+function renderTage() {
+  // Nur Datum-Spalte, Zeilen ohne Datum ignorieren
+  const datums = [...new Set(CONFIG.map(r => r.Datum).filter(d => d && d.match(/\d/)))].sort();
+  const tbody = document.getElementById('tageBody');
+  if (!tbody) return;
+  tbody.innerHTML = datums.map(datum => {
+    const typ = TAGE_TYPEN[datum] || autoDetectTyp(datum, CONFIG);
+    TAGE_TYPEN[datum] = typ;
+    return `<tr>
+      <td style="padding:8px;font-weight:600">${esc(datum)}</td>
+      <td style="padding:8px">
+        <input type="text" value="${esc(typ)}"
+          onchange="TAGE_TYPEN['${esc(datum)}']=this.value"
+          style="padding:4px 8px;border:1px solid var(--gray-mid);font-family:inherit;font-size:12px;width:160px;"
+          placeholder="Vorbereitung / Chilbi / Aufräumen">
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function autoDetectTyp(datum, config) {
+  const row = config.find(r => (r.Datum||r.TagLabel||r.Tag) === datum);
+  if (!row) return 'Chilbi';
+  const id = String(row.Tag||'');
+  if (id.startsWith('V')) return 'Vorbereitung';
+  if (id.startsWith('N')) return 'Aufräumen';
+  return 'Chilbi';
+}
+
+async function saveTage() {
+  const rows = Object.entries(TAGE_TYPEN).map(([datum, typ]) => ({Datum: datum, Typ: typ}));
+  await fetch(SCRIPT_URL, {method:'POST', mode:'no-cors', headers:{'Content-Type':'text/plain'},
+    body: JSON.stringify({action:'saveTage', password:ADMIN_PW, rows})});
+  showToast('✓ Tage gespeichert', 'success');
+}
+
+function toggleAccordion(id) {
+  const body = document.getElementById(id);
+  const arr  = document.getElementById('arr-' + id);
+  if (!body) return;
+  const isOpen = body.classList.contains('open');
+  body.classList.toggle('open', !isOpen);
+  if (arr) arr.style.transform = isOpen ? '' : 'rotate(180deg)';
+  if (id === 'acc-gaeste' && !isOpen) loadGaeste();
+}
+
+function loadAutoColorSetting() {
+  const auto = localStorage.getItem('chilbi_autoColor') !== 'false'; // Standard: Auto
+  const cb = document.getElementById('settingAutoColor');
+  if (cb) cb.checked = auto;
+  if (auto) toggleAutoColor(true);
+}
+
+// ── SCHICHTEN BEARBEITEN ──────────────────────────────────────
+function buildSchichtplan() {
+  const content = document.getElementById('schichtplanContent');
+  if (!content) return;
+
+  // Gruppiere nach Datum
+  const labelMap={}, labelOrder=[];
+  CONFIG.forEach(r=>{
+    const lbl=r.Datum||r.TagLabel||'';
+    if(!lbl||!lbl.match(/\d/)) return;
+    if(!labelMap[lbl]){labelMap[lbl]=[];labelOrder.push(lbl);}
+    labelMap[lbl].push(r);
+  });
+
+  if (!CONFIG || !CONFIG.length) { content.innerHTML='<div class="empty" style="padding:2rem;text-align:center;color:var(--text3)">Daten werden geladen…</div>'; setTimeout(buildSchichtplan, 500); return; }
+  if (!labelOrder.length) { content.innerHTML='<div class="empty">Noch keine Schichten erfasst.</div>'; return; }
+
+  function parseT(t,von){
+    const parts=String(t==null?'':t).split(':');
+    const h=Number(parts[0]), m=Number(parts[1]);
+    if(!isFinite(h)) return NaN;
+    let mins=h*60+(isFinite(m)?m:0);
+    if(von!==undefined && isFinite(von) && mins<=von && mins<720) mins+=24*60;
+    return mins;
+  }
+
+  // Globales Zeitraster über ALLE Tage → gleiche Achse; ungültige Zeiten ignorieren (kein NaN)
+  const globalT = [];
+  labelOrder.forEach(lbl => labelMap[lbl].forEach(r => {
+    const v=parseT(r.Von), b=parseT(r.Bis,v);
+    if(isFinite(v)) globalT.push(v);
+    if(isFinite(b)) globalT.push(b);
+  }));
+  let minT = globalT.length ? Math.min(...globalT) : 8*60;
+  let maxT = globalT.length ? Math.max(...globalT) : 24*60;
+  if(!isFinite(minT) || !isFinite(maxT) || maxT<=minT){ minT=8*60; maxT=24*60; }
+  const spanMin = (maxT - minT) || 1;
+  const PX = 2;
+  const totalPx = spanMin * PX;
+
+  let html = '';
+  labelOrder.forEach(lbl => {
+    const rows = labelMap[lbl];
+
+    // Schichten gruppieren
+    const schMap={}, schOrder=[];
+    rows.forEach(r=>{if(!schMap[r.Schicht]){schMap[r.Schicht]=[];schOrder.push(r.Schicht);}schMap[r.Schicht].push(r);});
+
+    // Ruler
+    let ticks='';
+    for(let h=Math.floor(minT/60);h<=Math.ceil(maxT/60);h++){
+      const px=(h*60-minT)*PX;
+      ticks+=`<div style="position:absolute;left:${px}px;font-size:9px;color:#888;border-left:1px solid #ddd;padding-left:2px;top:4px;white-space:nowrap">${h%24}:00</div>`;
+    }
+
+    html += `<div style="margin-bottom:24px;">
+      <div style="font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;padding:8px 0 6px;border-bottom:2px solid var(--black);margin-bottom:8px;">${esc(dayHeaderText(lbl))}</div>
+      <div style="overflow-x:auto;padding-bottom:8px;">
+        <div style="display:inline-block;min-width:100%">
+          <div style="display:flex;margin-bottom:4px;">
+            <div style="width:130px;min-width:130px;"></div>
+            <div style="position:relative;width:${totalPx}px;height:22px;border-bottom:1px solid #eee;">${ticks}</div>
+          </div>`;
+
+    schOrder.forEach(sch => {
+      html += `<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#888;margin:8px 0 3px 130px;border-bottom:1px solid #eee;padding-bottom:2px">${esc(sch)}</div>`;
+      schMap[sch].forEach(r => {
+        const vonM=parseT(r.Von), bisM=parseT(r.Bis,vonM);
+        const validT = isFinite(vonM) && isFinite(bisM) && bisM>vonM;
+        const leftPx=(validT?((vonM-minT)*PX):0).toFixed(1);
+        const widePx=(validT?((bisM-vonM)*PX):0).toFixed(1);
+        const color = r.Farbe==='none'?'#e0e0e0':normalizeColor(r.Farbe||'#CC0000');
+        const isClosed = String(r.Geschlossen)==='1'||r.Geschlossen===true;
+        const taken = SIGNUPS.filter(s=>String(s.Tag)===String(r.Tag)||String(s.ID)===String(r.Tag));
+        const max = parseInt(r.MaxPersonen||r['Max Personen'])||1;
+        const fg = textColor(color);
+        html += `<div style="display:flex;align-items:center;margin-bottom:3px;">
+          <div style="width:130px;min-width:130px;font-size:11px;font-weight:600;padding-right:8px;color:var(--text2)">${esc(r.Aufgabe)}</div>
+          <div style="position:relative;width:${totalPx}px;height:34px;background:rgba(0,0,0,.04);border:1px solid #eee;">
+            <div style="position:absolute;left:${leftPx}px;width:${widePx}px;height:34px;background:${isClosed?'#888':color};color:${isClosed?'white':fg};cursor:pointer;display:flex;align-items:center;padding:0 8px;gap:6px;font-size:10px;overflow:hidden;${r.Farbe==='none'?'border:2px solid #333;':''}"
+              onclick="openEditSchicht('${esc(r.Tag)}')"
+              title="Klicken zum Bearbeiten">
+              <span style="font-weight:400;white-space:nowrap">${esc(r.Von)}–${esc(r.Bis)}</span>
+              <span style="font-weight:700;white-space:nowrap">${esc(r.Aufgabe)}</span>
+              <span style="margin-left:auto;opacity:.7">${taken.length}/${max}${isClosed?' 🔒':''}</span>
+            </div>
+          </div>
+        </div>`;
+      });
+    });
+    html += `</div></div></div>`;
+  });
+  content.innerHTML = html;
+}
+
+function openNewSchicht() {
+  // Leeres Popup für neue Schicht
+  document.getElementById('esTag').value = '__new__';
+  document.getElementById('esDatum').value = '';
+  document.getElementById('esSchicht').value = '';
+  document.getElementById('esAufgabe').value = '';
+  document.getElementById('esVon').value = '';
+  document.getElementById('esBis').value = '';
+  document.getElementById('esMax').value = '2';
+  document.getElementById('esInfo').value = '';
+  document.getElementById('esGeschlossen').checked = false;
+  document.getElementById('esDeleteBtn').style.display = 'none';
+  document.getElementById('editSchichtOverlay').style.display = 'flex';
+  renderEditSchichtSignups('');
+}
+
+function openEditSchicht(tagId) {
+  const r = CONFIG.find(row => String(row.Tag) === String(tagId) || String(row.ID) === String(tagId));
+  if (!r) return;
+  document.getElementById('esTag').value = r.Tag || r.ID || '';
+  document.getElementById('esDatum').value = r.Datum || r.TagLabel || '';
+  document.getElementById('esSchicht').value = r.Schicht || '';
+  document.getElementById('esAufgabe').value = r.Aufgabe || '';
+  document.getElementById('esVon').value = r.Von || '';
+  document.getElementById('esBis').value = r.Bis || '';
+  document.getElementById('esMax').value = r.MaxPersonen || r['Max Personen'] || '1';
+  document.getElementById('esInfo').value = r.Informationen || '';
+  document.getElementById('esGeschlossen').checked = r.Geschlossen === true || String(r.Geschlossen) === '1';
+  document.getElementById('esDeleteBtn').style.display = '';
+  document.getElementById('editSchichtOverlay').style.display = 'flex';
+}
+
+function renderEditSchichtSignups(tagId) {
+  const container = document.getElementById('editSchichtSignups');
+  if (!container) return;
+  if (!tagId) { container.innerHTML = ''; return; }
+  const taken = SIGNUPS.filter(s => s.Tag && String(s.Tag) === String(tagId));
+  if (!taken.length) {
+    container.innerHTML = '<div style="font-size:12px;color:var(--text3);padding:6px 0">Noch niemand eingetragen.</div>';
+    return;
+  }
+  container.innerHTML = taken.map((s, i) => `
+    <div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--gray-mid);">
+      <span style="flex:1;font-size:13px;font-weight:600">${esc(s.Name)}</span>
+      <button onclick="removeSignupFromSchicht('${esc(s.Tag||s.ID)}','${esc(s.Name)}')"
+        style="border:none;background:none;cursor:pointer;color:var(--red);font-size:14px;padding:2px 6px;"
+        title="Löschen">✕</button>
+    </div>`).join('');
+}
+
+async function addSignupToSchicht() {
+  const name = document.getElementById('newSignupName').value.trim();
+  const tag  = document.getElementById('esTag').value;
+  if (!name || !tag) return;
+  const cfg = CONFIG.find(r => String(r.Tag||r.ID) === String(tag));
+  if (!cfg) return;
+  await fetch(SCRIPT_URL, {method:'POST', mode:'no-cors', headers:{'Content-Type':'text/plain'},
+    body: JSON.stringify({action:'signup', name, tag, schicht: cfg.Schicht, aufgabe: cfg.Aufgabe})});
+  SIGNUPS.push({Tag: tag, Name: name, Schicht: cfg.Schicht, Aufgabe: cfg.Aufgabe});
+  document.getElementById('newSignupName').value = '';
+  renderEditSchichtSignups(tag);
+  showToast('✓ ' + name + ' eingetragen', 'success');
+  setTimeout(() => loadData(), 2000);
+}
+
+async function removeSignupFromSchicht(tag, name) {
+  if (!confirm(`${name} aus dieser Schicht entfernen?`)) return;
+  await fetch(SCRIPT_URL, {method:'POST', mode:'no-cors', headers:{'Content-Type':'text/plain'},
+    body: JSON.stringify({action:'unsignup', tag, name})});
+  const idx = SIGNUPS.findIndex(s => String(s.Tag)===String(tag) && s.Name===name);
+  if (idx > -1) SIGNUPS.splice(idx, 1);
+  renderEditSchichtSignups(tag);
+  showToast('✓ ' + name + ' entfernt', 'success');
+  setTimeout(() => loadData(), 2000);
+}
+
+function closeEditSchicht() {
+  document.getElementById('editSchichtOverlay').style.display = 'none';
+}
+
+async function saveEditSchicht() {
+  const tag = document.getElementById('esTag').value;
+  const newData = {
+    Datum: document.getElementById('esDatum').value.trim(),
+    Schicht: document.getElementById('esSchicht').value.trim(),
+    Aufgabe: document.getElementById('esAufgabe').value.trim(),
+    Von: document.getElementById('esVon').value.trim(),
+    Bis: document.getElementById('esBis').value.trim(),
+    MaxPersonen: document.getElementById('esMax').value.trim(),
+    Informationen: document.getElementById('esInfo').value.trim(),
+    Geschlossen: document.getElementById('esGeschlossen').checked ? '1' : '0'
+  };
+  let updated;
+  if (tag === '__new__') {
+    // Neue ID generieren - keine Kollision
+    const existingIds = new Set(CONFIG.map(r=>String(r.Tag||r.ID||'')));
+    let newIdNum = CONFIG.reduce((m,r)=>Math.max(m,parseInt(r.Tag||r.ID||0)),0) + 1;
+    while (existingIds.has(String(newIdNum))) newIdNum++;
+    const newId = String(newIdNum);
+    updated = [...CONFIG, {...newData, Tag: newId, ID: newId, Farbe: '#CC0000'}];
+  } else {
+    updated = CONFIG.map(r => {
+      if (String(r.Tag||r.ID) !== String(tag)) return r;
+      return {...r, ...newData};
+    });
+  }
+  await fetch(SCRIPT_URL, {method:'POST', mode:'no-cors', headers:{'Content-Type':'text/plain'},
+    body: JSON.stringify({action:'saveConfig', password:ADMIN_PW, rows: updated.map(r => ({
+      Tag: r.Tag||r.ID, Datum: r.Datum||r.TagLabel, Von: r.Von, Bis: r.Bis,
+      Schicht: r.Schicht, Aufgabe: r.Aufgabe,
+      MaxPersonen: r.MaxPersonen||r['Max Personen'],
+      Farbe: r.Farbe||'#CC0000', Informationen: r.Informationen||'',
+      Geschlossen: r.Geschlossen||'0'
+    }))})});
+  closeEditSchicht();
+  showToast('✓ Schicht gespeichert', 'success');
+  setTimeout(async () => { await loadData(); buildSchichtplan(); }, 1500);
+}
+
+let deleteSchichtTag = null;
+
+function askDeleteSchicht() {
+  const tag = document.getElementById('esTag').value;
+  if (!tag || tag === '__new__') return;
+  deleteSchichtTag = tag;
+  const r = CONFIG.find(x => String(x.Tag||x.ID) === String(tag));
+  const taken = SIGNUPS.filter(s => String(s.Tag||s.ID) === String(tag));
+  const label = r ? `${esc(r.Aufgabe)} (${esc(r.Von)}–${esc(r.Bis)}, ${esc(r.Datum||r.TagLabel||'')})` : esc(tag);
+  let msg = `Schicht <strong>${label}</strong> wird gelöscht.`;
+  if (taken.length) msg += `<br><br><strong style="color:var(--red)">${taken.length} eingetragene Person(en) werden ebenfalls gelöscht.</strong>`;
+  msg += `<br><br>Das kann nicht rückgängig gemacht werden.`;
+  document.getElementById('deleteSchichtMsg').innerHTML = msg;
+  document.getElementById('confirmDeleteSchichtOverlay').style.display = 'flex';
+}
+
+function closeDeleteSchicht() {
+  document.getElementById('confirmDeleteSchichtOverlay').style.display = 'none';
+  deleteSchichtTag = null;
+}
+
+async function doDeleteSchicht() {
+  const tag = deleteSchichtTag;
+  if (!tag) return;
+  // 1) Schicht aus CONFIG entfernen + saveConfig (replace-all)
+  const newConfig = CONFIG.filter(r => String(r.Tag||r.ID) !== String(tag));
+  await fetch(SCRIPT_URL, {method:'POST', mode:'no-cors', headers:{'Content-Type':'text/plain'},
+    body: JSON.stringify({action:'saveConfig', password:ADMIN_PW, rows: newConfig.map(r => ({
+      Tag: r.Tag||r.ID, Datum: r.Datum||r.TagLabel, Von: r.Von, Bis: r.Bis,
+      Schicht: r.Schicht, Aufgabe: r.Aufgabe,
+      MaxPersonen: r.MaxPersonen||r['Max Personen'],
+      Farbe: r.Farbe||'#CC0000', Informationen: r.Informationen||'',
+      Geschlossen: r.Geschlossen||'0'
+    }))})});
+  // 2) Anmeldungen dieser Schicht kaskadiert entfernen via importSignups (replace-all mit Rest)
+  const taken = SIGNUPS.filter(s => String(s.Tag||s.ID) === String(tag));
+  if (taken.length) {
+    const remaining = SIGNUPS.filter(s => String(s.Tag||s.ID) !== String(tag)).map(s => ({
+      tag: s.Tag||s.ID, name: s.Name, schicht: s.Schicht, aufgabe: s.Aufgabe, timestamp: s.Timestamp||''
+    }));
+    await fetch(SCRIPT_URL, {method:'POST', mode:'no-cors', headers:{'Content-Type':'text/plain'},
+      body: JSON.stringify({action:'importSignups', password:ADMIN_PW, rows: remaining})});
+  }
+  closeDeleteSchicht();
+  closeEditSchicht();
+  showToast('✓ Schicht gelöscht', 'success');
+  setTimeout(async () => { await loadData(); buildSchichtplan(); }, 1800);
+}
+
+let GAESTE = [];
+
+async function loadGaeste() {
+  try {
+    const url = `https://docs.google.com/spreadsheets/d/1bK6IuVpAdLyYc9_NPbJxFMkvCZ0fNvadJABBUM-Rc0M/gviz/tq?tqx=out:json&sheet=${encodeURIComponent('Gast')}&_=${Date.now()}`;
+    const res = await fetch(url);
+    const text = await res.text();
+    const match = text.match(/google\.visualization\.Query\.setResponse\(([\s\S]*)\)/);
+    if (!match) { GAESTE = []; return; }
+    const json = JSON.parse(match[1]);
+    const rows = json.table.rows || [];
+    const gvizLabels = json.table.cols.map(c => c.label ? c.label.trim() : '');
+    const hasLabels = gvizLabels.some(l => l !== '');
+    let headers, dataRows;
+    if (hasLabels) { headers = gvizLabels; dataRows = rows; }
+    else { headers = rows[0]?.c.map(c => c ? String(c.v||'').trim() : '') || []; dataRows = rows.slice(1); }
+    GAESTE = dataRows.filter(row => row && row.c && row.c[0] && row.c[0].v != null).map(row => {
+      const obj = {};
+      headers.forEach((col, i) => {
+        const cell = row.c ? row.c[i] : null;
+        obj[col] = cell ? (cell.v != null ? String(cell.v).trim() : '') : '';
+      });
+      return obj;
+    });
+  } catch(e) { GAESTE = []; }
+  renderGaeste();
+}
+
+function renderGaeste() {
+  const el = document.getElementById('gaesteliste');
+  if (!el) return;
+  if (!GAESTE.length) { el.innerHTML = '<div style="padding:12px;color:var(--text3);font-size:13px">Noch keine Gäste registriert.</div>'; return; }
+  el.innerHTML = `<table style="width:100%;border-collapse:collapse;font-size:13px;">
+    <thead><tr style="background:var(--black);color:white;">
+      <th style="padding:8px;text-align:left">Kürzel</th>
+      <th style="padding:8px;text-align:left">Vorname</th>
+      <th style="padding:8px;text-align:left">Name</th>
+      <th style="padding:8px;text-align:left">Email</th>
+      <th style="padding:8px;text-align:left">Tel</th>
+      <th style="padding:8px"></th>
+    </tr></thead>
+    <tbody>
+      ${GAESTE.map((g,i) => `<tr style="border-bottom:1px solid var(--gray-mid);${i%2?'background:var(--bg2)':''}">
+        <td style="padding:8px;font-weight:700">${esc(g.Kürzel||g['Kürzel']||'')}</td>
+        <td style="padding:8px">${esc(g.Vorname||'')}</td>
+        <td style="padding:8px">${esc(g.Name||'')}</td>
+        <td style="padding:8px;color:var(--text3)">${esc(g.Email||'')}</td>
+        <td style="padding:8px;color:var(--text3)">${esc(g.Tel||'')}</td>
+        <td style="padding:8px;text-align:right">
+          <button onclick="openEditGast(${i})" style="border:none;background:none;cursor:pointer;font-size:14px;opacity:.6;padding:2px 6px;" title="Bearbeiten">✏️</button>
+        </td>
+      </tr>`).join('')}
+    </tbody>
+  </table>`;
+}
+
+function openEditGast(idx) {
+  const g = GAESTE[idx];
+  document.getElementById('editGastOldKuerzel').value = g.Kürzel||g['Kürzel']||'';
+  document.getElementById('editGastKuerzel').value  = g.Kürzel||g['Kürzel']||'';
+  document.getElementById('editGastVorname').value  = g.Vorname||'';
+  document.getElementById('editGastName').value     = g.Name||'';
+  document.getElementById('editGastEmail').value    = g.Email||'';
+  document.getElementById('editGastTel').value      = g.Tel||'';
+  document.getElementById('editGastOverlay').style.display = 'flex';
+}
+
+function closeEditGast() {
+  document.getElementById('editGastOverlay').style.display = 'none';
+}
+
+async function saveEditGast() {
+  const oldK = document.getElementById('editGastOldKuerzel').value;
+  const data = {
+    action: 'updateGuest',
+    oldKuerzel: oldK,
+    kuerzel:  document.getElementById('editGastKuerzel').value.trim(),
+    vorname:  document.getElementById('editGastVorname').value.trim(),
+    nachname: document.getElementById('editGastName').value.trim(),
+    email:    document.getElementById('editGastEmail').value.trim(),
+    tel:      document.getElementById('editGastTel').value.trim()
+  };
+  await fetch(SCRIPT_URL, {method:'POST', mode:'no-cors', headers:{'Content-Type':'text/plain'}, body: JSON.stringify(data)});
+  closeEditGast();
+  showToast('✓ Gast gespeichert', 'success');
+  setTimeout(loadGaeste, 1500);
+}
+
+async function deleteGast() {
+  const k = document.getElementById('editGastOldKuerzel').value;
+  if (!confirm(`Gast ${k} wirklich löschen?`)) return;
+  await fetch(SCRIPT_URL, {method:'POST', mode:'no-cors', headers:{'Content-Type':'text/plain'},
+    body: JSON.stringify({action:'deleteGuest', kuerzel: k})});
+  closeEditGast();
+  showToast('✓ Gast gelöscht', 'success');
+  setTimeout(loadGaeste, 1500);
+}
+
+function formatDate(d) { try{return new Date(d).toLocaleString('de-CH');}catch(e){return d||'';} }
+const SHEET_ID_ADMIN = '1GAxPj-6QtpkzVjNwww1L6ZERTJUje6pmsCBbtBzYq3Y';
+async function fetchGvizSheet(sheetName) {
+  const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID_ADMIN}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(sheetName)}&_=${Date.now()}`;
+  const res = await fetch(url);
+  const text = await res.text();
+  const match = text.match(/google\.visualization\.Query\.setResponse\(([\s\S]*)\)/);
+  if (!match) return [];
+  const json = JSON.parse(match[1]);
+  const rows = json.table.rows || [];
+  const gvizLabels = json.table.cols.map(c => c.label ? c.label.trim() : '');
+  const hasLabels = gvizLabels.some(l => l !== '');
+  let headers, dataRows;
+  if (hasLabels) { headers = gvizLabels; dataRows = rows; }
+  else { headers = rows[0]?.c.map(c => c ? String(c.v||'').trim() : '') || []; dataRows = rows.slice(1); }
+  return dataRows.filter(row => row && row.c && row.c[0] && row.c[0].v != null).map(row => {
+    const obj = {};
+    headers.forEach((col, i) => {
+      const cell = row.c ? row.c[i] : null;
+      if (!cell) { obj[col] = ''; return; }
+      // Für Datumswerte: cell.f (formatted) bevorzugen
+      const val = (cell.f != null && String(cell.f).match(/\d{1,2}\.\d{1,2}/))
+        ? String(cell.f).trim()
+        : (cell.v != null ? String(cell.v).trim() : '');
+      obj[col] = val;
+    });
+    return obj;
+  });
+}
+
+function rgbToHex(color) {
+  if (!color || color === 'none') return color;
+  if (color.startsWith('#')) return color;
+  const m = color.match(/rgb\s*\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)/i);
+  if (!m) return '#CC0000';
+  return '#' + [m[1],m[2],m[3]].map(x=>parseInt(x).toString(16).padStart(2,'0')).join('');
+}
+
+function textColor(hex) {
+  if (!hex || hex === 'none') return '#000000';
+  const h = hex.replace('#','');
+  if (h.length !== 6) return '#000000';
+  const r=parseInt(h.substr(0,2),16), g=parseInt(h.substr(2,2),16), b=parseInt(h.substr(4,2),16);
+  return (r*299+g*587+b*114)/1000 > 128 ? '#000000' : '#ffffff';
+}
+
+function textColor(bg) {
+  if (!bg || bg === 'none') return '#1a1a1a';
+  const hex = bg.startsWith('#') ? bg : rgbToHex(bg);
+  const r=parseInt(hex.slice(1,3),16), g=parseInt(hex.slice(3,5),16), b=parseInt(hex.slice(5,7),16);
+  return (r*299+g*587+b*114)/1000 > 128 ? '#1a1a1a' : '#ffffff';
+}
+
+function rgbToHex(rgb) {
+  if (!rgb) return '#CC0000';
+  if (rgb.startsWith('#')) return rgb;
+  const m = rgb.match(/rgb\s*\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)/);
+  if (!m) return '#CC0000';
+  return '#' + [m[1],m[2],m[3]].map(n=>parseInt(n).toString(16).padStart(2,'0')).join('');
+}
+
+function normalizeColor(color) {
+  if (!color || color === 'none') return color;
+  if (color.startsWith('rgb')) return rgbToHex(color);
+  return color;
+}
+
+function esc(s){return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function showToast(msg,type=''){const t=document.getElementById('toast');t.textContent=msg;t.className='toast'+(type?' '+type:'');t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3500);}
+</script>
+</body>
+</html>
