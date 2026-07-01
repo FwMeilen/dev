@@ -6,7 +6,7 @@
 <link rel="icon" href="favicon.ico" sizes="any">
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
-<title>Chilbi Herrliberg – Schichtplan Cl1.100-dev</title>
+<title>Chilbi Herrliberg – Schichtplan Cl1.101-dev</title>
 <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
@@ -317,21 +317,21 @@ body{font-family:'Open Sans',Arial,sans-serif;background:var(--bg3);color:var(--
     </div>
     <div class="splash-body">
       <h2>Willkommen – wer bist du?</h2>
-      <div class="splash-opt selected" id="opt-ff" onclick="splashSelect('ff')">
+      <div class="splash-opt" id="opt-ff" onclick="splashSelect('ff')">
         <div class="splash-opt-icon">🚒</div>
         <div><div class="splash-opt-title">Feuerwehr Meilen</div><div class="splash-opt-sub">3-Buchstaben-Kürzel eingeben (z.B. MUS)</div></div>
       </div>
       <div class="splash-opt" id="opt-guest" onclick="splashSelect('guest')">
         <div class="splash-opt-icon">👤</div>
-        <div><div class="splash-opt-title">Gast</div><div class="splash-opt-sub">Vorname und Name eingeben</div></div>
+        <div><div class="splash-opt-title">Ehemalige oder Gasthelfer</div><div class="splash-opt-sub">Vorname und Name eingeben</div></div>
       </div>
-      <div class="splash-input-wrap">
+      <div class="splash-input-wrap" id="splashInputWrap" style="display:none">
         <label id="splashLabel">Dein Kürzel (3 Grossbuchstaben)</label>
         <input type="text" id="splashInput" class="splash-input" maxlength="3" placeholder="MUS"
           oninput="splashInputChange()" onkeydown="if(event.key==='Enter') splashSubmit()">
         <div class="splash-error" id="splashError"></div>
       </div>
-      <button class="splash-btn" id="splashSubmitBtn" onclick="splashSubmit()">Weiter zum Schichtplan →</button>
+      <button class="splash-btn" id="splashSubmitBtn" onclick="splashSubmit()" style="display:none">Weiter zum Schichtplan →</button>
     </div>
   </div>
 </div>
@@ -340,7 +340,7 @@ body{font-family:'Open Sans',Arial,sans-serif;background:var(--bg3);color:var(--
   <div class="site-header-inner">
     <img src="https://www.feuerwehr-meilen.ch/fileadmin/Public/Website/Templates/Images/Logo-FeuerwehrMeilen.png" alt="Feuerwehr Meilen" style="height:38px;width:auto;object-fit:contain;">
     <div class="logo-text">Chilbi Herrliberg<span>Schichtplanung &amp; Anmeldung</span></div>
-    <div class="header-version">Cl1.100-dev</div>
+    <div class="header-version">Cl1.101-dev</div>
     <button class="help-btn" onclick="document.getElementById('helpOverlay').classList.add('open')" title="Bedienungsanleitung">?</button>
   </div>
 </div>
@@ -439,7 +439,7 @@ body{font-family:'Open Sans',Arial,sans-serif;background:var(--bg3);color:var(--
 </div>
 
 <div class="toast" id="toast"></div>
-<div class="site-footer">© Stützpunktfeuerwehr Meilen / LOL &nbsp;·&nbsp; Cl1.100-dev</div>
+<div class="site-footer">© Stützpunktfeuerwehr Meilen / LOL &nbsp;·&nbsp; Cl1.101-dev</div>
 
 <script>
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbztZ9C8RapYojQAb0U4fkY6xc_7JVsDMPsQEao4T1z_ObspHSeGB_X0ZONgqLANoyEbzQ/exec';
@@ -465,10 +465,12 @@ function textColor(hex) {
   return lum > 0.55 ? '#1a1a1a' : '#ffffff';
 }
 
-let splashMode = 'ff';
+let splashMode = null;
 
 function splashSelect(mode) {
   splashMode = mode;
+  document.getElementById('splashInputWrap').style.display = '';
+  document.getElementById('splashSubmitBtn').style.display = '';
   document.getElementById('opt-ff').classList.toggle('selected', mode==='ff');
   document.getElementById('opt-guest').classList.toggle('selected', mode==='guest');
   const inp = document.getElementById('splashInput');
@@ -494,6 +496,7 @@ function splashInputChange() {
 }
 
 async function splashSubmit() {
+  if (!splashMode) return;
   const val = document.getElementById('splashInput').value.trim();
   const err = document.getElementById('splashError');
   if (splashMode === 'ff' && !/^[A-Z]{3}$/.test(val)) { err.textContent = 'Bitte genau 3 Grossbuchstaben eingeben.'; return; }
@@ -609,6 +612,8 @@ function splashShow() {
     document.getElementById('splashLabel').textContent='Dein Name';
   }
   document.getElementById('splashError').textContent='';
+  document.getElementById('splashInputWrap').style.display = '';
+  document.getElementById('splashSubmitBtn').style.display = '';
   splash.style.display = 'flex';
   inp.focus();
 }
@@ -642,8 +647,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('splash').style.display = 'none';
     splashMode = mode;
   } else {
-    splashSelect('ff');
-    document.getElementById('splashInput').focus();
+    document.getElementById('splash').style.display = 'flex';
   }
   document.getElementById('popupOverlay').addEventListener('click', e => {
     if (e.target === document.getElementById('popupOverlay')) closePopup();
