@@ -6,7 +6,7 @@
 <link rel="icon" href="favicon.ico" sizes="any">
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
-<title>Chilbi Herrliberg – Schichtplan Cl1.102-dev</title>
+<title>Chilbi Herrliberg – Schichtplan Cl1.103-dev</title>
 <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
@@ -340,7 +340,7 @@ body{font-family:'Open Sans',Arial,sans-serif;background:var(--bg3);color:var(--
   <div class="site-header-inner">
     <img src="https://www.feuerwehr-meilen.ch/fileadmin/Public/Website/Templates/Images/Logo-FeuerwehrMeilen.png" alt="Feuerwehr Meilen" style="height:38px;width:auto;object-fit:contain;">
     <div class="logo-text">Chilbi Herrliberg<span>Schichtplanung &amp; Anmeldung</span></div>
-    <div class="header-version">Cl1.102-dev</div>
+    <div class="header-version">Cl1.103-dev</div>
     <button class="help-btn" onclick="document.getElementById('helpOverlay').classList.add('open')" title="Bedienungsanleitung">?</button>
   </div>
 </div>
@@ -439,7 +439,7 @@ body{font-family:'Open Sans',Arial,sans-serif;background:var(--bg3);color:var(--
 </div>
 
 <div class="toast" id="toast"></div>
-<div class="site-footer">© Stützpunktfeuerwehr Meilen / LOL &nbsp;·&nbsp; Cl1.102-dev</div>
+<div class="site-footer">© Stützpunktfeuerwehr Meilen / LOL &nbsp;·&nbsp; Cl1.103-dev</div>
 
 <script>
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbztZ9C8RapYojQAb0U4fkY6xc_7JVsDMPsQEao4T1z_ObspHSeGB_X0ZONgqLANoyEbzQ/exec';
@@ -466,6 +466,7 @@ function textColor(hex) {
 }
 
 let splashMode = null;
+let VALID_KUERZEL = null;
 
 function splashSelect(mode) {
   splashMode = mode;
@@ -495,11 +496,22 @@ function splashInputChange() {
   document.getElementById('splashError').textContent = '';
 }
 
+// Gültige Kürzel laden (Tabellenblatt1 + Gast), für Existenzprüfung beim Anmelden
+async function loadValidKuerzel() {
+  const [s1, sg] = await Promise.all([fetchKuerzelSheet(), fetchKuerzelSheetGast()]);
+  VALID_KUERZEL = new Set([...s1, ...sg].map(r => (r.Kürzel||r['Kürzel']||'').trim().toUpperCase()).filter(Boolean));
+  return VALID_KUERZEL;
+}
+
 async function splashSubmit() {
   if (!splashMode) return;
   const val = document.getElementById('splashInput').value.trim();
   const err = document.getElementById('splashError');
   if (splashMode === 'ff' && !/^[A-Z]{3}$/.test(val)) { err.textContent = 'Bitte genau 3 Grossbuchstaben eingeben.'; return; }
+  if (splashMode === 'ff') {
+    const set = VALID_KUERZEL || await loadValidKuerzel();
+    if (!set.has(val.toUpperCase())) { err.textContent = 'Kürzel nicht gefunden – bitte mit Vorname / Nachname anmelden.'; return; }
+  }
   if (splashMode === 'guest' && val.length < 2) { err.textContent = 'Bitte Namen eingeben.'; return; }
 
   if (splashMode === 'guest') {
@@ -648,6 +660,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     splashMode = mode;
   } else {
     document.getElementById('splash').style.display = 'flex';
+    loadValidKuerzel();
   }
   document.getElementById('popupOverlay').addEventListener('click', e => {
     if (e.target === document.getElementById('popupOverlay')) closePopup();
