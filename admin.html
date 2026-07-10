@@ -6,7 +6,7 @@
 <link rel="icon" href="favicon.ico" sizes="any">
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
-<title>Chilbi Admin – Schichtverwaltung Cl1.106-dev</title>
+<title>Chilbi Admin – Schichtverwaltung Cl1.107-dev</title>
 <meta property="og:title" content="Chilbi Herrliberg – Admin">
 <meta property="og:description" content="Schichtverwaltung Chilbi Herrliberg – Stützpunktfeuerwehr Meilen">
 <meta property="og:image" content="https://www.feuerwehr-meilen.ch/fileadmin/Public/Website/Templates/Images/Logo-FeuerwehrMeilen.png">
@@ -169,7 +169,7 @@ td input[type=color]{width:36px;height:26px;padding:1px;cursor:pointer;border:1p
     <div class="login-error" id="loginError"></div>
     <button class="btn btn-red" style="width:100%" onclick="doLogin()">Einloggen</button>
     <div style="margin-top:16px;padding-top:12px;border-top:1px solid var(--gray-mid);text-align:center;font-size:11px;color:var(--text3);">
-      © Stützpunktfeuerwehr Meilen / LOL &nbsp;·&nbsp; <strong>Cl1.106-dev</strong>
+      © Stützpunktfeuerwehr Meilen / LOL &nbsp;·&nbsp; <strong>Cl1.107-dev</strong>
     </div>
   </div>
 </div>
@@ -180,7 +180,7 @@ td input[type=color]{width:36px;height:26px;padding:1px;cursor:pointer;border:1p
     <img src="https://www.feuerwehr-meilen.ch/fileadmin/Public/Website/Templates/Images/Logo-FeuerwehrMeilen.png" alt="Feuerwehr Meilen" style="height:38px;width:auto;object-fit:contain;">
     <div class="logo-text">Chilbi Herrliberg<span>Admin – Schichtverwaltung</span></div>
     <div class="header-right">
-      <span class="header-version">Cl1.106-dev</span>
+      <span class="header-version">Cl1.107-dev</span>
       <button class="help-btn" onclick="document.getElementById('helpOverlay').style.display='flex'" title="Bedienungsanleitung" style="background:none;border:1.5px solid rgba(255,255,255,.5);color:white;width:22px;height:22px;border-radius:50%;font-size:12px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;margin-left:4px;">?</button>
       <button class="btn btn-sm" onclick="window.open('index.html','_blank')">Zu Schichtplan Signup</button>
       <button class="btn-refresh" id="btnRefresh" onclick="manualRefresh()">
@@ -323,6 +323,10 @@ td input[type=color]{width:36px;height:26px;padding:1px;cursor:pointer;border:1p
         <div style="margin-bottom:12px;">
           <label style="display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--text2);margin-bottom:4px;">Untertitel im Kopf <span style="color:var(--text3);font-weight:400;text-transform:none;">(freiwillig, unter «Chilbi Herrliberg»)</span></label>
           <input type="text" id="gbSub" placeholder="z. B. Feuerwehr Stäfa" style="box-sizing:border-box;width:100%;height:36px;padding:0 10px;border:1px solid var(--gray-mid);font-family:inherit;font-size:14px;">
+        </div>
+        <div style="margin-bottom:12px;">
+          <label style="display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--text2);margin-bottom:4px;">Kürzel Herausgeber <span style="color:var(--text3);font-weight:400;text-transform:none;">(freiwillig, erscheint in der Fusszeile)</span></label>
+          <input type="text" id="gbKuerzel" maxlength="10" placeholder="z. B. LOL" oninput="this.value=this.value.toUpperCase()" style="box-sizing:border-box;width:100%;height:36px;padding:0 10px;border:1px solid var(--gray-mid);font-family:inherit;font-size:14px;text-transform:uppercase;">
         </div>
         <div style="margin-bottom:16px;">
           <label style="display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--text2);margin-bottom:4px;">E-Mail <span style="color:var(--text3);font-weight:400;text-transform:none;">(nur zum Senden nötig)</span></label>
@@ -625,7 +629,7 @@ td input[type=color]{width:36px;height:26px;padding:1px;cursor:pointer;border:1p
   </div>
 </div>
 <div class="toast" id="toast"></div>
-<div class="site-footer" style="position:relative;z-index:1;">© Stützpunktfeuerwehr Meilen / LOL &nbsp;·&nbsp; Admin &nbsp;·&nbsp; Cl1.106-dev</div>
+<div class="site-footer" style="position:relative;z-index:1;">© Stützpunktfeuerwehr Meilen / LOL &nbsp;·&nbsp; Admin &nbsp;·&nbsp; Cl1.107-dev</div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script>
@@ -1244,11 +1248,12 @@ async function _avAssets(){
 }
 function _vFile(vorname,name){ return ('Gutschein_'+(vorname||'')+'_'+(name||'')).replace(/[^A-Za-z0-9_]/g,'_')+'.pdf'; }
 function _avPost(data){ return fetch(SCRIPT_URL, {method:'POST', mode:'no-cors', headers:{'Content-Type':'text/plain'}, body: JSON.stringify(data)}); }
-function _vFoot(doc){
+function _vFoot(doc, kuerzel){
   const bx=105, d=new Date(), z=n=>('0'+n).slice(-2);
   const ts = z(d.getDate())+'.'+z(d.getMonth()+1)+'.'+d.getFullYear()+' '+z(d.getHours())+':'+z(d.getMinutes())+' Uhr';
+  const k = (kuerzel||'').trim().toUpperCase();
   doc.setTextColor(102,102,102); doc.setFont('helvetica','normal'); doc.setFontSize(7.5); doc.text('© Stützpunktfeuerwehr Meilen / LOL', bx, 135.5, {align:'center'});
-  doc.setTextColor(153,153,153); doc.setFontSize(6.5); doc.text('Erstellt: '+ts, bx, 138.5, {align:'center'});
+  doc.setTextColor(153,153,153); doc.setFontSize(6.5); doc.text('Erstellt: '+ts+(k ? ' · '+k : ''), bx, 138.5, {align:'center'});
 }
 function _vHead(doc, subtitle, subSize){
   const m=8, W=210, H=148;
@@ -1335,7 +1340,7 @@ async function fwVoucher(i, mode){
   });
 }
 // ===== Gutschein-Bauer (freier Gutschein) =====
-async function buildVoucherCustom(name, was, zusatz, subtitle){
+async function buildVoucherCustom(name, was, zusatz, subtitle, kuerzel){
   await _avAssets();
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF({ orientation:'landscape', unit:'mm', format:'a5' });
@@ -1361,7 +1366,7 @@ async function buildVoucherCustom(name, was, zusatz, subtitle){
   doc.text('Sonntag, 16.08.26 · 11:00–21:00', bx, 112.5, {align:'center'});
   doc.setTextColor(51,51,51); doc.setFont('helvetica','normal'); doc.setFontSize(10.5); doc.text('Füürwehr Spätzli-Beiz, Chilbi Herrliberg', bx, 121.5, {align:'center'});
   doc.setTextColor(102,102,102); doc.setFont('helvetica','normal'); doc.setFontSize(8.5); doc.text('Primarschule Rebacker, Schulhausstrasse 23, 8704 Herrliberg', bx, 127, {align:'center'});
-  _vFoot(doc);
+  _vFoot(doc, kuerzel);
   return doc;
 }
 function gbToggleSend(){
@@ -1377,6 +1382,7 @@ function gbRead(){
   const was  = document.getElementById('gbText').value.trim();
   const zusatz = document.getElementById('gbZusatz').value.trim();
   const sub  = document.getElementById('gbSub').value.trim();
+  const kuerzel = document.getElementById('gbKuerzel').value.trim();
   const mail = document.getElementById('gbMail').value.trim();
   const err  = document.getElementById('gbErr');
   if(!name || !was){
@@ -1385,12 +1391,12 @@ function gbRead(){
     return null;
   }
   err.style.display = 'none';
-  return { name, was, zusatz, sub, mail };
+  return { name, was, zusatz, sub, kuerzel, mail };
 }
 async function gbPrint(){
   const d = gbRead(); if(!d) return;
   try{
-    const doc = await buildVoucherCustom(d.name, d.was, d.zusatz, d.sub);
+    const doc = await buildVoucherCustom(d.name, d.was, d.zusatz, d.sub, d.kuerzel);
     doc.save(('Gutschein_' + d.name).replace(/[^A-Za-z0-9_]/g,'_') + '.pdf');
   }catch(e){ showToast('Gutschein-Fehler: ' + e.message, 'error'); }
 }
@@ -1398,7 +1404,7 @@ async function gbSend(){
   const d = gbRead(); if(!d) return;
   if(!d.mail){ showToast('Keine Mailadresse angegeben','error'); return; }
   openVoucherConfirm(d.mail, async ()=>{
-    const doc = await buildVoucherCustom(d.name, d.was, d.zusatz, d.sub);
+    const doc = await buildVoucherCustom(d.name, d.was, d.zusatz, d.sub, d.kuerzel);
     const b64 = doc.output('datauristring').split(',')[1];
     await _avPost({action:'gutscheinMail', variant:'custom', vorname:d.name, name:'', mail:d.mail, was:d.was, zusatz:d.zusatz, pdf:b64});
     showToast('Gutschein an ' + d.mail + ' gesendet', 'success');
@@ -1622,7 +1628,7 @@ function printDay(dayId) {
   </head><body>
     <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:${px(0.5)}px;padding-bottom:${px(0.3)}px;border-bottom:2px solid black;">
       <div style="font-size:${px(1.3)}px;font-weight:700;text-transform:uppercase">${titleText}</div>
-      <div style="font-size:${px(0.62)}px;color:#666">Stützpunktfeuerwehr Meilen &nbsp;·&nbsp; Chilbi Herrliberg &nbsp;·&nbsp; Cl1.106-dev</div>
+      <div style="font-size:${px(0.62)}px;color:#666">Stützpunktfeuerwehr Meilen &nbsp;·&nbsp; Chilbi Herrliberg &nbsp;·&nbsp; Cl1.107-dev</div>
     </div>
     <div style="display:flex;margin-bottom:${px(0.2)}px;">
       <div style="width:${labelW}px;min-width:${labelW}px;"></div>
