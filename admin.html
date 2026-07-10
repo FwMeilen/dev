@@ -6,7 +6,7 @@
 <link rel="icon" href="favicon.ico" sizes="any">
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
-<title>Chilbi Admin – Schichtverwaltung Cl1.107-dev</title>
+<title>Chilbi Admin – Schichtverwaltung Cl1.108-dev</title>
 <meta property="og:title" content="Chilbi Herrliberg – Admin">
 <meta property="og:description" content="Schichtverwaltung Chilbi Herrliberg – Stützpunktfeuerwehr Meilen">
 <meta property="og:image" content="https://www.feuerwehr-meilen.ch/fileadmin/Public/Website/Templates/Images/Logo-FeuerwehrMeilen.png">
@@ -169,7 +169,7 @@ td input[type=color]{width:36px;height:26px;padding:1px;cursor:pointer;border:1p
     <div class="login-error" id="loginError"></div>
     <button class="btn btn-red" style="width:100%" onclick="doLogin()">Einloggen</button>
     <div style="margin-top:16px;padding-top:12px;border-top:1px solid var(--gray-mid);text-align:center;font-size:11px;color:var(--text3);">
-      © Stützpunktfeuerwehr Meilen / LOL &nbsp;·&nbsp; <strong>Cl1.107-dev</strong>
+      © Stützpunktfeuerwehr Meilen / LOL &nbsp;·&nbsp; <strong>Cl1.108-dev</strong>
     </div>
   </div>
 </div>
@@ -180,7 +180,7 @@ td input[type=color]{width:36px;height:26px;padding:1px;cursor:pointer;border:1p
     <img src="https://www.feuerwehr-meilen.ch/fileadmin/Public/Website/Templates/Images/Logo-FeuerwehrMeilen.png" alt="Feuerwehr Meilen" style="height:38px;width:auto;object-fit:contain;">
     <div class="logo-text">Chilbi Herrliberg<span>Admin – Schichtverwaltung</span></div>
     <div class="header-right">
-      <span class="header-version">Cl1.107-dev</span>
+      <span class="header-version">Cl1.108-dev</span>
       <button class="help-btn" onclick="document.getElementById('helpOverlay').style.display='flex'" title="Bedienungsanleitung" style="background:none;border:1.5px solid rgba(255,255,255,.5);color:white;width:22px;height:22px;border-radius:50%;font-size:12px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;margin-left:4px;">?</button>
       <button class="btn btn-sm" onclick="window.open('index.html','_blank')">Zu Schichtplan Signup</button>
       <button class="btn-refresh" id="btnRefresh" onclick="manualRefresh()">
@@ -307,36 +307,72 @@ td input[type=color]{width:36px;height:26px;padding:1px;cursor:pointer;border:1p
     <div class="card">
       <div class="card-title">Gutschein erstellen</div>
       <div style="font-size:12px;color:var(--text3);margin:-4px 0 16px;">Freier Gutschein mit den Öffnungszeiten der Füürwehr Spätzli-Beiz.</div>
-      <div style="max-width:640px;">
-        <div style="margin-bottom:12px;">
-          <label style="display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--text2);margin-bottom:4px;">Name <span style="color:var(--text3);font-weight:400;text-transform:none;">(erscheint unter «für»)</span></label>
-          <input type="text" id="gbName" placeholder="z. B. Korporal Max Muster" style="box-sizing:border-box;width:100%;height:36px;padding:0 10px;border:1px solid var(--gray-mid);font-family:inherit;font-size:14px;">
+      <div style="display:flex;gap:26px;flex-wrap:wrap;align-items:flex-start;">
+        <div style="flex:1 1 320px;min-width:280px;" oninput="gbInput()">
+          <div style="margin-bottom:12px;">
+            <label style="display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--text2);margin-bottom:4px;">Name <span style="color:var(--text3);font-weight:400;text-transform:none;">(erscheint unter «für»)</span></label>
+            <input type="text" id="gbName" placeholder="z. B. Korporal Max Muster" style="box-sizing:border-box;width:100%;height:36px;padding:0 10px;border:1px solid var(--gray-mid);font-family:inherit;font-size:14px;">
+          </div>
+          <div style="margin-bottom:12px;">
+            <label style="display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--text2);margin-bottom:4px;">Gutschein für</label>
+            <input type="text" id="gbText" placeholder="z. B. 1 Getränk nach Wahl" style="box-sizing:border-box;width:100%;height:36px;padding:0 10px;border:1px solid var(--gray-mid);font-family:inherit;font-size:14px;">
+          </div>
+          <div style="margin-bottom:12px;">
+            <label style="display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--text2);margin-bottom:4px;">Zusatz / Bedingung <span style="color:var(--text3);font-weight:400;text-transform:none;">(freiwillig)</span></label>
+            <input type="text" id="gbZusatz" placeholder="z. B. Nur gültig in Kombination mit …" style="box-sizing:border-box;width:100%;height:36px;padding:0 10px;border:1px solid var(--gray-mid);font-family:inherit;font-size:14px;">
+          </div>
+          <div style="margin-bottom:12px;">
+            <label style="display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--text2);margin-bottom:4px;">Untertitel im Kopf <span style="color:var(--text3);font-weight:400;text-transform:none;">(freiwillig, unter «Chilbi Herrliberg»)</span></label>
+            <input type="text" id="gbSub" placeholder="z. B. Feuerwehr Stäfa" style="box-sizing:border-box;width:100%;height:36px;padding:0 10px;border:1px solid var(--gray-mid);font-family:inherit;font-size:14px;">
+          </div>
+          <div style="margin-bottom:12px;">
+            <label style="display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--text2);margin-bottom:4px;">Kürzel Herausgeber <span style="color:var(--red);font-weight:400;text-transform:none;">(Pflicht, erscheint in der Fusszeile)</span></label>
+            <input type="text" id="gbKuerzel" maxlength="10" placeholder="z. B. LOL" oninput="this.value=this.value.toUpperCase()" style="box-sizing:border-box;width:100%;height:36px;padding:0 10px;border:1px solid var(--gray-mid);font-family:inherit;font-size:14px;text-transform:uppercase;">
+          </div>
+          <div style="margin-bottom:16px;">
+            <label style="display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--text2);margin-bottom:4px;">E-Mail <span style="color:var(--text3);font-weight:400;text-transform:none;">(nur zum Senden nötig)</span></label>
+            <input type="email" id="gbMail" placeholder="name@example.ch" style="box-sizing:border-box;width:100%;height:36px;padding:0 10px;border:1px solid var(--gray-mid);font-family:inherit;font-size:14px;">
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button class="btn btn-sm" onclick="gbPrint()">Gutschein drucken</button>
+            <button class="btn btn-sm" id="gbSendBtn" onclick="gbSend()" disabled style="opacity:.4;cursor:not-allowed">Gutschein senden</button>
+          </div>
+          <div id="gbErr" style="display:none;color:var(--red);font-size:13px;margin-top:10px;"></div>
         </div>
-        <div style="margin-bottom:12px;">
-          <label style="display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--text2);margin-bottom:4px;">Gutschein für</label>
-          <input type="text" id="gbText" placeholder="z. B. 1 Getränk nach Wahl" style="box-sizing:border-box;width:100%;height:36px;padding:0 10px;border:1px solid var(--gray-mid);font-family:inherit;font-size:14px;">
+
+        <div style="flex:1 1 400px;min-width:300px;">
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--text2);margin-bottom:8px;">Vorschau</div>
+          <div id="gbPreview" style="width:100%;max-width:560px;aspect-ratio:210/148;position:relative;overflow:hidden;background:#fff;border:1px solid var(--gray-mid);font-family:Helvetica,Arial,sans-serif;container-type:inline-size;box-shadow:0 2px 12px rgba(0,0,0,.09);">
+            <img src="ehemalige/assets/gutschein_hahn.png" alt="" style="position:absolute;right:-4%;top:15%;height:104%;opacity:.5;pointer-events:none;">
+            <div style="position:absolute;left:3.8%;right:3.8%;top:5.4%;bottom:5.4%;border:1px solid #ccc;"></div>
+            <div style="position:absolute;left:3.8%;right:3.8%;top:5.4%;height:17.6%;background:#1a1a1a;display:flex;align-items:center;padding:0 3%;box-sizing:border-box;">
+              <img src="ehemalige/assets/gutschein_logo.png" alt="" style="height:72%;width:auto;">
+              <div style="margin-left:3%;line-height:1.15;">
+                <div style="color:#fff;font-weight:700;font-size:2.5cqw;letter-spacing:.02em;">CHILBI HERRLIBERG</div>
+                <div id="gbpSub" style="color:#bbb;font-size:1.85cqw;margin-top:1.5%;"></div>
+              </div>
+            </div>
+            <div style="position:absolute;left:3.8%;right:3.8%;top:22.9%;height:1%;background:#cc0000;"></div>
+            <div style="position:absolute;left:7%;right:7%;top:29%;text-align:center;">
+              <div style="color:#cc0000;font-weight:700;font-size:5cqw;line-height:1;">GUTSCHEIN</div>
+              <div style="color:#666;font-size:1.7cqw;margin-top:2%;">für</div>
+              <div id="gbpName" style="color:#1a1a1a;font-weight:700;font-size:2.7cqw;margin-top:1%;"></div>
+              <div style="width:34%;height:1px;background:#cc0000;margin:3% auto;"></div>
+              <div style="color:#333;font-size:1.7cqw;">Gegen Abgabe dieses Gutscheins:</div>
+              <div id="gbpWas" style="color:#1a1a1a;font-weight:700;font-size:2.2cqw;margin-top:2%;line-height:1.25;"></div>
+              <div id="gbpZusatz" style="color:#333;font-size:1.75cqw;margin-top:1.5%;line-height:1.25;"></div>
+            </div>
+            <div style="position:absolute;left:7%;right:7%;top:66%;text-align:center;color:#1a1a1a;font-weight:700;font-size:1.78cqw;line-height:1.7;">
+              Freitag, 14.08.26 · 16:00–22:00<br>Samstag, 15.08.26 · 17:00–22:00<br>Sonntag, 16.08.26 · 11:00–21:00
+            </div>
+            <div style="position:absolute;left:7%;right:7%;top:80.5%;text-align:center;color:#333;font-size:1.78cqw;">Füürwehr Spätzli-Beiz, Chilbi Herrliberg</div>
+            <div style="position:absolute;left:7%;right:7%;top:84.5%;text-align:center;color:#666;font-size:1.45cqw;">Primarschule Rebacker, Schulhausstrasse 23, 8704 Herrliberg</div>
+            <div style="position:absolute;left:7%;right:7%;bottom:4.5%;text-align:center;">
+              <div style="color:#666;font-size:1.27cqw;">© Stützpunktfeuerwehr Meilen / LOL</div>
+              <div id="gbpFoot" style="color:#999;font-size:1.1cqw;margin-top:1%;"></div>
+            </div>
+          </div>
         </div>
-        <div style="margin-bottom:12px;">
-          <label style="display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--text2);margin-bottom:4px;">Zusatz / Bedingung <span style="color:var(--text3);font-weight:400;text-transform:none;">(freiwillig)</span></label>
-          <input type="text" id="gbZusatz" placeholder="z. B. Nur gültig in Kombination mit …" style="box-sizing:border-box;width:100%;height:36px;padding:0 10px;border:1px solid var(--gray-mid);font-family:inherit;font-size:14px;">
-        </div>
-        <div style="margin-bottom:12px;">
-          <label style="display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--text2);margin-bottom:4px;">Untertitel im Kopf <span style="color:var(--text3);font-weight:400;text-transform:none;">(freiwillig, unter «Chilbi Herrliberg»)</span></label>
-          <input type="text" id="gbSub" placeholder="z. B. Feuerwehr Stäfa" style="box-sizing:border-box;width:100%;height:36px;padding:0 10px;border:1px solid var(--gray-mid);font-family:inherit;font-size:14px;">
-        </div>
-        <div style="margin-bottom:12px;">
-          <label style="display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--text2);margin-bottom:4px;">Kürzel Herausgeber <span style="color:var(--text3);font-weight:400;text-transform:none;">(freiwillig, erscheint in der Fusszeile)</span></label>
-          <input type="text" id="gbKuerzel" maxlength="10" placeholder="z. B. LOL" oninput="this.value=this.value.toUpperCase()" style="box-sizing:border-box;width:100%;height:36px;padding:0 10px;border:1px solid var(--gray-mid);font-family:inherit;font-size:14px;text-transform:uppercase;">
-        </div>
-        <div style="margin-bottom:16px;">
-          <label style="display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--text2);margin-bottom:4px;">E-Mail <span style="color:var(--text3);font-weight:400;text-transform:none;">(nur zum Senden nötig)</span></label>
-          <input type="email" id="gbMail" oninput="gbToggleSend()" placeholder="name@example.ch" style="box-sizing:border-box;width:100%;height:36px;padding:0 10px;border:1px solid var(--gray-mid);font-family:inherit;font-size:14px;">
-        </div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;">
-          <button class="btn btn-sm" onclick="gbPrint()">Gutschein drucken</button>
-          <button class="btn btn-sm" id="gbSendBtn" onclick="gbSend()" disabled style="opacity:.4;cursor:not-allowed">Gutschein senden</button>
-        </div>
-        <div id="gbErr" style="display:none;color:var(--red);font-size:13px;margin-top:10px;"></div>
       </div>
     </div>
   </div>
@@ -629,7 +665,7 @@ td input[type=color]{width:36px;height:26px;padding:1px;cursor:pointer;border:1p
   </div>
 </div>
 <div class="toast" id="toast"></div>
-<div class="site-footer" style="position:relative;z-index:1;">© Stützpunktfeuerwehr Meilen / LOL &nbsp;·&nbsp; Admin &nbsp;·&nbsp; Cl1.107-dev</div>
+<div class="site-footer" style="position:relative;z-index:1;">© Stützpunktfeuerwehr Meilen / LOL &nbsp;·&nbsp; Admin &nbsp;·&nbsp; Cl1.108-dev</div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script>
@@ -718,6 +754,7 @@ async function loadData() {
 function switchSection(id, btn) {
   document.querySelectorAll('.admin-section').forEach(s => s.classList.remove('active'));
   if (id === 'schichtplan') { if (CONFIG && CONFIG.length) buildSchichtplan(); else setTimeout(buildSchichtplan, 1000); }
+  if (id === 'gutschein') gbRenderPreview();
   document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
   document.getElementById('sec-'+id).classList.add('active');
   btn.classList.add('active');
@@ -1377,6 +1414,21 @@ function gbToggleSend(){
   b.style.opacity = ok ? '' : '.4';
   b.style.cursor = ok ? 'pointer' : 'not-allowed';
 }
+function gbInput(){ gbToggleSend(); gbRenderPreview(); }
+function gbRenderPreview(){
+  const g = id => document.getElementById(id);
+  if(!g('gbPreview')) return;
+  g('gbpSub').textContent = g('gbSub').value.trim();
+  g('gbpName').textContent = g('gbName').value.trim() || '—';
+  g('gbpWas').textContent = g('gbText').value.trim() || '…';
+  const z = g('gbZusatz').value.trim();
+  g('gbpZusatz').textContent = z;
+  g('gbpZusatz').style.display = z ? 'block' : 'none';
+  const kl = g('gbKuerzel').value.trim().toUpperCase();
+  const d = new Date(), p = n => ('0'+n).slice(-2);
+  const ts = p(d.getDate())+'.'+p(d.getMonth()+1)+'.'+d.getFullYear()+' '+p(d.getHours())+':'+p(d.getMinutes())+' Uhr';
+  g('gbpFoot').textContent = 'Erstellt: ' + ts + (kl ? ' · ' + kl : '');
+}
 function gbRead(){
   const name = document.getElementById('gbName').value.trim();
   const was  = document.getElementById('gbText').value.trim();
@@ -1385,8 +1437,8 @@ function gbRead(){
   const kuerzel = document.getElementById('gbKuerzel').value.trim();
   const mail = document.getElementById('gbMail').value.trim();
   const err  = document.getElementById('gbErr');
-  if(!name || !was){
-    err.textContent = 'Bitte Name und «Gutschein für» ausfüllen.';
+  if(!name || !was || !kuerzel){
+    err.textContent = 'Bitte Name, «Gutschein für» und Kürzel ausfüllen.';
     err.style.display = 'block';
     return null;
   }
@@ -1628,7 +1680,7 @@ function printDay(dayId) {
   </head><body>
     <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:${px(0.5)}px;padding-bottom:${px(0.3)}px;border-bottom:2px solid black;">
       <div style="font-size:${px(1.3)}px;font-weight:700;text-transform:uppercase">${titleText}</div>
-      <div style="font-size:${px(0.62)}px;color:#666">Stützpunktfeuerwehr Meilen &nbsp;·&nbsp; Chilbi Herrliberg &nbsp;·&nbsp; Cl1.107-dev</div>
+      <div style="font-size:${px(0.62)}px;color:#666">Stützpunktfeuerwehr Meilen &nbsp;·&nbsp; Chilbi Herrliberg &nbsp;·&nbsp; Cl1.108-dev</div>
     </div>
     <div style="display:flex;margin-bottom:${px(0.2)}px;">
       <div style="width:${labelW}px;min-width:${labelW}px;"></div>
