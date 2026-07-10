@@ -1,6 +1,6 @@
 // ============================================================
 // Chilbi Herrliberg – Schichtplanung Backend
-// Google Apps Script  |  Cl1.105-dev
+// Google Apps Script  |  Cl1.106-dev
 // Schema Konfiguration: ID|Datum|Von|Bis|Schicht|Aufgabe|Max Personen|Farbe|Informationen|Geschlossen
 // Schema Anmeldungen:   ID|Name|Schicht|Aufgabe|Timestamp
 // Schema Tage:          Datum|Typ
@@ -298,7 +298,29 @@ function gutscheinMail(p) {
     var blob = Utilities.newBlob(bytes, 'application/pdf', fn);
     var vn = p.vorname || '';
     var subj, text, html;
-    if (p.variant === 'fw') {
+    if (p.variant === 'custom') {
+      var was = p.was || 'Deinen Gutschein';
+      subj = 'Dein Gutschein für die Chilbi Herrliberg';
+      text = 'Hallo ' + vn + ',\n\n'
+        + 'Im Anhang findest Du Deinen persönlichen Gutschein für: ' + was + '\n'
+        + (p.zusatz ? p.zusatz + '\n' : '')
+        + '\nWann:\n'
+        + 'Freitag, 14.08.26 · 16:00–22:00\n'
+        + 'Samstag, 15.08.26 · 17:00–22:00\n'
+        + 'Sonntag, 16.08.26 · 11:00–21:00\n'
+        + 'Wo: Füürwehr Spätzli-Beiz an der Chilbi Herrliberg (Primarschule Rebacker, Schulhausstrasse 23, 8704 Herrliberg)\n\n'
+        + 'Bitte druck den Gutschein aus und gib ihn bei uns am Stand ab.\n\n'
+        + 'Wir freuen uns auf Dich!\n\nKameradschaftliche Grüsse\nEuer Chilbi-OK';
+      html = '<div style="font-family:Arial,Helvetica,sans-serif;font-size:14px;color:#222;line-height:1.55">'
+        + '<p>Hallo ' + vn + ',</p>'
+        + '<p>Im Anhang findest Du Deinen persönlichen Gutschein für: <b>' + was + '</b>'
+        + (p.zusatz ? '<br>' + p.zusatz : '') + '</p>'
+        + '<p><b>Wann:</b><br>Freitag, 14.08.26 · 16:00–22:00<br>Samstag, 15.08.26 · 17:00–22:00<br>Sonntag, 16.08.26 · 11:00–21:00<br>'
+        + '<b>Wo:</b> Füürwehr Spätzli-Beiz an der Chilbi Herrliberg (Primarschule Rebacker, Schulhausstrasse 23, 8704 Herrliberg)</p>'
+        + '<p>Bitte <b>druck den Gutschein aus und gib ihn bei uns am Stand ab.</b></p>'
+        + '<p>Wir freuen uns auf Dich!</p>'
+        + '<p>Kameradschaftliche Grüsse<br>Euer Chilbi-OK</p></div>';
+    } else if (p.variant === 'fw') {
       subj = 'Dein Gutschein für die Füürwehr Spätzli-Beiz an der Chilbi Herrliberg';
       text = 'Liebe/r ' + vn + ',\n\n'
         + 'Schön, dass Du dabei bist! Im Anhang findest Du Deinen persönlichen Gutschein für eine Portion Spätzli und ein Süssgetränk/Bier für 10 CHF (nur gültig in Kombination mit einem Feuerwehr-T-Shirt / Oberteil).\n\n'
