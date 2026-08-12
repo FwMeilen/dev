@@ -1,6 +1,6 @@
 // ============================================================
 // Chilbi Herrliberg – Schichtplanung Backend
-// Google Apps Script  |  Cl1.110-dev
+// Google Apps Script  |  Cl1.111-dev
 // Schema Konfiguration: ID|Datum|Von|Bis|Schicht|Aufgabe|Max Personen|Farbe|Informationen|Geschlossen
 // Schema Anmeldungen:   ID|Name|Schicht|Aufgabe|Timestamp
 // Schema Tage:          Datum|Typ
@@ -41,6 +41,10 @@ function doPost(e) {
       return jsonResponse(saveFeuerwehren(p.rows));
     }
     if (p.action === 'gutscheinMail')      return jsonResponse(gutscheinMail(p));
+    if (p.action === 'sendeSchichtMails') {
+      if (p.password !== ADMIN_PW) return jsonResponse({ ok: false, error: 'Falsches Passwort' });
+      return jsonResponse(sendeSchichtMails(p));
+    }
     if (p.action === 'saveConfig') {
       if (p.password !== ADMIN_PW) return jsonResponse({ ok: false, error: 'Falsches Passwort' });
       return jsonResponse(saveConfig(p.rows));
@@ -286,6 +290,23 @@ function saveFeuerwehren(rows) {
   sh.getRange(1, 1).setValue('Feuerwehr');
   if (list.length) sh.getRange(2, 1, list.length, 1).setValues(list.map(function (v) { return [v]; }));
   return { ok: true, count: list.length };
+}
+
+// Schicht-Mails: Frontend liefert fertige Nachrichten (email, subject, html, text, ics); hier nur versenden
+function sendeSchichtMails(p) {
+  var msgs = p.messages || [];
+  var sent = 0, fails = [];
+  for (var i = 0; i < msgs.length; i++) {
+    var m = msgs[i];
+    if (!m || !m.email) continue;
+    try {
+      var opts = { from: 'chilbi@feuerwehrmeilen.ch', name: 'Chilbi Herrliberg', htmlBody: m.html };
+      if (m.ics) opts.attachments = [Utilities.newBlob(m.ics, 'text/calendar', 'Chilbi_Schichten.ics')];
+      GmailApp.sendEmail(m.email, m.subject, m.text, opts);
+      sent++;
+    } catch (e) { fails.push(m.email + ': ' + e.message); }
+  }
+  return { ok: true, sent: sent, fails: fails };
 }
 
 // Gutschein per Mail senden (PDF kommt fertig als Base64 vom Frontend; Versand via Alias chilbi@feuerwehrmeilen.ch)
