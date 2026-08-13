@@ -1,6 +1,6 @@
 // ============================================================
 // Chilbi Herrliberg – Schichtplanung Backend
-// Google Apps Script  |  Cl1.111-dev
+// Google Apps Script  |  Cl1.112-dev
 // Schema Konfiguration: ID|Datum|Von|Bis|Schicht|Aufgabe|Max Personen|Farbe|Informationen|Geschlossen
 // Schema Anmeldungen:   ID|Name|Schicht|Aufgabe|Timestamp
 // Schema Tage:          Datum|Typ
@@ -301,7 +301,10 @@ function sendeSchichtMails(p) {
     if (!m || !m.email) continue;
     try {
       var opts = { from: 'chilbi@feuerwehrmeilen.ch', name: 'Chilbi Herrliberg', htmlBody: m.html };
-      if (m.ics) opts.attachments = [Utilities.newBlob(m.ics, 'text/calendar', 'Chilbi_Schichten.ics')];
+      var atts = [];
+      if (m.ics) atts.push(Utilities.newBlob(m.ics, 'text/calendar', 'Chilbi_Schichten.ics'));
+      if (m.pdf) atts.push(Utilities.newBlob(Utilities.base64Decode(m.pdf), 'application/pdf', m.pdfname || 'Dankes-Gutschein.pdf'));
+      if (atts.length) opts.attachments = atts;
       GmailApp.sendEmail(m.email, m.subject, m.text, opts);
       sent++;
     } catch (e) { fails.push(m.email + ': ' + e.message); }

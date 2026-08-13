@@ -6,7 +6,7 @@
 <link rel="icon" href="favicon.ico" sizes="any">
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
-<title>Chilbi Admin – Schichtverwaltung Cl1.111-dev</title>
+<title>Chilbi Admin – Schichtverwaltung Cl1.112-dev</title>
 <meta property="og:title" content="Chilbi Herrliberg – Admin">
 <meta property="og:description" content="Schichtverwaltung Chilbi Herrliberg – Stützpunktfeuerwehr Meilen">
 <meta property="og:image" content="https://www.feuerwehr-meilen.ch/fileadmin/Public/Website/Templates/Images/Logo-FeuerwehrMeilen.png">
@@ -169,7 +169,7 @@ td input[type=color]{width:36px;height:26px;padding:1px;cursor:pointer;border:1p
     <div class="login-error" id="loginError"></div>
     <button class="btn btn-red" style="width:100%" onclick="doLogin()">Einloggen</button>
     <div style="margin-top:16px;padding-top:12px;border-top:1px solid var(--gray-mid);text-align:center;font-size:11px;color:var(--text3);">
-      © Stützpunktfeuerwehr Meilen / LOL &nbsp;·&nbsp; <strong>Cl1.111-dev</strong>
+      © Stützpunktfeuerwehr Meilen / LOL &nbsp;·&nbsp; <strong>Cl1.112-dev</strong>
     </div>
   </div>
 </div>
@@ -180,7 +180,7 @@ td input[type=color]{width:36px;height:26px;padding:1px;cursor:pointer;border:1p
     <img src="https://www.feuerwehr-meilen.ch/fileadmin/Public/Website/Templates/Images/Logo-FeuerwehrMeilen.png" alt="Feuerwehr Meilen" style="height:38px;width:auto;object-fit:contain;">
     <div class="logo-text">Chilbi Herrliberg<span>Admin – Schichtverwaltung</span></div>
     <div class="header-right">
-      <span class="header-version">Cl1.111-dev</span>
+      <span class="header-version">Cl1.112-dev</span>
       <button class="help-btn" onclick="document.getElementById('helpOverlay').style.display='flex'" title="Bedienungsanleitung" style="background:none;border:1.5px solid rgba(255,255,255,.5);color:white;width:22px;height:22px;border-radius:50%;font-size:12px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;margin-left:4px;">?</button>
       <button class="btn btn-sm" onclick="window.open('index.html','_blank')">Zu Schichtplan Signup</button>
       <button class="btn-refresh" id="btnRefresh" onclick="manualRefresh()">
@@ -407,14 +407,48 @@ Bei Fragen melde dich einfach bei uns.
 Kameradschaftliche Grüsse
 Euer Chilbi-OK</textarea>
           </div>
+
+          <div style="border:1px solid var(--gray-mid);padding:12px;margin-bottom:16px;background:var(--bg2);">
+            <label style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;cursor:pointer;">
+              <input type="checkbox" id="emGutOn" onchange="emGutToggle()"> Dankes-Gutschein anhängen (als 2. Anhang, Name = jeweiliger Helfer)
+            </label>
+            <div id="emGutFields" style="display:none;margin-top:12px;">
+              <div style="margin-bottom:10px;">
+                <label style="display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--text2);margin-bottom:4px;">Gutschein für</label>
+                <input type="text" id="emGutFuer" placeholder="z. B. 1 Dankes-Getränk" style="box-sizing:border-box;width:100%;height:34px;padding:0 10px;border:1px solid var(--gray-mid);font-family:inherit;font-size:14px;">
+              </div>
+              <div style="margin-bottom:10px;">
+                <label style="display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--text2);margin-bottom:4px;">Zusatz / Bedingung <span style="color:var(--text3);font-weight:400;text-transform:none;">(freiwillig)</span></label>
+                <input type="text" id="emGutZusatz" style="box-sizing:border-box;width:100%;height:34px;padding:0 10px;border:1px solid var(--gray-mid);font-family:inherit;font-size:14px;">
+              </div>
+              <div style="margin-bottom:10px;">
+                <label style="display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--text2);margin-bottom:4px;">Untertitel im Kopf <span style="color:var(--text3);font-weight:400;text-transform:none;">(freiwillig)</span></label>
+                <input type="text" id="emGutSub" style="box-sizing:border-box;width:100%;height:34px;padding:0 10px;border:1px solid var(--gray-mid);font-family:inherit;font-size:14px;">
+              </div>
+              <div>
+                <label style="display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--text2);margin-bottom:4px;">Kürzel Herausgeber <span style="color:var(--red);font-weight:400;text-transform:none;">(Pflicht)</span></label>
+                <input type="text" id="emGutKuerzel" maxlength="10" placeholder="z. B. LOL" oninput="this.value=this.value.toUpperCase()" style="box-sizing:border-box;width:140px;height:34px;padding:0 10px;border:1px solid var(--gray-mid);font-family:inherit;font-size:14px;text-transform:uppercase;">
+              </div>
+            </div>
+          </div>
+
           <button class="btn btn-red btn-sm" onclick="emailSendAll()">✉ An alle senden</button>
           <div id="emResult" style="display:none;color:var(--text);font-size:13px;margin-top:12px;padding:10px 12px;background:var(--bg2);border-left:3px solid var(--green);"></div>
+
+          <div style="border-top:1px solid var(--gray-mid);margin:20px 0 14px;"></div>
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--text2);margin-bottom:6px;">Einzelversand <span style="color:var(--text3);font-weight:400;text-transform:none;">(Test / Nachzügler – per Kürzel)</span></div>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+            <input type="text" id="emOneKuerzel" maxlength="10" placeholder="Kürzel, z. B. LOL" oninput="this.value=this.value.toUpperCase()" style="box-sizing:border-box;width:180px;height:34px;padding:0 10px;border:1px solid var(--gray-mid);font-family:inherit;font-size:14px;text-transform:uppercase;">
+            <button class="btn btn-sm" onclick="emailSendOne()">Eine E-Mail senden</button>
+          </div>
+          <div id="emResultOne" style="display:none;color:var(--text);font-size:13px;margin-top:10px;padding:10px 12px;background:var(--bg2);border-left:3px solid var(--green);"></div>
         </div>
         <div style="flex:1 1 380px;min-width:300px;">
           <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--text2);margin-bottom:8px;">Vorschau <span style="color:var(--text3);font-weight:400;text-transform:none;">(Beispieldaten)</span></div>
           <div style="border:1px solid var(--gray-mid);padding:14px 16px;background:#fff;">
             <div style="font-size:12px;color:var(--text3);border-bottom:1px solid var(--gray-mid);padding-bottom:6px;margin-bottom:10px;">Betreff: <b id="emPreviewSubj" style="color:var(--text)"></b></div>
             <div id="emPreview"></div>
+            <div id="emPreviewAtt" style="font-size:11px;color:var(--text3);margin-top:10px;border-top:1px solid var(--gray-mid);padding-top:8px;"></div>
           </div>
         </div>
       </div>
@@ -709,7 +743,7 @@ Euer Chilbi-OK</textarea>
   </div>
 </div>
 <div class="toast" id="toast"></div>
-<div class="site-footer" style="position:relative;z-index:1;">© Stützpunktfeuerwehr Meilen / LOL &nbsp;·&nbsp; Admin &nbsp;·&nbsp; Cl1.111-dev</div>
+<div class="site-footer" style="position:relative;z-index:1;">© Stützpunktfeuerwehr Meilen / LOL &nbsp;·&nbsp; Admin &nbsp;·&nbsp; Cl1.112-dev</div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script>
@@ -1569,10 +1603,19 @@ function emailReadTpl(){
   return {
     subject: document.getElementById('emSubject').value,
     intro:   document.getElementById('emIntro').value,
-    schluss: document.getElementById('emSchluss').value
+    schluss: document.getElementById('emSchluss').value,
+    gutOn:   document.getElementById('emGutOn').checked,
+    gutWas:  document.getElementById('emGutFuer').value.trim(),
+    gutZusatz: document.getElementById('emGutZusatz').value.trim(),
+    gutSub:  document.getElementById('emGutSub').value.trim(),
+    gutKuerzel: document.getElementById('emGutKuerzel').value.trim()
   };
 }
-function emailBuildMessage(r, tpl){
+function emGutToggle(){
+  document.getElementById('emGutFields').style.display = document.getElementById('emGutOn').checked ? 'block' : 'none';
+  emailRenderPreview();
+}
+function _emRender(r, tpl){
   const rep = s => String(s||'').replace(/\{vorname\}/g, r.vorname).replace(/\{name\}/g, r.name);
   const subject = rep(tpl.subject);
   const introT = rep(tpl.intro), schlussT = rep(tpl.schluss);
@@ -1583,7 +1626,19 @@ function emailBuildMessage(r, tpl){
     + _emShiftHtml(r.shifts)
     + '<p>'+_emNl2br(schlussT)+'</p>'
     + '</div></div>';
-  return { email:r.email, subject, html, text, ics:_emIcs(r) };
+  return { subject, html, text };
+}
+async function emailBuildMessage(r, tpl){
+  const m = _emRender(r, tpl);
+  const msg = { email:r.email, subject:m.subject, html:m.html, text:m.text, ics:_emIcs(r) };
+  if (tpl.gutOn) {
+    try {
+      const doc = await buildVoucherCustom(r.name, tpl.gutWas, tpl.gutZusatz, tpl.gutSub, tpl.gutKuerzel);
+      msg.pdf = doc.output('datauristring').split(',')[1];
+      msg.pdfname = ('Dankes-Gutschein_' + r.name).replace(/[^A-Za-z0-9_]/g,'_') + '.pdf';
+    } catch(e){ /* ohne Gutschein weiter */ }
+  }
+  return msg;
 }
 function emailRenderPreview(){
   if(!document.getElementById('emPreview')) return;
@@ -1591,9 +1646,11 @@ function emailRenderPreview(){
     {datum:'14.08.2026', von:'16:00', bis:'22:00', schicht:'Küche', aufgabe:'Spätzli machen', info:'Bitte 5–10 Min vor Schichtbeginn da sein. Tenue: FW-Shirt'},
     {datum:'15.08.2026', von:'17:00', bis:'22:00', schicht:'Bar', aufgabe:'Ausschank', info:''}
   ]};
-  const m = emailBuildMessage(sample, emailReadTpl());
+  const m = _emRender(sample, emailReadTpl());
   document.getElementById('emPreview').innerHTML = m.html;
   document.getElementById('emPreviewSubj').textContent = m.subject;
+  const att = document.getElementById('emPreviewAtt');
+  if(att) att.textContent = 'Anhänge: Kalender (.ics)' + (document.getElementById('emGutOn').checked ? ' + Dankes-Gutschein (PDF)' : '');
 }
 function emailConfirm(msg, cb){
   _voucherCb = cb;
@@ -1604,6 +1661,7 @@ function emailConfirm(msg, cb){
 async function emailSendAll(){
   const tpl = emailReadTpl();
   if(!tpl.subject.trim()){ showToast('Betreff fehlt', 'error'); return; }
+  if(tpl.gutOn && (!tpl.gutWas || !tpl.gutKuerzel)){ showToast('Gutschein: «Gutschein für» und Kürzel Herausgeber ausfüllen', 'error'); return; }
   const byK = emailGroupHelpers();
   const recipients = [], skipped = [];
   Object.keys(byK).forEach(k => {
@@ -1613,15 +1671,36 @@ async function emailSendAll(){
     if(email && /@/.test(email)) recipients.push(r); else skipped.push(k);
   });
   if(!recipients.length){ showToast('Keine Helfer mit hinterlegter E-Mail gefunden', 'error'); return; }
-  let msg = 'Schicht-Mails an ' + recipients.length + ' Helfer senden?';
+  let msg = 'Schicht-Mails an ' + recipients.length + ' Helfer senden?' + (tpl.gutOn ? ' (inkl. Dankes-Gutschein)' : '');
   if(skipped.length) msg += '\n\n' + skipped.length + ' ohne Adresse werden übersprungen:\n' + skipped.slice().sort().join(', ');
   emailConfirm(msg, async () => {
-    const messages = recipients.map(r => emailBuildMessage(r, tpl));
+    const messages = await Promise.all(recipients.map(r => emailBuildMessage(r, tpl)));
     await _avPost({ action:'sendeSchichtMails', password:ADMIN_PW, messages });
     const res = document.getElementById('emResult');
     res.style.display = 'block';
-    res.innerHTML = '✓ Versand ausgelöst: <b>' + recipients.length + '</b> Mail(s).'
+    res.innerHTML = '✓ Versand ausgelöst: <b>' + recipients.length + '</b> Mail(s)' + (tpl.gutOn ? ' inkl. Gutschein' : '') + '.'
       + (skipped.length ? ' &nbsp;Übersprungen (keine Adresse): ' + skipped.length + ' – ' + skipped.slice().sort().join(', ') : '');
+    showToast('Versand ausgelöst', 'success');
+  });
+}
+async function emailSendOne(){
+  const tpl = emailReadTpl();
+  if(!tpl.subject.trim()){ showToast('Betreff fehlt', 'error'); return; }
+  if(tpl.gutOn && (!tpl.gutWas || !tpl.gutKuerzel)){ showToast('Gutschein: «Gutschein für» und Kürzel Herausgeber ausfüllen', 'error'); return; }
+  const k = document.getElementById('emOneKuerzel').value.trim().toUpperCase();
+  if(!k){ showToast('Bitte Kürzel eingeben', 'error'); return; }
+  const byK = emailGroupHelpers();
+  const realK = Object.keys(byK).find(x => x.toUpperCase() === k);
+  if(!realK){ showToast('Kürzel «' + k + '» hat keine Schichten', 'error'); return; }
+  const email = String(KMAIL[k]||'').trim();
+  if(!email || !/@/.test(email)){ showToast('Für «' + k + '» ist keine E-Mail hinterlegt', 'error'); return; }
+  const r = { kuerzel:realK, email, vorname:(KVOR[k]||realK), name:(KNAMES[k]||realK), shifts:byK[realK] };
+  emailConfirm('Schicht-Mail an ' + email + ' senden?' + (tpl.gutOn ? ' (inkl. Gutschein)' : ''), async () => {
+    const m = await emailBuildMessage(r, tpl);
+    await _avPost({ action:'sendeSchichtMails', password:ADMIN_PW, messages:[m] });
+    const res = document.getElementById('emResultOne');
+    res.style.display = 'block';
+    res.innerHTML = '✓ Versand ausgelöst an ' + email + (tpl.gutOn ? ' inkl. Gutschein' : '') + '.';
     showToast('Versand ausgelöst', 'success');
   });
 }
@@ -1843,7 +1922,7 @@ function printDay(dayId) {
   </head><body>
     <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:${px(0.5)}px;padding-bottom:${px(0.3)}px;border-bottom:2px solid black;">
       <div style="font-size:${px(1.3)}px;font-weight:700;text-transform:uppercase">${titleText}</div>
-      <div style="font-size:${px(0.62)}px;color:#666">Stützpunktfeuerwehr Meilen &nbsp;·&nbsp; Chilbi Herrliberg &nbsp;·&nbsp; Cl1.111-dev</div>
+      <div style="font-size:${px(0.62)}px;color:#666">Stützpunktfeuerwehr Meilen &nbsp;·&nbsp; Chilbi Herrliberg &nbsp;·&nbsp; Cl1.112-dev</div>
     </div>
     <div style="display:flex;margin-bottom:${px(0.2)}px;">
       <div style="width:${labelW}px;min-width:${labelW}px;"></div>
