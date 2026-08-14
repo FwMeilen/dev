@@ -6,7 +6,7 @@
 <link rel="icon" href="favicon.ico" sizes="any">
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
-<title>Chilbi Admin – Schichtverwaltung Cl1.113-dev</title>
+<title>Chilbi Admin – Schichtverwaltung Cl1.114-dev</title>
 <meta property="og:title" content="Chilbi Herrliberg – Admin">
 <meta property="og:description" content="Schichtverwaltung Chilbi Herrliberg – Stützpunktfeuerwehr Meilen">
 <meta property="og:image" content="https://www.feuerwehr-meilen.ch/fileadmin/Public/Website/Templates/Images/Logo-FeuerwehrMeilen.png">
@@ -156,6 +156,12 @@ td input[type=color]{width:36px;height:26px;padding:1px;cursor:pointer;border:1p
 }
 .print-btn{height:30px;padding:0 12px;border:2px solid var(--black);background:var(--bg);color:var(--black);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;cursor:pointer;font-family:inherit;border-radius:0;margin-right:6px;}
 .print-btn:hover{background:var(--black);color:white;}
+.pn-switch{position:relative;display:inline-block;width:46px;height:24px;flex:0 0 auto;}
+.pn-switch input{opacity:0;width:0;height:0;}
+.pn-slider{position:absolute;inset:0;background:var(--gray-mid);border-radius:24px;transition:.2s;cursor:pointer;}
+.pn-slider::before{content:'';position:absolute;height:18px;width:18px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.2s;}
+.pn-switch input:checked + .pn-slider{background:var(--black);}
+.pn-switch input:checked + .pn-slider::before{transform:translateX(22px);}
 </style>
 </head>
 <body>
@@ -169,7 +175,7 @@ td input[type=color]{width:36px;height:26px;padding:1px;cursor:pointer;border:1p
     <div class="login-error" id="loginError"></div>
     <button class="btn btn-red" style="width:100%" onclick="doLogin()">Einloggen</button>
     <div style="margin-top:16px;padding-top:12px;border-top:1px solid var(--gray-mid);text-align:center;font-size:11px;color:var(--text3);">
-      © Stützpunktfeuerwehr Meilen / LOL &nbsp;·&nbsp; <strong>Cl1.113-dev</strong>
+      © Stützpunktfeuerwehr Meilen / LOL &nbsp;·&nbsp; <strong>Cl1.114-dev</strong>
     </div>
   </div>
 </div>
@@ -180,7 +186,7 @@ td input[type=color]{width:36px;height:26px;padding:1px;cursor:pointer;border:1p
     <img src="https://www.feuerwehr-meilen.ch/fileadmin/Public/Website/Templates/Images/Logo-FeuerwehrMeilen.png" alt="Feuerwehr Meilen" style="height:38px;width:auto;object-fit:contain;">
     <div class="logo-text">Chilbi Herrliberg<span>Admin – Schichtverwaltung</span></div>
     <div class="header-right">
-      <span class="header-version">Cl1.113-dev</span>
+      <span class="header-version">Cl1.114-dev</span>
       <button class="help-btn" onclick="document.getElementById('helpOverlay').style.display='flex'" title="Bedienungsanleitung" style="background:none;border:1.5px solid rgba(255,255,255,.5);color:white;width:22px;height:22px;border-radius:50%;font-size:12px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;margin-left:4px;">?</button>
       <button class="btn btn-sm" onclick="window.open('index.html','_blank')">Zu Schichtplan Signup</button>
       <button class="btn-refresh" id="btnRefresh" onclick="manualRefresh()">
@@ -546,6 +552,11 @@ Euer Chilbi-OK</textarea>
     <div class="card" style="border-top-color:var(--black)">
       <div class="card-title">Tage drucken</div>
       <div id="printBtns" style="display:flex;flex-wrap:wrap;gap:8px;"></div>
+      <div style="margin-top:14px;display:flex;align-items:center;gap:10px;font-size:13px;color:var(--text2);">
+        <span>Namen drucken als:</span>
+        <label class="pn-switch"><input type="checkbox" id="pnToggle" onchange="printToggleName()"><span class="pn-slider"></span></label>
+        <span id="pnLabel" style="font-weight:600;color:var(--text);">Kürzel</span>
+      </div>
     </div>
     <div class="card">
       <div class="card-title">Belegungsübersicht</div>
@@ -743,7 +754,7 @@ Euer Chilbi-OK</textarea>
   </div>
 </div>
 <div class="toast" id="toast"></div>
-<div class="site-footer" style="position:relative;z-index:1;">© Stützpunktfeuerwehr Meilen / LOL &nbsp;·&nbsp; Admin &nbsp;·&nbsp; Cl1.113-dev</div>
+<div class="site-footer" style="position:relative;z-index:1;">© Stützpunktfeuerwehr Meilen / LOL &nbsp;·&nbsp; Admin &nbsp;·&nbsp; Cl1.114-dev</div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script>
@@ -1821,13 +1832,24 @@ function renderOverview() {
           <div class="ov-task-name">${esc(t.Aufgabe)}${isClosed?' 🔒':''}</div>
           <div class="ov-task-time">${esc(t.Von)}–${esc(t.Bis)}</div>
           <div class="ov-bar-wrap"><div class="ov-bar" style="width:${pct}%;background:${isClosed?'#888':barColor}"></div></div>
-          <div class="ov-persons" style="color:${isClosed?'#888':barColor}">${taken.length}/${max} ${taken.map(s=>`<span style="font-weight:700">${esc(s.Name)}</span>`).join(', ')}</div>
+          <div class="ov-persons" style="color:${isClosed?'#888':barColor}">${taken.length}/${max} ${taken.map(s=>`<span style="font-weight:700">${esc(printResolveName(s.Name))}</span>`).join(', ')}</div>
         </div>`;
       });
     });
     html += '</div>';
   });
   document.getElementById('overviewContent').innerHTML = html || '<div style="padding:2rem;color:var(--text3);text-align:center">Noch keine Schichten definiert.</div>';
+}
+
+let printFullName = false;
+function printToggleName(){
+  printFullName = document.getElementById('pnToggle').checked;
+  document.getElementById('pnLabel').textContent = printFullName ? 'Voller Name' : 'Kürzel';
+  renderOverview();
+}
+function printResolveName(k){
+  if(!printFullName) return k;
+  return KNAMES[String(k||'').toUpperCase()] || k;
 }
 
 function printDay(dayId) {
@@ -1896,7 +1918,7 @@ function printDay(dayId) {
       const isClosed=String(r.Geschlossen)==='1'||r.Geschlossen===true;
       const blockH=px(max);          // Höhe der Personen-Linien
       const rowH=px(rowU(r));         // Zeilenhöhe = max(Block, Label) → kein Überlauf
-      const namedLines=taken.map(s=>`<div style="border-bottom:1px solid #bbb;padding:0 3px;font-size:${px(0.62)}px;font-weight:700;height:${px(1)}px;line-height:${px(1)}px;overflow:hidden">${s.Name}</div>`).join('');
+      const namedLines=taken.map(s=>`<div style="border-bottom:1px solid #bbb;padding:0 3px;font-size:${px(0.62)}px;font-weight:700;height:${px(1)}px;line-height:${px(1)}px;overflow:hidden">${esc(printResolveName(s.Name))}</div>`).join('');
       const emptyLines=Array.from({length:Math.max(0,max-taken.length)},()=>`<div style="border-bottom:1px solid #bbb;height:${px(1)}px;"></div>`).join('');
       schHtml+=`<div style="display:flex;align-items:flex-start;margin-bottom:${px(GAP_U)}px;height:${rowH}px;">
         <div style="width:${labelW}px;min-width:${labelW}px;padding-right:6px;padding-top:1px;overflow:hidden">
@@ -1927,7 +1949,7 @@ function printDay(dayId) {
   </head><body>
     <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:${px(0.5)}px;padding-bottom:${px(0.3)}px;border-bottom:2px solid black;">
       <div style="font-size:${px(1.3)}px;font-weight:700;text-transform:uppercase">${titleText}</div>
-      <div style="font-size:${px(0.62)}px;color:#666">Stützpunktfeuerwehr Meilen &nbsp;·&nbsp; Chilbi Herrliberg &nbsp;·&nbsp; Cl1.113-dev</div>
+      <div style="font-size:${px(0.62)}px;color:#666">Stützpunktfeuerwehr Meilen &nbsp;·&nbsp; Chilbi Herrliberg &nbsp;·&nbsp; Cl1.114-dev</div>
     </div>
     <div style="display:flex;margin-bottom:${px(0.2)}px;">
       <div style="width:${labelW}px;min-width:${labelW}px;"></div>
