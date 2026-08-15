@@ -6,7 +6,7 @@
 <link rel="icon" href="favicon.ico" sizes="any">
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
-<title>Chilbi Admin – Schichtverwaltung Cl1.115-dev</title>
+<title>Chilbi Admin – Schichtverwaltung Cl1.116-dev</title>
 <meta property="og:title" content="Chilbi Herrliberg – Admin">
 <meta property="og:description" content="Schichtverwaltung Chilbi Herrliberg – Stützpunktfeuerwehr Meilen">
 <meta property="og:image" content="https://www.feuerwehr-meilen.ch/fileadmin/Public/Website/Templates/Images/Logo-FeuerwehrMeilen.png">
@@ -175,7 +175,7 @@ td input[type=color]{width:36px;height:26px;padding:1px;cursor:pointer;border:1p
     <div class="login-error" id="loginError"></div>
     <button class="btn btn-red" style="width:100%" onclick="doLogin()">Einloggen</button>
     <div style="margin-top:16px;padding-top:12px;border-top:1px solid var(--gray-mid);text-align:center;font-size:11px;color:var(--text3);">
-      © Stützpunktfeuerwehr Meilen / LOL &nbsp;·&nbsp; <strong>Cl1.115-dev</strong>
+      © Stützpunktfeuerwehr Meilen / LOL &nbsp;·&nbsp; <strong>Cl1.116-dev</strong>
     </div>
   </div>
 </div>
@@ -186,7 +186,7 @@ td input[type=color]{width:36px;height:26px;padding:1px;cursor:pointer;border:1p
     <img src="https://www.feuerwehr-meilen.ch/fileadmin/Public/Website/Templates/Images/Logo-FeuerwehrMeilen.png" alt="Feuerwehr Meilen" style="height:38px;width:auto;object-fit:contain;">
     <div class="logo-text">Chilbi Herrliberg<span>Admin – Schichtverwaltung</span></div>
     <div class="header-right">
-      <span class="header-version">Cl1.115-dev</span>
+      <span class="header-version">Cl1.116-dev</span>
       <button class="help-btn" onclick="document.getElementById('helpOverlay').style.display='flex'" title="Bedienungsanleitung" style="background:none;border:1.5px solid rgba(255,255,255,.5);color:white;width:22px;height:22px;border-radius:50%;font-size:12px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;margin-left:4px;">?</button>
       <button class="btn btn-sm" onclick="window.open('index.html','_blank')">Zu Schichtplan Signup</button>
       <button class="btn-refresh" id="btnRefresh" onclick="manualRefresh()">
@@ -207,8 +207,8 @@ td input[type=color]{width:36px;height:26px;padding:1px;cursor:pointer;border:1p
     <button class="admin-tab" onclick="switchSection('feuerwehrkollegen',this)">Feuerwehrkollegen</button>
     <button class="admin-tab" onclick="switchSection('gutschein',this)">Gutschein</button>
     <button class="admin-tab" onclick="switchSection('email',this)">E-Mail Versand</button>
-    <button class="admin-tab" onclick="switchSection('kuerzel',this)">Kürzel</button>
     <button class="admin-tab" onclick="switchSection('einstellungen',this)">Einstellungen</button>
+    <button class="admin-tab" onclick="switchSection('statistik',this)">Statistik</button>
   </div>
 
   <!-- ANMELDUNGEN -->
@@ -462,13 +462,17 @@ Euer Chilbi-OK</textarea>
     </div>
   </div>
 
-  <!-- KÜRZEL-VERZEICHNIS -->
-  <div class="admin-section" id="sec-kuerzel">
+  <!-- STATISTIK -->
+  <div class="admin-section" id="sec-statistik">
     <div class="card">
-      <div class="card-title">Kürzel-Verzeichnis <span id="kuerzelCount" style="font-size:12px;font-weight:400;color:var(--text3);"></span></div>
-      <div style="font-size:12px;color:var(--text3);margin:-4px 0 14px;">Alle Kürzel mit Namen – offizielle Feuerwehrleute und Gäste. Suchbar nach Kürzel oder Name.</div>
-      <input type="text" id="kuerzelSearch" oninput="renderKuerzelList()" placeholder="Kürzel oder Name suchen…" style="box-sizing:border-box;width:100%;max-width:360px;height:36px;padding:0 10px;border:1px solid var(--gray-mid);font-family:inherit;font-size:14px;margin-bottom:14px;">
-      <div id="kuerzelList"></div>
+      <div class="card-title">Helfer &amp; Schichten <span id="statTotal" style="font-size:12px;font-weight:400;color:var(--text3);"></span></div>
+      <div style="font-size:12px;color:var(--text3);margin:-4px 0 14px;">Wer hat wie viele Schichten übernommen. Alle Schichten gezählt, Gäste inklusive.</div>
+      <div style="display:flex;gap:18px;flex-wrap:wrap;align-items:center;margin-bottom:14px;">
+        <input type="text" id="statSearch" oninput="renderStatHelfer()" placeholder="Kürzel oder Name suchen…" style="box-sizing:border-box;flex:1 1 240px;min-width:200px;height:36px;padding:0 10px;border:1px solid var(--gray-mid);font-family:inherit;font-size:14px;">
+        <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text2);white-space:nowrap;">alphabetisch <span class="pn-switch"><input type="checkbox" id="statSortAlpha" onchange="renderStatHelfer()"><span class="pn-slider"></span></span></label>
+        <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text2);white-space:nowrap;">alle Kürzel (auch ohne Schicht) <span class="pn-switch"><input type="checkbox" id="statShowAll" onchange="renderStatHelfer()"><span class="pn-slider"></span></span></label>
+      </div>
+      <div id="statHelferList"></div>
     </div>
   </div>
 
@@ -765,7 +769,7 @@ Euer Chilbi-OK</textarea>
   </div>
 </div>
 <div class="toast" id="toast"></div>
-<div class="site-footer" style="position:relative;z-index:1;">© Stützpunktfeuerwehr Meilen / LOL &nbsp;·&nbsp; Admin &nbsp;·&nbsp; Cl1.115-dev</div>
+<div class="site-footer" style="position:relative;z-index:1;">© Stützpunktfeuerwehr Meilen / LOL &nbsp;·&nbsp; Admin &nbsp;·&nbsp; Cl1.116-dev</div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script>
@@ -857,7 +861,7 @@ function switchSection(id, btn) {
   if (id === 'schichtplan') { if (CONFIG && CONFIG.length) buildSchichtplan(); else setTimeout(buildSchichtplan, 1000); }
   if (id === 'gutschein') gbRenderPreview();
   if (id === 'email') emailRenderPreview();
-  if (id === 'kuerzel') renderKuerzelList();
+  if (id === 'statistik') renderStatHelfer();
   document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
   document.getElementById('sec-'+id).classList.add('active');
   btn.classList.add('active');
@@ -1961,7 +1965,7 @@ function printDay(dayId) {
   </head><body>
     <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:${px(0.5)}px;padding-bottom:${px(0.3)}px;border-bottom:2px solid black;">
       <div style="font-size:${px(1.3)}px;font-weight:700;text-transform:uppercase">${titleText}</div>
-      <div style="font-size:${px(0.62)}px;color:#666">Stützpunktfeuerwehr Meilen &nbsp;·&nbsp; Chilbi Herrliberg &nbsp;·&nbsp; Cl1.115-dev</div>
+      <div style="font-size:${px(0.62)}px;color:#666">Stützpunktfeuerwehr Meilen &nbsp;·&nbsp; Chilbi Herrliberg &nbsp;·&nbsp; Cl1.116-dev</div>
     </div>
     <div style="display:flex;margin-bottom:${px(0.2)}px;">
       <div style="width:${labelW}px;min-width:${labelW}px;"></div>
@@ -2616,23 +2620,38 @@ async function loadKuerzelNames(){
   };
   try { (await _gvizRows(`https://docs.google.com/spreadsheets/d/${KID}/gviz/tq?tqx=out:json&headers=1&_=${Date.now()}`)).forEach(r=>addK(r,false)); } catch(e){}
   try { (await _gvizRows(`https://docs.google.com/spreadsheets/d/${KID}/gviz/tq?tqx=out:json&sheet=Gast&headers=1&_=${Date.now()}`)).forEach(r=>addK(r,true)); } catch(e){}
-  if (document.getElementById('kuerzelList')) renderKuerzelList();
+  if (document.getElementById('statHelferList')) renderStatHelfer();
 }
-function renderKuerzelList(){
-  const box = document.getElementById('kuerzelList'); if(!box) return;
-  const q = (document.getElementById('kuerzelSearch').value||'').trim().toLowerCase();
-  let rows = (KLIST||[]).slice().sort((a,b)=> a.kuerzel.localeCompare(b.kuerzel,'de'));
+function renderStatHelfer(){
+  const box = document.getElementById('statHelferList'); if(!box) return;
+  const q = (document.getElementById('statSearch').value||'').trim().toLowerCase();
+  const showAll = document.getElementById('statShowAll').checked;
+  const sortAlpha = document.getElementById('statSortAlpha').checked;
+  const count = {};
+  (SIGNUPS||[]).forEach(sg => { const k = String(sg.Name||'').trim().toUpperCase(); if(k) count[k] = (count[k]||0) + 1; });
+  const info = {};
+  (KLIST||[]).forEach(r => { info[r.kuerzel] = r; });
+  let keys;
+  if(showAll){ const set = new Set(Object.keys(info)); Object.keys(count).forEach(k=>set.add(k)); keys = [...set]; }
+  else { keys = Object.keys(count); }
+  let rows = keys.map(k => { const i = info[k]||{}; return { kuerzel:k, name:(KNAMES[k]||i.name||k), count:(count[k]||0), guest:!!i.guest, email:(i.email||'') }; });
+  const helfer = Object.keys(count).length;
+  const totalSch = Object.values(count).reduce((a,b)=>a+b,0);
   if(q) rows = rows.filter(r => r.kuerzel.toLowerCase().includes(q) || (r.name||'').toLowerCase().includes(q));
-  document.getElementById('kuerzelCount').textContent = rows.length + (q ? ' Treffer' : ' Einträge');
+  if(sortAlpha) rows.sort((a,b)=> (a.name||a.kuerzel).localeCompare(b.name||b.kuerzel,'de'));
+  else rows.sort((a,b)=> b.count-a.count || (a.name||a.kuerzel).localeCompare(b.name||b.kuerzel,'de'));
+  document.getElementById('statTotal').textContent = helfer + ' Helfer · ' + totalSch + ' Schichten';
   if(!rows.length){ box.innerHTML = '<div style="padding:1.5rem;color:var(--text3);text-align:center">Keine Einträge.</div>'; return; }
+  const head = showAll
+    ? '<th style="padding:6px 8px;">Name</th><th style="padding:6px 8px;">Kürzel</th><th style="padding:6px 8px;">Typ</th><th style="padding:6px 8px;">E-Mail</th><th style="padding:6px 8px;text-align:right;">Schichten</th>'
+    : '<th style="padding:6px 8px;">Name</th><th style="padding:6px 8px;">Kürzel</th><th style="padding:6px 8px;text-align:right;">Schichten</th>';
   box.innerHTML = '<table style="width:100%;border-collapse:collapse;font-size:13px;">'
-    + '<thead><tr style="text-align:left;border-bottom:2px solid var(--black);">'
-    + '<th style="padding:6px 8px;">Kürzel</th><th style="padding:6px 8px;">Name</th><th style="padding:6px 8px;">Typ</th><th style="padding:6px 8px;">E-Mail</th></tr></thead><tbody>'
+    + '<thead><tr style="text-align:left;border-bottom:2px solid var(--black);">' + head + '</tr></thead><tbody>'
     + rows.map(r => '<tr style="border-bottom:1px solid var(--gray-mid);">'
-        + '<td style="padding:6px 8px;font-weight:700;">'+esc(r.kuerzel)+'</td>'
         + '<td style="padding:6px 8px;">'+esc(r.name||'—')+'</td>'
-        + '<td style="padding:6px 8px;">'+(r.guest?'<span style="font-size:11px;padding:1px 6px;background:var(--bg2);border:1px solid var(--gray-mid);">Gast</span>':'FW')+'</td>'
-        + '<td style="padding:6px 8px;color:'+(r.email?'var(--text)':'var(--text3)')+'">'+(r.email?esc(r.email):'—')+'</td>'
+        + '<td style="padding:6px 8px;font-weight:700;">'+esc(r.kuerzel)+'</td>'
+        + (showAll ? '<td style="padding:6px 8px;">'+(r.guest?'<span style="font-size:11px;padding:1px 6px;background:var(--bg2);border:1px solid var(--gray-mid);">Gast</span>':'FW')+'</td><td style="padding:6px 8px;color:'+(r.email?'var(--text)':'var(--text3)')+'">'+(r.email?esc(r.email):'—')+'</td>' : '')
+        + '<td style="padding:6px 8px;text-align:right;font-weight:700;'+(r.count===0?'color:var(--text3)':'')+'">'+r.count+'</td>'
         + '</tr>').join('')
     + '</tbody></table>';
 }
