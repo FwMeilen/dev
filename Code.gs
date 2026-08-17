@@ -1,6 +1,6 @@
 // ============================================================
 // Chilbi Herrliberg – Schichtplanung Backend
-// Google Apps Script  |  Cl1.116-dev
+// Google Apps Script  |  Cl1.117-dev
 // Schema Konfiguration: ID|Datum|Von|Bis|Schicht|Aufgabe|Max Personen|Farbe|Informationen|Geschlossen
 // Schema Anmeldungen:   ID|Name|Schicht|Aufgabe|Timestamp
 // Schema Tage:          Datum|Typ
@@ -10,6 +10,8 @@
 const SHEET_ID       = '1GAxPj-6QtpkzVjNwww1L6ZERTJUje6pmsCBbtBzYq3Y';
 const KUERZEL_SHEET_ID = '1bK6IuVpAdLyYc9_NPbJxFMkvCZ0fNvadJABBUM-Rc0M';
 const ADMIN_PW       = 'chilbi2025';
+const ABRECHNUNG_SHEET_ID = '1IbXEr2UJLh6GOJsvFttVScuF3l4KpLR6hVUESqHlQ4s';
+const ABRECHNUNG_PW  = 'stock2026';
 const SS             = SpreadsheetApp.openById(SHEET_ID);
 const SS_KUERZEL     = SpreadsheetApp.openById(KUERZEL_SHEET_ID);
 const SH_CONFIG      = 'Konfiguration';
@@ -56,6 +58,10 @@ function doPost(e) {
     if (p.action === 'importSignups') {
       if (p.password !== ADMIN_PW) return jsonResponse({ ok: false, error: 'Falsches Passwort' });
       return jsonResponse(importSignups(p.rows));
+    }
+    if (p.action === 'abrSave') {
+      if (p.password !== ABRECHNUNG_PW) return jsonResponse({ ok: false, error: 'Falsches Passwort' });
+      return jsonResponse(abrSave(p));
     }
     return jsonResponse({ ok: false, error: 'Unbekannte Aktion' });
   } catch(err) {
@@ -391,6 +397,33 @@ function gutscheinMail(p) {
   } catch (e) {
     return { ok: false, error: String(e) };
   }
+}
+
+// Abrechnung ins separate Sheet schreiben (Reiter Meta/Einnahmen/Ausgaben werden bei Bedarf angelegt)
+function _abrNum(v){ var n = parseFloat(String(v==null?'':v).replace(',', '.')); return isNaN(n) ? 0 : n; }
+function abrSave(p) {
+  var ss = SpreadsheetApp.openById(ABRECHNUNG_SHEET_ID);
+  var meta = p.meta || {};
+  var mSheet = ss.getSheetByName('Meta') || ss.insertSheet('Meta');
+  mSheet.clear();
+  mSheet.getRange(1,1,5,2).setValues([
+    ['Schlüssel','Wert'],
+    ['Jahr', meta.jahr || ''],
+    ['Vorjahr', meta.vorjahr || ''],
+    ['EinnahmenKategorien', (meta.einKat || []).join(', ')],
+    ['AusgabenKategorien', (meta.ausKat || []).join(', ')]
+  ]);
+  var e = p.einnahmen || [];
+  var eSheet = ss.getSheetByName('Einnahmen') || ss.insertSheet('Einnahmen');
+  eSheet.clear();
+  eSheet.getRange(1,1,1,5).setValues([['Nr','Kategorie','Beschreibung','Betrag','Vorjahr']]);
+  if (e.length) eSheet.getRange(2,1,e.length,5).setValues(e.map(function(r,i){ return [i+1, r.kat||'', r.besch||'', _abrNum(r.betrag), _abrNum(r.vorjahr)]; }));
+  var a = p.ausgaben || [];
+  var aSheet = ss.getSheetByName('Ausgaben') || ss.insertSheet('Ausgaben');
+  aSheet.clear();
+  aSheet.getRange(1,1,1,6).setValues([['Nr','Zahlungsart','Beschreibung','Betrag','Vorjahr','Bemerkung']]);
+  if (a.length) aSheet.getRange(2,1,a.length,6).setValues(a.map(function(r,i){ return [i+1, r.art||'', r.besch||'', _abrNum(r.betrag), _abrNum(r.vorjahr), r.bem||'']; }));
+  return { ok:true, einnahmen:e.length, ausgaben:a.length };
 }
 
 function jsonResponse(obj) {

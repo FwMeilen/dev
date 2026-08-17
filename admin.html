@@ -6,7 +6,7 @@
 <link rel="icon" href="favicon.ico" sizes="any">
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
-<title>Chilbi Admin – Schichtverwaltung Cl1.116-dev</title>
+<title>Chilbi Admin – Schichtverwaltung Cl1.117-dev</title>
 <meta property="og:title" content="Chilbi Herrliberg – Admin">
 <meta property="og:description" content="Schichtverwaltung Chilbi Herrliberg – Stützpunktfeuerwehr Meilen">
 <meta property="og:image" content="https://www.feuerwehr-meilen.ch/fileadmin/Public/Website/Templates/Images/Logo-FeuerwehrMeilen.png">
@@ -175,7 +175,7 @@ td input[type=color]{width:36px;height:26px;padding:1px;cursor:pointer;border:1p
     <div class="login-error" id="loginError"></div>
     <button class="btn btn-red" style="width:100%" onclick="doLogin()">Einloggen</button>
     <div style="margin-top:16px;padding-top:12px;border-top:1px solid var(--gray-mid);text-align:center;font-size:11px;color:var(--text3);">
-      © Stützpunktfeuerwehr Meilen / LOL &nbsp;·&nbsp; <strong>Cl1.116-dev</strong>
+      © Stützpunktfeuerwehr Meilen / LOL &nbsp;·&nbsp; <strong>Cl1.117-dev</strong>
     </div>
   </div>
 </div>
@@ -186,7 +186,7 @@ td input[type=color]{width:36px;height:26px;padding:1px;cursor:pointer;border:1p
     <img src="https://www.feuerwehr-meilen.ch/fileadmin/Public/Website/Templates/Images/Logo-FeuerwehrMeilen.png" alt="Feuerwehr Meilen" style="height:38px;width:auto;object-fit:contain;">
     <div class="logo-text">Chilbi Herrliberg<span>Admin – Schichtverwaltung</span></div>
     <div class="header-right">
-      <span class="header-version">Cl1.116-dev</span>
+      <span class="header-version">Cl1.117-dev</span>
       <button class="help-btn" onclick="document.getElementById('helpOverlay').style.display='flex'" title="Bedienungsanleitung" style="background:none;border:1.5px solid rgba(255,255,255,.5);color:white;width:22px;height:22px;border-radius:50%;font-size:12px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;margin-left:4px;">?</button>
       <button class="btn btn-sm" onclick="window.open('index.html','_blank')">Zu Schichtplan Signup</button>
       <button class="btn-refresh" id="btnRefresh" onclick="manualRefresh()">
@@ -208,6 +208,7 @@ td input[type=color]{width:36px;height:26px;padding:1px;cursor:pointer;border:1p
     <button class="admin-tab" onclick="switchSection('gutschein',this)">Gutschein</button>
     <button class="admin-tab" onclick="switchSection('email',this)">E-Mail Versand</button>
     <button class="admin-tab" onclick="switchSection('einstellungen',this)">Einstellungen</button>
+    <button class="admin-tab" onclick="switchSection('abrechnung',this)">Abrechnung</button>
     <button class="admin-tab" onclick="switchSection('statistik',this)">Statistik</button>
   </div>
 
@@ -458,6 +459,27 @@ Euer Chilbi-OK</textarea>
             <div id="emPreviewAtt" style="font-size:11px;color:var(--text3);margin-top:10px;border-top:1px solid var(--gray-mid);padding-top:8px;"></div>
           </div>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ABRECHNUNG -->
+  <div class="admin-section" id="sec-abrechnung">
+    <div class="card" id="abrGate">
+      <div class="card-title">Abrechnung &ndash; gesch&uuml;tzter Bereich</div>
+      <div style="font-size:13px;color:var(--text3);margin:-4px 0 12px;">Eigenes Passwort f&uuml;r die Finanzdaten.</div>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+        <input type="password" id="abrPw" onkeydown="if(event.key==='Enter')abrUnlock()" placeholder="Passwort" style="height:36px;padding:0 10px;border:1px solid var(--gray-mid);font-family:inherit;font-size:14px;">
+        <button class="btn btn-sm" onclick="abrUnlock()">Entsperren</button>
+      </div>
+      <div id="abrGateErr" style="display:none;color:var(--red);font-size:13px;margin-top:8px;"></div>
+    </div>
+    <div id="abrModule" style="display:none;">
+      <div id="abrBody"></div>
+      <div style="margin-top:16px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+        <button class="btn btn-red btn-sm" onclick="abrSaveNow()">&#128190; Speichern</button>
+        <button class="btn btn-sm" onclick="abrLoad()">Neu laden</button>
+        <span id="abrSaveResult" style="display:none;font-size:13px;color:var(--text3);"></span>
       </div>
     </div>
   </div>
@@ -769,12 +791,14 @@ Euer Chilbi-OK</textarea>
   </div>
 </div>
 <div class="toast" id="toast"></div>
-<div class="site-footer" style="position:relative;z-index:1;">© Stützpunktfeuerwehr Meilen / LOL &nbsp;·&nbsp; Admin &nbsp;·&nbsp; Cl1.116-dev</div>
+<div class="site-footer" style="position:relative;z-index:1;">© Stützpunktfeuerwehr Meilen / LOL &nbsp;·&nbsp; Admin &nbsp;·&nbsp; Cl1.117-dev</div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script>
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbztZ9C8RapYojQAb0U4fkY6xc_7JVsDMPsQEao4T1z_ObspHSeGB_X0ZONgqLANoyEbzQ/exec';
 const ADMIN_PW   = 'chilbi2025';
+const ABRECHNUNG_SHEET_ID = '1IbXEr2UJLh6GOJsvFttVScuF3l4KpLR6hVUESqHlQ4s';
+const ABRECHNUNG_PW = 'stock2026';
 const PALETTE    = ['#c0392b','#1565c0','#2e7d32','#6a1b9a','#00695c','#e65100','#4527a0','#00838f','#558b2f'];
 
 let CONFIG  = [];
@@ -862,6 +886,7 @@ function switchSection(id, btn) {
   if (id === 'gutschein') gbRenderPreview();
   if (id === 'email') emailRenderPreview();
   if (id === 'statistik') renderStatHelfer();
+  if (id === 'abrechnung') abrOnOpen();
   document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
   document.getElementById('sec-'+id).classList.add('active');
   btn.classList.add('active');
@@ -1965,7 +1990,7 @@ function printDay(dayId) {
   </head><body>
     <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:${px(0.5)}px;padding-bottom:${px(0.3)}px;border-bottom:2px solid black;">
       <div style="font-size:${px(1.3)}px;font-weight:700;text-transform:uppercase">${titleText}</div>
-      <div style="font-size:${px(0.62)}px;color:#666">Stützpunktfeuerwehr Meilen &nbsp;·&nbsp; Chilbi Herrliberg &nbsp;·&nbsp; Cl1.116-dev</div>
+      <div style="font-size:${px(0.62)}px;color:#666">Stützpunktfeuerwehr Meilen &nbsp;·&nbsp; Chilbi Herrliberg &nbsp;·&nbsp; Cl1.117-dev</div>
     </div>
     <div style="display:flex;margin-bottom:${px(0.2)}px;">
       <div style="width:${labelW}px;min-width:${labelW}px;"></div>
@@ -2622,6 +2647,124 @@ async function loadKuerzelNames(){
   try { (await _gvizRows(`https://docs.google.com/spreadsheets/d/${KID}/gviz/tq?tqx=out:json&sheet=Gast&headers=1&_=${Date.now()}`)).forEach(r=>addK(r,true)); } catch(e){}
   if (document.getElementById('statHelferList')) renderStatHelfer();
 }
+// ===== Abrechnung (Stufe 1: Einnahmen/Ausgaben/P&L) =====
+let _abrUnlocked = false;
+let ABR = { jahr:'2026', vorjahr:'2025', einKat:['Kasse','TWINT','Rechnung'], ausKat:['Bar','Rechnung'], einnahmen:[], ausgaben:[] };
+function abrOnOpen(){
+  document.getElementById('abrGate').style.display = _abrUnlocked ? 'none' : 'block';
+  document.getElementById('abrModule').style.display = _abrUnlocked ? 'block' : 'none';
+}
+function abrUnlock(){
+  const pw = document.getElementById('abrPw').value;
+  if(pw !== ABRECHNUNG_PW){ const e=document.getElementById('abrGateErr'); e.style.display='block'; e.textContent='Falsches Passwort.'; return; }
+  _abrUnlocked = true; abrOnOpen(); abrLoad();
+}
+function _abrGviz(sheet){
+  return _gvizRows(`https://docs.google.com/spreadsheets/d/${ABRECHNUNG_SHEET_ID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(sheet)}&headers=1&_=${Date.now()}`);
+}
+async function abrLoad(){
+  try{
+    const [meta, ein, aus] = await Promise.all([ _abrGviz('Meta'), _abrGviz('Einnahmen'), _abrGviz('Ausgaben') ]);
+    const mm = {}; (meta||[]).forEach(r => { const k=String(r['Schlüssel']||r.Schlüssel||'').trim(); if(k) mm[k]=(r['Wert']!=null?r['Wert']:r.Wert); });
+    if(mm.Jahr) ABR.jahr = String(mm.Jahr);
+    if(mm.Vorjahr) ABR.vorjahr = String(mm.Vorjahr);
+    if(mm.EinnahmenKategorien) ABR.einKat = String(mm.EinnahmenKategorien).split(',').map(x=>x.trim()).filter(Boolean);
+    if(mm.AusgabenKategorien) ABR.ausKat = String(mm.AusgabenKategorien).split(',').map(x=>x.trim()).filter(Boolean);
+    ABR.einnahmen = (ein||[]).map(r => ({ kat:String(r.Kategorie||''), besch:String(r.Beschreibung||''), betrag:String(r.Betrag||''), vorjahr:String(r.Vorjahr||'') }));
+    ABR.ausgaben  = (aus||[]).map(r => ({ art:String(r.Zahlungsart||''), besch:String(r.Beschreibung||''), betrag:String(r.Betrag||''), vorjahr:String(r.Vorjahr||''), bem:String(r.Bemerkung||'') }));
+  }catch(e){}
+  abrRender();
+}
+function _abrN(v){ const n=parseFloat(String(v==null?'':v).replace(',','.')); return isNaN(n)?0:n; }
+function _abrF(n){ return n.toLocaleString('de-CH',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+function _abrPct(cur,prev){ if(!prev) return ''; const p=(cur-prev)/Math.abs(prev); return (p>=0?'+':'')+(p*100).toFixed(1)+'%'; }
+function _abrOpts(list,sel){ return list.map(k=>`<option${k===sel?' selected':''}>${esc(k)}</option>`).join(''); }
+function abrRender(){
+  const body = document.getElementById('abrBody'); if(!body) return;
+  const inSty='box-sizing:border-box;width:100%;height:32px;padding:0 8px;border:1px solid var(--gray-mid);font-family:inherit;font-size:13px;';
+  let h = `<div class="card" style="margin-bottom:16px;"><div class="card-title">Einstellungen</div>
+    <div style="display:flex;gap:16px;flex-wrap:wrap;">
+      <label style="font-size:12px;color:var(--text2);">Jahr<br><input id="abrJahr" value="${esc(ABR.jahr)}" oninput="abrRecalc()" style="${inSty}width:90px;"></label>
+      <label style="font-size:12px;color:var(--text2);">Vorjahr<br><input id="abrVorjahr" value="${esc(ABR.vorjahr)}" style="${inSty}width:90px;"></label>
+      <label style="font-size:12px;color:var(--text2);flex:1 1 240px;">Einnahmen-Kategorien (Komma)<br><input id="abrEinKat" value="${esc(ABR.einKat.join(', '))}" onchange="abrKatChange()" style="${inSty}"></label>
+      <label style="font-size:12px;color:var(--text2);flex:1 1 240px;">Ausgaben-Kategorien (Komma)<br><input id="abrAusKat" value="${esc(ABR.ausKat.join(', '))}" onchange="abrKatChange()" style="${inSty}"></label>
+    </div></div>`;
+  h += `<div class="card" style="margin-bottom:16px;"><div class="card-title">Einnahmen <span id="abrEinTot" style="font-size:12px;font-weight:400;color:var(--text3);"></span></div>
+    <div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:13px;min-width:520px;"><thead><tr style="text-align:left;border-bottom:2px solid var(--black);">
+    <th style="padding:4px 6px;width:150px;">Kategorie</th><th style="padding:4px 6px;">Beschreibung</th><th style="padding:4px 6px;width:120px;text-align:right;">Betrag ${esc(ABR.jahr)}</th><th style="padding:4px 6px;width:120px;text-align:right;">Vorjahr ${esc(ABR.vorjahr)}</th><th style="width:34px;"></th></tr></thead>
+    <tbody id="abrEinBody"></tbody></table></div>
+    <button class="btn btn-sm" style="margin-top:10px;" onclick="abrAddEin()">+ Zeile</button></div>`;
+  h += `<div class="card" style="margin-bottom:16px;"><div class="card-title">Ausgaben <span id="abrAusTot" style="font-size:12px;font-weight:400;color:var(--text3);"></span></div>
+    <div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:13px;min-width:640px;"><thead><tr style="text-align:left;border-bottom:2px solid var(--black);">
+    <th style="padding:4px 6px;width:130px;">Zahlungsart</th><th style="padding:4px 6px;">Beschreibung</th><th style="padding:4px 6px;width:110px;text-align:right;">Betrag ${esc(ABR.jahr)}</th><th style="padding:4px 6px;width:100px;text-align:right;">Vorjahr</th><th style="padding:4px 6px;width:150px;">Bemerkung</th><th style="width:34px;"></th></tr></thead>
+    <tbody id="abrAusBody"></tbody></table></div>
+    <button class="btn btn-sm" style="margin-top:10px;" onclick="abrAddAus()">+ Zeile</button></div>`;
+  h += `<div class="card"><div class="card-title">Abrechnung (Zusammenfassung)</div><div id="abrPL"></div></div>`;
+  body.innerHTML = h;
+  abrRenderRows();
+  abrRecalc();
+}
+function abrRenderRows(){
+  const inSty='box-sizing:border-box;width:100%;height:30px;padding:0 6px;border:1px solid var(--gray-mid);font-family:inherit;font-size:13px;';
+  const numSty=inSty+'text-align:right;';
+  const eb=document.getElementById('abrEinBody');
+  eb.innerHTML = ABR.einnahmen.map((r,i)=>`<tr data-i="${i}">
+    <td style="padding:3px 6px;"><select class="abr-e-kat" style="${inSty}">${_abrOpts(ABR.einKat, r.kat)}</select></td>
+    <td style="padding:3px 6px;"><input class="abr-e-besch" value="${esc(r.besch)}" style="${inSty}"></td>
+    <td style="padding:3px 6px;"><input class="abr-e-betrag" value="${esc(r.betrag)}" oninput="abrRecalc()" style="${numSty}"></td>
+    <td style="padding:3px 6px;"><input class="abr-e-vorjahr" value="${esc(r.vorjahr)}" oninput="abrRecalc()" style="${numSty}"></td>
+    <td style="text-align:center;"><button class="print-btn" style="height:26px;padding:0 8px;margin:0;" onclick="abrDelEin(${i})">&times;</button></td></tr>`).join('') || '<tr><td colspan="5" style="padding:8px;color:var(--text3);">Noch keine Einnahmen.</td></tr>';
+  const ab=document.getElementById('abrAusBody');
+  ab.innerHTML = ABR.ausgaben.map((r,i)=>`<tr data-i="${i}">
+    <td style="padding:3px 6px;"><select class="abr-a-art" style="${inSty}">${_abrOpts(ABR.ausKat, r.art)}</select></td>
+    <td style="padding:3px 6px;"><input class="abr-a-besch" value="${esc(r.besch)}" style="${inSty}"></td>
+    <td style="padding:3px 6px;"><input class="abr-a-betrag" value="${esc(r.betrag)}" oninput="abrRecalc()" style="${numSty}"></td>
+    <td style="padding:3px 6px;"><input class="abr-a-vorjahr" value="${esc(r.vorjahr)}" oninput="abrRecalc()" style="${numSty}"></td>
+    <td style="padding:3px 6px;"><input class="abr-a-bem" value="${esc(r.bem)}" style="${inSty}"></td>
+    <td style="text-align:center;"><button class="print-btn" style="height:26px;padding:0 8px;margin:0;" onclick="abrDelAus(${i})">&times;</button></td></tr>`).join('') || '<tr><td colspan="6" style="padding:8px;color:var(--text3);">Noch keine Ausgaben.</td></tr>';
+}
+function abrCollect(){
+  ABR.jahr = document.getElementById('abrJahr').value.trim();
+  ABR.vorjahr = document.getElementById('abrVorjahr').value.trim();
+  ABR.einKat = document.getElementById('abrEinKat').value.split(',').map(x=>x.trim()).filter(Boolean);
+  ABR.ausKat = document.getElementById('abrAusKat').value.split(',').map(x=>x.trim()).filter(Boolean);
+  ABR.einnahmen = [...document.querySelectorAll('#abrEinBody tr[data-i]')].map(tr=>({
+    kat: tr.querySelector('.abr-e-kat') ? tr.querySelector('.abr-e-kat').value : '',
+    besch: tr.querySelector('.abr-e-besch').value, betrag: tr.querySelector('.abr-e-betrag').value, vorjahr: tr.querySelector('.abr-e-vorjahr').value }));
+  ABR.ausgaben = [...document.querySelectorAll('#abrAusBody tr[data-i]')].map(tr=>({
+    art: tr.querySelector('.abr-a-art') ? tr.querySelector('.abr-a-art').value : '',
+    besch: tr.querySelector('.abr-a-besch').value, betrag: tr.querySelector('.abr-a-betrag').value, vorjahr: tr.querySelector('.abr-a-vorjahr').value, bem: tr.querySelector('.abr-a-bem').value }));
+}
+function abrAddEin(){ abrCollect(); ABR.einnahmen.push({kat:ABR.einKat[0]||'',besch:'',betrag:'',vorjahr:''}); abrRenderRows(); abrRecalc(); }
+function abrAddAus(){ abrCollect(); ABR.ausgaben.push({art:ABR.ausKat[0]||'',besch:'',betrag:'',vorjahr:'',bem:''}); abrRenderRows(); abrRecalc(); }
+function abrDelEin(i){ abrCollect(); ABR.einnahmen.splice(i,1); abrRenderRows(); abrRecalc(); }
+function abrDelAus(i){ abrCollect(); ABR.ausgaben.splice(i,1); abrRenderRows(); abrRecalc(); }
+function abrKatChange(){ abrCollect(); abrRender(); }
+function abrRecalc(){
+  let eJ=0,eV=0,aJ=0,aV=0;
+  [...document.querySelectorAll('#abrEinBody tr[data-i]')].forEach(tr=>{ eJ+=_abrN(tr.querySelector('.abr-e-betrag').value); eV+=_abrN(tr.querySelector('.abr-e-vorjahr').value); });
+  [...document.querySelectorAll('#abrAusBody tr[data-i]')].forEach(tr=>{ aJ+=_abrN(tr.querySelector('.abr-a-betrag').value); aV+=_abrN(tr.querySelector('.abr-a-vorjahr').value); });
+  const jahr = document.getElementById('abrJahr') ? document.getElementById('abrJahr').value : ABR.jahr;
+  const et=document.getElementById('abrEinTot'); if(et) et.textContent = 'Total: CHF '+_abrF(eJ);
+  const at=document.getElementById('abrAusTot'); if(at) at.textContent = 'Total: CHF '+_abrF(aJ);
+  const gJ=eJ-aJ, gV=eV-aV;
+  const rowFn=(label,cur,prev,bold)=>`<tr style="${bold?'font-weight:700;border-top:2px solid var(--black);':'border-bottom:1px solid var(--gray-mid);'}">
+    <td style="padding:6px 8px;">${label}</td>
+    <td style="padding:6px 8px;text-align:right;">CHF ${_abrF(cur)}</td>
+    <td style="padding:6px 8px;text-align:right;color:var(--text3);">CHF ${_abrF(prev)}</td>
+    <td style="padding:6px 8px;text-align:right;color:${cur-prev>=0?'var(--green)':'var(--red)'};">${_abrPct(cur,prev)}</td></tr>`;
+  const pl=document.getElementById('abrPL'); if(!pl) return;
+  pl.innerHTML = `<table style="width:100%;border-collapse:collapse;font-size:13px;"><thead><tr style="text-align:left;border-bottom:2px solid var(--black);">
+    <th style="padding:6px 8px;"></th><th style="padding:6px 8px;text-align:right;">${esc(jahr)}</th><th style="padding:6px 8px;text-align:right;">Vorjahr</th><th style="padding:6px 8px;text-align:right;">% Diff.</th></tr></thead><tbody>
+    ${rowFn('Total Einnahmen',eJ,eV,false)}${rowFn('Total Ausgaben',aJ,aV,false)}${rowFn('Gewinn / Verlust',gJ,gV,true)}</tbody></table>`;
+}
+async function abrSaveNow(){
+  abrCollect();
+  await _avPost({ action:'abrSave', password:ABRECHNUNG_PW, meta:{jahr:ABR.jahr, vorjahr:ABR.vorjahr, einKat:ABR.einKat, ausKat:ABR.ausKat}, einnahmen:ABR.einnahmen, ausgaben:ABR.ausgaben });
+  const r=document.getElementById('abrSaveResult'); r.style.display='inline'; r.textContent='✓ Gespeichert ('+ABR.einnahmen.length+' Einnahmen, '+ABR.ausgaben.length+' Ausgaben) · '+new Date().toLocaleTimeString('de-CH');
+  showToast('Abrechnung gespeichert','success');
+}
+
 function renderStatHelfer(){
   const box = document.getElementById('statHelferList'); if(!box) return;
   const q = (document.getElementById('statSearch').value||'').trim().toLowerCase();
