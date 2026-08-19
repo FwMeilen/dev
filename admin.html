@@ -4,14 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta http-equiv="Cache-Control" content="no-cache, must-revalidate">
-<meta name="app-version" content="Cl1.119-dev">
+<meta name="app-version" content="Cl1.120-dev">
 <script>
 (function(){var el=document.querySelector('meta[name="app-version"]');var RUN=el?el.content:'';fetch(location.pathname+'?_v='+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){var m=t.match(/name="app-version" content="([^"]+)"/);if(m&&RUN&&m[1]!==RUN){var tg='v='+encodeURIComponent(m[1]);if(location.search.indexOf(tg)===-1){location.replace(location.pathname+'?'+tg);}}}).catch(function(){});})();
 </script>
 <link rel="icon" href="favicon.ico" sizes="any">
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
-<title>Chilbi Admin – Schichtverwaltung Cl1.119-dev</title>
+<title>Chilbi Admin – Schichtverwaltung Cl1.120-dev</title>
 <meta property="og:title" content="Chilbi Herrliberg – Admin">
 <meta property="og:description" content="Schichtverwaltung Chilbi Herrliberg – Stützpunktfeuerwehr Meilen">
 <meta property="og:image" content="https://www.feuerwehr-meilen.ch/fileadmin/Public/Website/Templates/Images/Logo-FeuerwehrMeilen.png">
@@ -180,7 +180,7 @@ td input[type=color]{width:36px;height:26px;padding:1px;cursor:pointer;border:1p
     <div class="login-error" id="loginError"></div>
     <button class="btn btn-red" style="width:100%" onclick="doLogin()">Einloggen</button>
     <div style="margin-top:16px;padding-top:12px;border-top:1px solid var(--gray-mid);text-align:center;font-size:11px;color:var(--text3);">
-      © Stützpunktfeuerwehr Meilen / LOL &nbsp;·&nbsp; <strong>Cl1.119-dev</strong>
+      © Stützpunktfeuerwehr Meilen / LOL &nbsp;·&nbsp; <strong>Cl1.120-dev</strong>
     </div>
   </div>
 </div>
@@ -191,7 +191,7 @@ td input[type=color]{width:36px;height:26px;padding:1px;cursor:pointer;border:1p
     <img src="https://www.feuerwehr-meilen.ch/fileadmin/Public/Website/Templates/Images/Logo-FeuerwehrMeilen.png" alt="Feuerwehr Meilen" style="height:38px;width:auto;object-fit:contain;">
     <div class="logo-text">Chilbi Herrliberg<span>Admin – Schichtverwaltung</span></div>
     <div class="header-right">
-      <span class="header-version">Cl1.119-dev</span>
+      <span class="header-version">Cl1.120-dev</span>
       <button class="help-btn" onclick="document.getElementById('helpOverlay').style.display='flex'" title="Bedienungsanleitung" style="background:none;border:1.5px solid rgba(255,255,255,.5);color:white;width:22px;height:22px;border-radius:50%;font-size:12px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;margin-left:4px;">?</button>
       <button class="btn btn-sm" onclick="window.open('index.html','_blank')">Zu Schichtplan Signup</button>
       <button class="btn-refresh" id="btnRefresh" onclick="manualRefresh()">
@@ -454,6 +454,7 @@ Euer Chilbi-OK</textarea>
           </div>
 
           <button class="btn btn-red btn-sm" id="emSendAllBtn" onclick="emailSendAll()">✉ An alle senden</button>
+          <span id="emSendCount" style="margin-left:12px;font-size:13px;color:var(--text3);"></span>
           <div id="emResult" style="display:none;color:var(--text);font-size:13px;margin-top:12px;padding:10px 12px;background:var(--bg2);border-left:3px solid var(--green);"></div>
 
           <div style="border-top:1px solid var(--gray-mid);margin:20px 0 14px;"></div>
@@ -804,7 +805,7 @@ Euer Chilbi-OK</textarea>
   </div>
 </div>
 <div class="toast" id="toast"></div>
-<div class="site-footer" style="position:relative;z-index:1;">© Stützpunktfeuerwehr Meilen / LOL &nbsp;·&nbsp; Admin &nbsp;·&nbsp; Cl1.119-dev</div>
+<div class="site-footer" style="position:relative;z-index:1;">© Stützpunktfeuerwehr Meilen / LOL &nbsp;·&nbsp; Admin &nbsp;·&nbsp; Cl1.120-dev</div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script>
@@ -1722,6 +1723,14 @@ async function emailBuildMessage(r, tpl){
   }
   return msg;
 }
+function emUpdateCount(){
+  var el=document.getElementById('emSendCount'); if(!el) return;
+  try{
+    var byK=emailGroupHelpers(emMode==='dankes'), n=0;
+    Object.keys(byK).forEach(function(k){ var e=String(KMAIL[k.toUpperCase()]||'').trim(); if(e && /@/.test(e)) n++; });
+    el.textContent = '→ '+n+(n===1?' Mail':' Mails');
+  }catch(e){ el.textContent=''; }
+}
 function emailRenderPreview(){
   if(!document.getElementById('emPreview')) return;
   const sample = { kuerzel:'MUS', email:'max@example.ch', vorname:'Max', name:'Max Muster', shifts:[
@@ -1733,6 +1742,7 @@ function emailRenderPreview(){
   document.getElementById('emPreviewSubj').textContent = m.subject;
   const att = document.getElementById('emPreviewAtt');
   if(att){ var parts=[]; if(emMode!=='dankes') parts.push('Kalender (.ics)'); if(document.getElementById('emGutOn').checked) parts.push('Dankes-Gutschein (PDF)'); att.textContent = 'Anhänge: ' + (parts.length?parts.join(' + '):'keine'); }
+  emUpdateCount();
 }
 function emailConfirm(msg, cb){
   _voucherCb = cb;
@@ -2015,7 +2025,7 @@ function printDay(dayId) {
   </head><body>
     <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:${px(0.5)}px;padding-bottom:${px(0.3)}px;border-bottom:2px solid black;">
       <div style="font-size:${px(1.3)}px;font-weight:700;text-transform:uppercase">${titleText}</div>
-      <div style="font-size:${px(0.62)}px;color:#666">Stützpunktfeuerwehr Meilen &nbsp;·&nbsp; Chilbi Herrliberg &nbsp;·&nbsp; Cl1.119-dev</div>
+      <div style="font-size:${px(0.62)}px;color:#666">Stützpunktfeuerwehr Meilen &nbsp;·&nbsp; Chilbi Herrliberg &nbsp;·&nbsp; Cl1.120-dev</div>
     </div>
     <div style="display:flex;margin-bottom:${px(0.2)}px;">
       <div style="width:${labelW}px;min-width:${labelW}px;"></div>
