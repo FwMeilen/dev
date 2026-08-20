@@ -4,14 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta http-equiv="Cache-Control" content="no-cache, must-revalidate">
-<meta name="app-version" content="Cl1.122-dev">
+<meta name="app-version" content="Cl1.123-dev">
 <script>
 (function(){var el=document.querySelector('meta[name="app-version"]');var RUN=el?el.content:'';fetch(location.pathname+'?_v='+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){var m=t.match(/name="app-version" content="([^"]+)"/);if(m&&RUN&&m[1]!==RUN){var tg='v='+encodeURIComponent(m[1]);if(location.search.indexOf(tg)===-1){location.replace(location.pathname+'?'+tg);}}}).catch(function(){});})();
 </script>
 <link rel="icon" href="favicon.ico" sizes="any">
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
-<title>Chilbi Admin – Schichtverwaltung Cl1.122-dev</title>
+<title>Chilbi Admin – Schichtverwaltung Cl1.123-dev</title>
 <meta property="og:title" content="Chilbi Herrliberg – Admin">
 <meta property="og:description" content="Schichtverwaltung Chilbi Herrliberg – Stützpunktfeuerwehr Meilen">
 <meta property="og:image" content="https://www.feuerwehr-meilen.ch/fileadmin/Public/Website/Templates/Images/Logo-FeuerwehrMeilen.png">
@@ -180,7 +180,7 @@ td input[type=color]{width:36px;height:26px;padding:1px;cursor:pointer;border:1p
     <div class="login-error" id="loginError"></div>
     <button class="btn btn-red" style="width:100%" onclick="doLogin()">Einloggen</button>
     <div style="margin-top:16px;padding-top:12px;border-top:1px solid var(--gray-mid);text-align:center;font-size:11px;color:var(--text3);">
-      © Stützpunktfeuerwehr Meilen / LOL &nbsp;·&nbsp; <strong>Cl1.122-dev</strong>
+      © Stützpunktfeuerwehr Meilen / LOL &nbsp;·&nbsp; <strong>Cl1.123-dev</strong>
     </div>
   </div>
 </div>
@@ -191,7 +191,7 @@ td input[type=color]{width:36px;height:26px;padding:1px;cursor:pointer;border:1p
     <img src="https://www.feuerwehr-meilen.ch/fileadmin/Public/Website/Templates/Images/Logo-FeuerwehrMeilen.png" alt="Feuerwehr Meilen" style="height:38px;width:auto;object-fit:contain;">
     <div class="logo-text">Chilbi Herrliberg<span>Admin – Schichtverwaltung</span></div>
     <div class="header-right">
-      <span class="header-version">Cl1.122-dev</span>
+      <span class="header-version">Cl1.123-dev</span>
       <button class="help-btn" onclick="document.getElementById('helpOverlay').style.display='flex'" title="Bedienungsanleitung" style="background:none;border:1.5px solid rgba(255,255,255,.5);color:white;width:22px;height:22px;border-radius:50%;font-size:12px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;margin-left:4px;">?</button>
       <button class="btn btn-sm" onclick="window.open('index.html','_blank')">Zu Schichtplan Signup</button>
       <button class="btn-refresh" id="btnRefresh" onclick="manualRefresh()">
@@ -450,6 +450,15 @@ Euer Chilbi-OK</textarea>
               <div>
                 <label style="display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--text2);margin-bottom:4px;">Kürzel Herausgeber <span style="color:var(--red);font-weight:400;text-transform:none;">(Pflicht)</span></label>
                 <input type="text" id="emGutKuerzel" maxlength="10" placeholder="z. B. LOL" oninput="this.value=this.value.toUpperCase()" style="box-sizing:border-box;width:140px;height:34px;padding:0 10px;border:1px solid var(--gray-mid);font-family:inherit;font-size:14px;text-transform:uppercase;">
+              </div>
+              <div id="emGutOeffWrap" style="display:none;margin-top:12px;">
+                <label style="display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--text2);margin-bottom:4px;">Öffnungszeiten &amp; Ort auf dem Gutschein <span style="color:var(--text3);font-weight:400;text-transform:none;">(nur Dankesmail · pro Zeile eine Angabe · Leerzeile = Abstand)</span></label>
+                <textarea id="emGutOeff" rows="6" style="box-sizing:border-box;width:100%;padding:8px 10px;border:1px solid var(--gray-mid);font-family:inherit;font-size:13px;resize:vertical;">Freitag, 14.08.26 · 16:00–22:00
+Samstag, 15.08.26 · 17:00–22:00
+Sonntag, 16.08.26 · 11:00–21:00
+
+Füürwehr Spätzli-Beiz, Chilbi Herrliberg
+Primarschule Rebacker, Schulhausstrasse 23, 8704 Herrliberg</textarea>
               </div>
             </div>
           </div>
@@ -819,7 +828,7 @@ Euer Chilbi-OK</textarea>
   </div>
 </div>
 <div class="toast" id="toast"></div>
-<div class="site-footer" style="position:relative;z-index:1;">© Stützpunktfeuerwehr Meilen / LOL &nbsp;·&nbsp; Admin &nbsp;·&nbsp; Cl1.122-dev</div>
+<div class="site-footer" style="position:relative;z-index:1;">© Stützpunktfeuerwehr Meilen / LOL &nbsp;·&nbsp; Admin &nbsp;·&nbsp; Cl1.123-dev</div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script>
@@ -1540,7 +1549,7 @@ async function fwVoucher(i, mode){
   });
 }
 // ===== Gutschein-Bauer (freier Gutschein) =====
-async function buildVoucherCustom(name, was, zusatz, subtitle, kuerzel){
+async function buildVoucherCustom(name, was, zusatz, subtitle, kuerzel, oeff){
   await _avAssets();
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF({ orientation:'landscape', unit:'mm', format:'a5' });
@@ -1560,12 +1569,17 @@ async function buildVoucherCustom(name, was, zusatz, subtitle, kuerzel){
     doc.setTextColor(51,51,51); doc.setFont('helvetica','normal'); doc.setFontSize(10.5);
     doc.splitTextToSize(zusatz, 175).slice(0,2).forEach(l => { doc.text(l, bx, y + 0.5, {align:'center'}); y += 5.5; });
   }
-  doc.setTextColor(26,26,26); doc.setFont('helvetica','bold'); doc.setFontSize(10.5);
-  doc.text('Freitag, 14.08.26 · 16:00–22:00', bx, 100.5, {align:'center'});
-  doc.text('Samstag, 15.08.26 · 17:00–22:00', bx, 106.5, {align:'center'});
-  doc.text('Sonntag, 16.08.26 · 11:00–21:00', bx, 112.5, {align:'center'});
-  doc.setTextColor(51,51,51); doc.setFont('helvetica','normal'); doc.setFontSize(10.5); doc.text('Füürwehr Spätzli-Beiz, Chilbi Herrliberg', bx, 121.5, {align:'center'});
-  doc.setTextColor(102,102,102); doc.setFont('helvetica','normal'); doc.setFontSize(8.5); doc.text('Primarschule Rebacker, Schulhausstrasse 23, 8704 Herrliberg', bx, 127, {align:'center'});
+  if (oeff && String(oeff).trim()) {
+    const oL = String(oeff).replace(/\r/g,'').split('\n'); let oy = 100.5;
+    oL.forEach(function(ln){ const t=ln.trim(); if(!t){ oy+=3; return; } doc.setTextColor(45,45,45); doc.setFont('helvetica','normal'); doc.setFontSize(10.5); doc.splitTextToSize(t,180).slice(0,1).forEach(function(x){ doc.text(x, bx, oy, {align:'center'}); }); oy+=5.8; });
+  } else {
+    doc.setTextColor(26,26,26); doc.setFont('helvetica','bold'); doc.setFontSize(10.5);
+    doc.text('Freitag, 14.08.26 · 16:00–22:00', bx, 100.5, {align:'center'});
+    doc.text('Samstag, 15.08.26 · 17:00–22:00', bx, 106.5, {align:'center'});
+    doc.text('Sonntag, 16.08.26 · 11:00–21:00', bx, 112.5, {align:'center'});
+    doc.setTextColor(51,51,51); doc.setFont('helvetica','normal'); doc.setFontSize(10.5); doc.text('Füürwehr Spätzli-Beiz, Chilbi Herrliberg', bx, 121.5, {align:'center'});
+    doc.setTextColor(102,102,102); doc.setFont('helvetica','normal'); doc.setFontSize(8.5); doc.text('Primarschule Rebacker, Schulhausstrasse 23, 8704 Herrliberg', bx, 127, {align:'center'});
+  }
   _vFoot(doc, kuerzel);
   return doc;
 }
@@ -1695,7 +1709,8 @@ function emailReadTpl(){
     gutWas:  document.getElementById('emGutFuer').value.trim(),
     gutZusatz: document.getElementById('emGutZusatz').value.trim(),
     gutSub:  document.getElementById('emGutSub').value.trim(),
-    gutKuerzel: document.getElementById('emGutKuerzel').value.trim()
+    gutKuerzel: document.getElementById('emGutKuerzel').value.trim(),
+    gutOeff: (document.getElementById('emGutOeff') ? document.getElementById('emGutOeff').value : '')
   };
 }
 function emGutToggle(){
@@ -1709,6 +1724,7 @@ function emSetMode(m){
   var h=document.getElementById('emModeHint');
   if(h) h.textContent = m==='dankes' ? 'Dankesmail an alle, die eine Schicht übernommen haben – ohne Schichtliste, ohne Kalender. Gutschein optional.' : 'Schicht-Mail an Helfer mit kommenden Schichten – mit Schichtliste + Kalender (.ics).';
   var b=document.getElementById('emSendAllBtn'); if(b) b.textContent = m==='dankes' ? '✉ Dankesmail an alle' : '✉ An alle senden';
+  var ow=document.getElementById('emGutOeffWrap'); if(ow) ow.style.display=(m==='dankes')?'block':'none';
   emailRenderPreview();
 }
 function _emRender(r, tpl){
@@ -1731,7 +1747,7 @@ async function emailBuildMessage(r, tpl){
   if (emMode!=='dankes') msg.ics = _emIcs(r);
   if (tpl.gutOn) {
     try {
-      const doc = await buildVoucherCustom(r.name, tpl.gutWas, tpl.gutZusatz, tpl.gutSub, tpl.gutKuerzel);
+      const doc = await buildVoucherCustom(r.name, tpl.gutWas, tpl.gutZusatz, tpl.gutSub, tpl.gutKuerzel, emMode==='dankes' ? tpl.gutOeff : '');
       msg.pdf = doc.output('datauristring').split(',')[1];
       msg.pdfname = ('Dankes-Gutschein_' + r.name).replace(/[^A-Za-z0-9_]/g,'_') + '.pdf';
     } catch(e){ /* ohne Gutschein weiter */ }
@@ -2043,7 +2059,7 @@ function printDay(dayId) {
   </head><body>
     <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:${px(0.5)}px;padding-bottom:${px(0.3)}px;border-bottom:2px solid black;">
       <div style="font-size:${px(1.3)}px;font-weight:700;text-transform:uppercase">${titleText}</div>
-      <div style="font-size:${px(0.62)}px;color:#666">Stützpunktfeuerwehr Meilen &nbsp;·&nbsp; Chilbi Herrliberg &nbsp;·&nbsp; Cl1.122-dev</div>
+      <div style="font-size:${px(0.62)}px;color:#666">Stützpunktfeuerwehr Meilen &nbsp;·&nbsp; Chilbi Herrliberg &nbsp;·&nbsp; Cl1.123-dev</div>
     </div>
     <div style="display:flex;margin-bottom:${px(0.2)}px;">
       <div style="width:${labelW}px;min-width:${labelW}px;"></div>
