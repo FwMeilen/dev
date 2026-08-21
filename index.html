@@ -6,7 +6,7 @@
 <link rel="icon" href="favicon.ico" sizes="any">
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
-<title>Chilbi Herrliberg – Schichtplan Cl1.119-dev</title>
+<title>Chilbi Herrliberg – Schichtplan Cl1.120-dev</title>
 <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
@@ -235,6 +235,8 @@ body{font-family:'Open Sans',Arial,sans-serif;background:var(--bg3);color:var(--
 <style>
 #statusScreen{position:fixed;inset:0;z-index:99999;overflow:auto;background:var(--bg3);display:none;}
 body.status-lock{overflow:hidden;}
+#statusScreen .st-watermark{position:fixed;inset:0;background:url('https://www.feuerwehr-meilen.ch/fileadmin/Public/Website/Templates/Images/Logo-FeuerwehrMeilen.png') center center / min(90vmin,760px) no-repeat;opacity:.9;z-index:0;pointer-events:none;}
+#statusScreen .site-header,#statusScreen .red-stripe,#statusScreen .st-main,#statusScreen .st-footer{position:relative;z-index:1;}
 #statusScreen .st-main{min-height:calc(100vh - 116px);display:flex;align-items:center;justify-content:center;padding:40px 20px;}
 #statusScreen .st-panel{background:var(--bg);width:100%;max-width:620px;border:1px solid var(--gray-mid);border-top:5px solid var(--red);}
 #statusScreen .st-panel.st-center{text-align:center;}
@@ -370,7 +372,7 @@ body.status-lock{overflow:hidden;}
   <div class="site-header-inner">
     <img src="https://www.feuerwehr-meilen.ch/fileadmin/Public/Website/Templates/Images/Logo-FeuerwehrMeilen.png" alt="Feuerwehr Meilen" style="height:38px;width:auto;object-fit:contain;">
     <div class="logo-text">Chilbi Herrliberg<span>Schichtplanung &amp; Anmeldung</span></div>
-    <div class="header-version">Cl1.119-dev</div>
+    <div class="header-version">Cl1.120-dev</div>
     <button class="help-btn" onclick="document.getElementById('helpOverlay').classList.add('open')" title="Bedienungsanleitung">?</button>
   </div>
 </div>
@@ -469,7 +471,7 @@ body.status-lock{overflow:hidden;}
 </div>
 
 <div class="toast" id="toast"></div>
-<div class="site-footer">© Stützpunktfeuerwehr Meilen / LOL &nbsp;·&nbsp; Cl1.119-dev</div>
+<div class="site-footer">© Stützpunktfeuerwehr Meilen / LOL &nbsp;·&nbsp; Cl1.120-dev</div>
 
 <script>
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbztZ9C8RapYojQAb0U4fkY6xc_7JVsDMPsQEao4T1z_ObspHSeGB_X0ZONgqLANoyEbzQ/exec';
@@ -995,7 +997,7 @@ async function fetchKuerzelSheetGast() {
 }
 
 function _stEsc(x){ return String(x==null?'':x).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-function _stHeader(){ return '<div class="site-header"><div class="site-header-inner"><img src="https://www.feuerwehr-meilen.ch/fileadmin/Public/Website/Templates/Images/Logo-FeuerwehrMeilen.png" alt="Feuerwehr Meilen"><div class="logo-text">Chilbi Herrliberg<span>Schichtplanung &amp; Anmeldung</span></div></div></div><div class="red-stripe"></div>'; }
+function _stHeader(){ return '<div class="site-header"><div class="site-header-inner"><div class="logo-text">Chilbi Herrliberg<span>Schichtplanung &amp; Anmeldung</span></div></div></div><div class="red-stripe"></div>'; }
 function _stFooter(){ return '<div class="st-footer"><div class="st-footer-txt">Feuerwehr Meilen &nbsp;&middot;&nbsp; Herrliberger Chilbi-OK</div></div>'; }
 function vorChilbiHtml(kv){
   var titel=_stEsc(kv.vorTitel||'Chilbi Herrliberg');
@@ -1004,7 +1006,7 @@ function vorChilbiHtml(kv){
   var info=_stEsc(kv.vorInfo||'Die Anmeldung f\u00fcr Schichten \u00f6ffnet bald wieder.');
   var schluss=_stEsc(kv.vorSchluss||'');
   var dateBlock = (datum||ort) ? ('<div class="st-date-block">'+(datum?'<div class="st-date-label">N\u00e4chste Durchf\u00fchrung</div><div class="st-date-main">'+datum+'</div>':'')+(ort?'<div class="st-date-loc">'+ort+'</div>':'')+'</div>') : '';
-  return _stHeader()
+  return '<div class="st-watermark"></div>'+_stHeader()
     +'<div class="st-main"><div class="st-panel"><div class="st-inner">'
     +'<span class="st-eyebrow st-eyebrow-box">Save the Date</span>'
     +'<h1 class="st-h1">'+titel+'</h1>'
@@ -1019,7 +1021,7 @@ function nachChilbiHtml(kv){
   var sub=_stEsc(kv.nachSub||'Die Chilbi ist vorbei');
   var text=_stEsc(kv.nachText||'Ein riesiges Dankesch\u00f6n an alle Helferinnen und Helfer, die mit ihrem Einsatz die Chilbi m\u00f6glich gemacht haben!');
   var ausblick=_stEsc(kv.nachAusblick||'');
-  return _stHeader()
+  return '<div class="st-watermark"></div>'+_stHeader()
     +'<div class="st-main"><div class="st-panel st-center"><div class="st-inner">'
     +'<div class="st-eyebrow">'+eyebrow+'</div>'
     +'<div class="st-thanks">'+titel+'</div>'
