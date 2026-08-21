@@ -1,17 +1,18 @@
 // ============================================================
 // Chilbi Herrliberg – Schichtplanung Backend
-// Google Apps Script  |  Cl1.117-dev
+// Google Apps Script  |  Cl1.162
 // Schema Konfiguration: ID|Datum|Von|Bis|Schicht|Aufgabe|Max Personen|Farbe|Informationen|Geschlossen
 // Schema Anmeldungen:   ID|Name|Schicht|Aufgabe|Timestamp
 // Schema Tage:          Datum|Typ
 // Schema Gast:          Kürzel|Vorname|Name|Email|Tel
 // ============================================================
 
-const SHEET_ID       = '1GAxPj-6QtpkzVjNwww1L6ZERTJUje6pmsCBbtBzYq3Y';
+const SHEET_ID       = '1XqTNfgONmHX9GvmfOVvb94BUo_oQ04Uy7R97FVfdWyo';
 const KUERZEL_SHEET_ID = '1bK6IuVpAdLyYc9_NPbJxFMkvCZ0fNvadJABBUM-Rc0M';
 const ADMIN_PW       = 'chilbi2025';
 const ABRECHNUNG_SHEET_ID = '1IbXEr2UJLh6GOJsvFttVScuF3l4KpLR6hVUESqHlQ4s';
-const ABRECHNUNG_PW  = 'stock2026';
+const ABRECHNUNG_PW  = 'Kohle_26';
+const ABRECHNUNG_PW_VIEW = 'CHberg_26';
 const SS             = SpreadsheetApp.openById(SHEET_ID);
 const SS_KUERZEL     = SpreadsheetApp.openById(KUERZEL_SHEET_ID);
 const SH_CONFIG      = 'Konfiguration';
@@ -21,15 +22,23 @@ const SH_GAST        = 'Gast';
 const SH_EHEMALIGE   = 'Ehemalige';
 const SH_FEUERWEHR   = 'Feuerwehr';
 const SH_FEUERWEHREN = 'Feuerwehren';
+const SH_STATUS      = 'Status';
 
 function doGet(e) {
-  return jsonResponse({ config: getConfig(), signups: getSignups(), tage: getTage() });
+  var p = (e && e.parameter) || {};
+  if (p.action === 'abrLoad') {
+    if (p.pw === ABRECHNUNG_PW) return jsonResponse(abrLoad(false));
+    if (p.pw === ABRECHNUNG_PW_VIEW) return jsonResponse(abrLoad(true));
+    return jsonResponse({ ok: false, error: 'Falsches Passwort' });
+  }
+  return jsonResponse({ config: getConfig(), signups: getSignups(), tage: getTage(), status: getStatus() });
 }
 
 function doPost(e) {
   try {
     const p = JSON.parse(e.postData.contents);
     if (p.action === 'signup')         return jsonResponse(saveSignup(p));
+    if (p.action === 'saveStatus')     return jsonResponse(saveStatus(p));
     if (p.action === 'unsignup')       return jsonResponse(removeSignup(p));
     if (p.action === 'editSignup')     return jsonResponse(editSignup(p));
     if (p.action === 'registerGuest')  return jsonResponse(registerGuest(p));
@@ -43,6 +52,10 @@ function doPost(e) {
       return jsonResponse(saveFeuerwehren(p.rows));
     }
     if (p.action === 'gutscheinMail')      return jsonResponse(gutscheinMail(p));
+    if (p.action === 'kuerzelSave') {
+      if (p.password !== ADMIN_PW) return jsonResponse({ ok: false, error: 'Falsches Passwort' });
+      return jsonResponse(kuerzelSave(p));
+    }
     if (p.action === 'sendeSchichtMails') {
       if (p.password !== ADMIN_PW) return jsonResponse({ ok: false, error: 'Falsches Passwort' });
       return jsonResponse(sendeSchichtMails(p));
@@ -60,8 +73,12 @@ function doPost(e) {
       return jsonResponse(importSignups(p.rows));
     }
     if (p.action === 'abrSave') {
-      if (p.password !== ABRECHNUNG_PW) return jsonResponse({ ok: false, error: 'Falsches Passwort' });
+      if (p.password !== ABRECHNUNG_PW && p.pw !== ABRECHNUNG_PW) return jsonResponse({ ok: false, error: 'Falsches Passwort' });
       return jsonResponse(abrSave(p));
+    }
+    if (p.action === 'rechnungMail') {
+      if (p.password !== ABRECHNUNG_PW && p.pw !== ABRECHNUNG_PW) return jsonResponse({ ok: false, error: 'Falsches Passwort' });
+      return jsonResponse(rechnungMail(p));
     }
     return jsonResponse({ ok: false, error: 'Unbekannte Aktion' });
   } catch(err) {
@@ -106,6 +123,38 @@ function getTage() {
     headers.forEach((h, i) => obj[h] = r[i]);
     return obj;
   });
+}
+
+function getStatus() {
+  var m = { mode:'live', vor:{}, nach:{} };
+  try {
+    var sh = SS.getSheetByName(SH_STATUS);
+    if (!sh) return m;
+    var rows = sh.getDataRange().getValues();
+    var kv = {};
+    for (var i=1; i<rows.length; i++){ if (rows[i][0] !== '') kv[String(rows[i][0])] = rows[i][1]; }
+    m.mode = kv.mode || 'live';
+    m.vor  = { titel:kv.vorTitel||'', datum:kv.vorDatum||'', ort:kv.vorOrt||'', info:kv.vorInfo||'', schluss:kv.vorSchluss||'' };
+    m.nach = { eyebrow:kv.nachEyebrow||'', titel:kv.nachTitel||'', sub:kv.nachSub||'', text:kv.nachText||'', ausblick:kv.nachAusblick||'' };
+  } catch(e) {}
+  return m;
+}
+
+function saveStatus(p) {
+  if (p.password !== ADMIN_PW) return { ok:false, error:'Falsches Passwort' };
+  var o; try { o = JSON.parse(p.statusJson || '{}'); } catch(e){ return { ok:false, error:'Ungueltige Daten' }; }
+  var v = o.vor || {}, n = o.nach || {};
+  var pairs = [
+    ['mode', o.mode || 'live'],
+    ['vorTitel', v.titel||''], ['vorDatum', v.datum||''], ['vorOrt', v.ort||''], ['vorInfo', v.info||''], ['vorSchluss', v.schluss||''],
+    ['nachEyebrow', n.eyebrow||''], ['nachTitel', n.titel||''], ['nachSub', n.sub||''], ['nachText', n.text||''], ['nachAusblick', n.ausblick||'']
+  ];
+  var sh = SS.getSheetByName(SH_STATUS);
+  if (!sh) sh = SS.insertSheet(SH_STATUS);
+  sh.clear();
+  sh.getRange(1,1,1,2).setValues([['Key','Value']]);
+  sh.getRange(2,1,pairs.length,2).setValues(pairs);
+  return { ok:true };
 }
 
 function saveSignup(p) {
@@ -399,33 +448,90 @@ function gutscheinMail(p) {
   }
 }
 
-// Abrechnung ins separate Sheet schreiben (Reiter Meta/Einnahmen/Ausgaben werden bei Bedarf angelegt)
+// ===== Finanzen / Abrechnung (separates Sheet ABRECHNUNG_SHEET_ID) =====
 function _abrNum(v){ var n = parseFloat(String(v==null?'':v).replace(',', '.')); return isNaN(n) ? 0 : n; }
-function abrSave(p) {
+function _abrReadTab(ss, name){
+  var sh = ss.getSheetByName(name); if(!sh) return [];
+  var vals = sh.getDataRange().getValues(); if(vals.length < 2) return [];
+  var head = vals[0].map(function(h){ return String(h).trim(); });
+  var out = [];
+  for(var i=1;i<vals.length;i++){ var o={}; for(var j=0;j<head.length;j++){ o[head[j]] = vals[i][j]; } out.push(o); }
+  return out;
+}
+function _abrWriteTab(ss, name, header, rows){
+  var sh = ss.getSheetByName(name) || ss.insertSheet(name);
+  sh.clear();
+  sh.getRange(1,1,1,header.length).setValues([header]);
+  if(rows.length) sh.getRange(2,1,rows.length,header.length).setValues(rows);
+}
+function abrLoad(readonly){
+  var ss = SpreadsheetApp.openById(ABRECHNUNG_SHEET_ID);
+  var meta = {};
+  var mSheet = ss.getSheetByName('Meta');
+  if(mSheet){ var mv = mSheet.getDataRange().getValues(); for(var i=1;i<mv.length;i++){ if(mv[i][0]) meta[String(mv[i][0]).trim()] = mv[i][1]; } }
+  return { ok:true, readonly:!!readonly, meta:meta,
+    einnahmen:_abrReadTab(ss,'Einnahmen'), ausgaben:_abrReadTab(ss,'Ausgaben'),
+    stock:_abrReadTab(ss,'Stock'), kasse:_abrReadTab(ss,'Kasse'),
+    rechnungen:_abrReadTab(ss,'Rechnungen') };
+}
+function abrSave(p){
   var ss = SpreadsheetApp.openById(ABRECHNUNG_SHEET_ID);
   var meta = p.meta || {};
   var mSheet = ss.getSheetByName('Meta') || ss.insertSheet('Meta');
   mSheet.clear();
-  mSheet.getRange(1,1,5,2).setValues([
+  mSheet.getRange(1,1,21,2).setValues([
     ['Schlüssel','Wert'],
-    ['Jahr', meta.jahr || ''],
-    ['Vorjahr', meta.vorjahr || ''],
-    ['EinnahmenKategorien', (meta.einKat || []).join(', ')],
-    ['AusgabenKategorien', (meta.ausKat || []).join(', ')]
+    ['Jahr', meta.jahr||''],
+    ['Vorjahr', meta.vorjahr||''],
+    ['VorjahrKasse', meta.vorjahrKasse||''],
+    ['EinnahmenKategorien', (meta.einKat||[]).join(', ')],
+    ['AusgabenKategorien', (meta.ausKat||[]).join(', ')],
+    ['KostenKategorien', (meta.kostKat||[]).join(', ')],
+    ['SollStock', meta.sollStock||''],
+    ['SollKasse', meta.sollKasse||''],
+    ['MuenzProRolle', meta.muenzProRolle||''],
+    ['Spaetzli', meta.spaetzli||''],
+    ['Helferstunden', meta.helferstunden||''],
+    ['Twint', meta.twint||''],
+    ['VorjahrJson', meta.vorjahrJson||''],
+    ['RgAbsender', meta.rgAbsender||''],
+    ['RgIntro', meta.rgIntro||''],
+    ['RgVorPos', meta.rgVorPos||''],
+    ['RgIban', meta.rgIban||''],
+    ['RgGruss', meta.rgGruss||''],
+    ['RgFooter', meta.rgFooter||''],
+    ['RgNext', meta.rgNext||'']
   ]);
-  var e = p.einnahmen || [];
-  var eSheet = ss.getSheetByName('Einnahmen') || ss.insertSheet('Einnahmen');
-  eSheet.clear();
-  eSheet.getRange(1,1,1,5).setValues([['Nr','Kategorie','Beschreibung','Betrag','Vorjahr']]);
-  if (e.length) eSheet.getRange(2,1,e.length,5).setValues(e.map(function(r,i){ return [i+1, r.kat||'', r.besch||'', _abrNum(r.betrag), _abrNum(r.vorjahr)]; }));
-  var a = p.ausgaben || [];
-  var aSheet = ss.getSheetByName('Ausgaben') || ss.insertSheet('Ausgaben');
-  aSheet.clear();
-  aSheet.getRange(1,1,1,6).setValues([['Nr','Zahlungsart','Beschreibung','Betrag','Vorjahr','Bemerkung']]);
-  if (a.length) aSheet.getRange(2,1,a.length,6).setValues(a.map(function(r,i){ return [i+1, r.art||'', r.besch||'', _abrNum(r.betrag), _abrNum(r.vorjahr), r.bem||'']; }));
-  return { ok:true, einnahmen:e.length, ausgaben:a.length };
+  _abrWriteTab(ss,'Einnahmen',['Nr','Kategorie','Beschreibung','Betrag','Vorjahr'],
+    (p.einnahmen||[]).map(function(r,i){ return [i+1, r.kat||'', r.besch||'', _abrNum(r.betrag), _abrNum(r.vorjahr)]; }));
+  _abrWriteTab(ss,'Ausgaben',['Nr','Zahlungsart','Beschreibung','Betrag','Vorjahr','Bemerkung','Kostenart','Vorschuss','Zurueckbezahlt'],
+    (p.ausgaben||[]).map(function(r,i){ return [i+1, r.art||'', r.besch||'', _abrNum(r.betrag), _abrNum(r.vorjahr), r.bem||'', r.kostenart||'', r.vorschuss?1:'', r.rueck?1:'']; }));
+  _abrWriteTab(ss,'Stock',['Wert','Einzeln','Rollen'],
+    (p.stock||[]).map(function(r){ return [_abrNum(r.wert), _abrNum(r.einzeln), _abrNum(r.rollen)]; }));
+  _abrWriteTab(ss,'Kasse',['Wert','Einzeln','Rollen'],
+    (p.kasse||[]).map(function(r){ return [_abrNum(r.wert), _abrNum(r.einzeln), _abrNum(r.rollen)]; }));
+  _abrWriteTab(ss,'Rechnungen',['Nr','Datum','Empfaenger','Email','Betreff','Total','JSON'],
+    (p.rechnungen||[]).map(function(r){ return [r.nr||'', r.datum||'', r.empfaenger||'', r.email||'', r.betreff||'', _abrNum(r.total), r.json||'']; }));
+  return { ok:true };
+}
+function rechnungMail(p){
+  var opts = { from:'chilbi@feuerwehrmeilen.ch', name:'Chilbi Herrliberg', htmlBody:p.html };
+  if(p.pdf) opts.attachments = [Utilities.newBlob(Utilities.base64Decode(p.pdf), 'application/pdf', p.pdfname||'Rechnung.pdf')];
+  GmailApp.sendEmail(p.email, p.subject, p.text||'', opts);
+  return { ok:true };
 }
 
+function kuerzelSave(p){
+  _kzWrite(SS_KUERZEL,'Tabellenblatt1',['Kürzel','Vorname','Name','Email'],(p.feuerwehr||[]).map(function(r){ return [r.kuerzel||'', r.vorname||'', r.name||'', r.email||'']; }));
+  _kzWrite(SS_KUERZEL,'Gast',['Kürzel','Vorname','Name','Email','Tel'],(p.gasthelfer||[]).map(function(r){ return [r.kuerzel||'', r.vorname||'', r.name||'', r.email||'', r.tel||'']; }));
+  return { ok:true };
+}
+function _kzWrite(ss,name,headers,rows){
+  var sh=ss.getSheetByName(name); if(!sh) sh=ss.insertSheet(name);
+  sh.clearContents();
+  sh.getRange(1,1,1,headers.length).setValues([headers]);
+  if(rows.length) sh.getRange(2,1,rows.length,headers.length).setValues(rows);
+}
 function jsonResponse(obj) {
   return ContentService
     .createTextOutput(JSON.stringify(obj))
