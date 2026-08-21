@@ -4,14 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta http-equiv="Cache-Control" content="no-cache, must-revalidate">
-<meta name="app-version" content="Cl1.124-dev">
+<meta name="app-version" content="Cl1.125-dev">
 <script>
 (function(){var el=document.querySelector('meta[name="app-version"]');var RUN=el?el.content:'';fetch(location.pathname+'?_v='+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){var m=t.match(/name="app-version" content="([^"]+)"/);if(m&&RUN&&m[1]!==RUN){var tg='v='+encodeURIComponent(m[1]);if(location.search.indexOf(tg)===-1){location.replace(location.pathname+'?'+tg);}}}).catch(function(){});})();
 </script>
 <link rel="icon" href="favicon.ico" sizes="any">
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
-<title>Chilbi Admin – Schichtverwaltung Cl1.124-dev</title>
+<title>Chilbi Admin – Schichtverwaltung Cl1.125-dev</title>
 <meta property="og:title" content="Chilbi Herrliberg – Admin">
 <meta property="og:description" content="Schichtverwaltung Chilbi Herrliberg – Stützpunktfeuerwehr Meilen">
 <meta property="og:image" content="https://www.feuerwehr-meilen.ch/fileadmin/Public/Website/Templates/Images/Logo-FeuerwehrMeilen.png">
@@ -180,7 +180,7 @@ td input[type=color]{width:36px;height:26px;padding:1px;cursor:pointer;border:1p
     <div class="login-error" id="loginError"></div>
     <button class="btn btn-red" style="width:100%" onclick="doLogin()">Einloggen</button>
     <div style="margin-top:16px;padding-top:12px;border-top:1px solid var(--gray-mid);text-align:center;font-size:11px;color:var(--text3);">
-      © Stützpunktfeuerwehr Meilen / LOL &nbsp;·&nbsp; <strong>Cl1.124-dev</strong>
+      © Stützpunktfeuerwehr Meilen / LOL &nbsp;·&nbsp; <strong>Cl1.125-dev</strong>
     </div>
   </div>
 </div>
@@ -191,7 +191,7 @@ td input[type=color]{width:36px;height:26px;padding:1px;cursor:pointer;border:1p
     <img src="https://www.feuerwehr-meilen.ch/fileadmin/Public/Website/Templates/Images/Logo-FeuerwehrMeilen.png" alt="Feuerwehr Meilen" style="height:38px;width:auto;object-fit:contain;">
     <div class="logo-text">Chilbi Herrliberg<span>Admin – Schichtverwaltung</span></div>
     <div class="header-right">
-      <span class="header-version">Cl1.124-dev</span>
+      <span class="header-version">Cl1.125-dev</span>
       <button class="help-btn" onclick="document.getElementById('helpOverlay').style.display='flex'" title="Bedienungsanleitung" style="background:none;border:1.5px solid rgba(255,255,255,.5);color:white;width:22px;height:22px;border-radius:50%;font-size:12px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;margin-left:4px;">?</button>
       <button class="btn btn-sm" onclick="window.open('index.html','_blank')">Zu Schichtplan Signup</button>
       <button class="btn-refresh" id="btnRefresh" onclick="manualRefresh()">
@@ -223,7 +223,7 @@ td input[type=color]{width:36px;height:26px;padding:1px;cursor:pointer;border:1p
     <div class="stats" id="statsBar"></div>
     <div class="card">
       <div class="card-title">Alle Anmeldungen</div>
-      <div style="font-size:12px;color:var(--text3);margin:-4px 0 12px;">CSV-Import/-Export der Anmeldungen – eingetragene Personen je Schicht. <strong>Import ersetzt alle bestehenden Anmeldungen.</strong></div>
+      <div style="font-size:12px;color:var(--text3);margin:-4px 0 12px;">Excel-Import/-Export der Anmeldungen – eingetragene Personen je Schicht. <strong>Import ersetzt alle bestehenden Anmeldungen.</strong></div>
       <div class="filter-bar">
         <input type="text" id="filterName" placeholder="ID oder Name suchen…" oninput="renderSignups()">
         <select id="filterTag" onchange="renderSignups()"><option value="">Alle Tage</option></select>
@@ -236,8 +236,8 @@ td input[type=color]{width:36px;height:26px;padding:1px;cursor:pointer;border:1p
           <option value="Aufgabe">Sortierung: Aufgabe</option>
           <option value="Name">Sortierung: Name</option>
         </select>
-        <label class="btn btn-sm" style="cursor:pointer">📂 CSV Import<input type="file" accept=".csv" onchange="importSignupsCSV(this)" style="display:none"></label>
-        <button class="btn btn-sm" onclick="exportCSV()">⬇ CSV Export</button>
+        <label class="btn btn-sm" style="cursor:pointer">📂 Excel Import<input type="file" accept=".xlsx" onchange="importSignupsCSV(this)" style="display:none"></label>
+        <button class="btn btn-sm" onclick="exportCSV()">⬇ Excel Export</button>
       </div>
       <div class="table-wrap">
         <table>
@@ -256,14 +256,14 @@ td input[type=color]{width:36px;height:26px;padding:1px;cursor:pointer;border:1p
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
         <div class="card-title" style="margin-bottom:0">Schichten bearbeiten</div>
         <div style="display:flex;gap:8px;">
-          <label class="btn btn-sm" style="cursor:pointer">📂 CSV Import<input type="file" accept=".csv" onchange="importCSV(this)" style="display:none"></label>
+          <label class="btn btn-sm" style="cursor:pointer">📂 Excel Import<input type="file" accept=".xlsx" onchange="importCSV(this)" style="display:none"></label>
           <button class="btn btn-sm" onclick="exportConfigCSV()">⬇ Nur Schichten</button>
           <button class="btn btn-sm" onclick="scheduleFullExport()">⬇ Komplett-Backup</button>
-          <label class="btn btn-sm" style="cursor:pointer">↪ Backup import<input type="file" accept=".csv" onchange="scheduleFullImport(this)" style="display:none"></label>
+          <label class="btn btn-sm" style="cursor:pointer">↪ Backup import<input type="file" accept=".xlsx" onchange="scheduleFullImport(this)" style="display:none"></label>
           <button class="btn btn-green btn-sm" onclick="openNewSchicht()">+ Neue Schicht</button>
         </div>
       </div>
-      <div style="font-size:12px;color:var(--text3);margin:0 0 1rem;">CSV-Import/-Export betrifft nur die Schichtdefinitionen (Zeiten, Aufgaben, Max-Personen) – ohne eingetragene Personen. «Komplett-Backup» sichert zusätzlich alle Anmeldungen in einer Datei; «Backup import» stellt Schichten + Anmeldungen wieder her (ersetzt beides).</div>
+      <div style="font-size:12px;color:var(--text3);margin:0 0 1rem;">Excel-Import/-Export betrifft nur die Schichtdefinitionen (Zeiten, Aufgaben, Max-Personen) – ohne eingetragene Personen. «Komplett-Backup» sichert zusätzlich alle Anmeldungen in einer Datei; «Backup import» stellt Schichten + Anmeldungen wieder her (ersetzt beides).</div>
       <div id="schichtplanContent"></div>
     </div>
   </div>
@@ -280,7 +280,7 @@ td input[type=color]{width:36px;height:26px;padding:1px;cursor:pointer;border:1p
             <button class="btn btn-sm" data-f="Zusage" onclick="setEhFilter('Zusage',this)">Zusagen</button>
             <button class="btn btn-sm" data-f="Absage" onclick="setEhFilter('Absage',this)">Absagen</button>
           </div>
-          <button class="btn btn-sm" onclick="exportEhemaligeCSV()">⬇ CSV Export</button>
+          <button class="btn btn-sm" onclick="exportEhemaligeCSV()">⬇ Excel Export</button>
         </div>
       </div>
       <div class="table-wrap">
@@ -307,7 +307,7 @@ td input[type=color]{width:36px;height:26px;padding:1px;cursor:pointer;border:1p
           <select id="fwFwFilter" onchange="setFwFwFilter(this.value)" style="height:30px;border:2px solid var(--black);background:var(--bg);font-family:inherit;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;padding:0 8px;border-radius:0;cursor:pointer;">
             <option value="">Alle Feuerwehren</option>
           </select>
-          <button class="btn btn-sm" onclick="exportFeuerwehrCSV()">⬇ CSV Export</button>
+          <button class="btn btn-sm" onclick="exportFeuerwehrCSV()">⬇ Excel Export</button>
         </div>
       </div>
       <div class="table-wrap">
@@ -533,8 +533,8 @@ Primarschule Rebacker, Schulhausstrasse 23, 8704 Herrliberg</textarea>
     <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">
       <button class="btn btn-red btn-sm" onclick="kzSave()">💾 Speichern</button>
       <button class="btn btn-sm" onclick="kzLoad()">Neu laden</button>
-      <button class="btn btn-sm" onclick="kzExport()">CSV export</button>
-      <label class="btn btn-sm" style="cursor:pointer;display:inline-flex;align-items:center">CSV import<input type="file" accept=".csv,text/csv" style="display:none" onchange="kzImport(this)"></label>
+      <button class="btn btn-sm" onclick="kzExport()">Excel export</button>
+      <label class="btn btn-sm" style="cursor:pointer;display:inline-flex;align-items:center">Excel import<input type="file" accept=".xlsx" style="display:none" onchange="kzImport(this)"></label>
     </div>
     <div id="kzBody"></div>
   </div>
@@ -700,7 +700,7 @@ Primarschule Rebacker, Schulhausstrasse 23, 8704 Herrliberg</textarea>
   <div style="background:white;max-width:560px;width:100%;max-height:85vh;overflow-y:auto;box-shadow:0 8px 40px rgba(0,0,0,.3);">
     <div style="background:var(--red);color:white;padding:16px 20px;font-size:14px;font-weight:700;text-transform:uppercase;">⚠ Doppelte ID(s) gefunden</div>
     <div style="padding:20px;">
-      <p style="font-size:13px;margin-bottom:14px;line-height:1.5;color:var(--text2)">Folgende ID(s) kommen mehrfach vor. Bitte im Sheet oder per CSV-Export/Import korrigieren – im Schicht-Editor lassen sich gleiche IDs nicht eindeutig bearbeiten.</p>
+      <p style="font-size:13px;margin-bottom:14px;line-height:1.5;color:var(--text2)">Folgende ID(s) kommen mehrfach vor. Bitte im Sheet oder per Excel-Export/Import korrigieren – im Schicht-Editor lassen sich gleiche IDs nicht eindeutig bearbeiten.</p>
       <div id="dupIdList"></div>
       <div style="display:flex;justify-content:flex-end;margin-top:16px;">
         <button class="btn btn-sm" onclick="closeDupId()">Schliessen</button>
@@ -767,7 +767,7 @@ Primarschule Rebacker, Schulhausstrasse 23, 8704 Herrliberg</textarea>
     <div style="padding:20px;font-size:12px;color:var(--text2);line-height:1.6;">
       <div style="margin-bottom:16px;">
         <div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--red);margin-bottom:6px;border-bottom:1px solid var(--gray-mid);padding-bottom:4px;">Anmeldungen</div>
-        <ul style="padding-left:16px;"><li>Übersicht aller eingetragenen Personen, mit Statistik oben.</li><li>Filtern nach Tag, Schicht, Aufgabe oder ID-/Namens-Suche.</li><li>Stift-Icon zum Bearbeiten oder Löschen eines Eintrags.</li><li><strong>📂 CSV Import / ⬇ CSV Export</strong> der Anmeldungen. Reihenfolge wie im Sheet: <code>ID,Name,Schicht,Aufgabe,Timestamp</code>. Der <strong>Import ersetzt alle</strong> bestehenden Anmeldungen (mit Sicherheitsabfrage) und prüft jede Zeile gegen die vorhandenen Schichten.</li></ul>
+        <ul style="padding-left:16px;"><li>Übersicht aller eingetragenen Personen, mit Statistik oben.</li><li>Filtern nach Tag, Schicht, Aufgabe oder ID-/Namens-Suche.</li><li>Stift-Icon zum Bearbeiten oder Löschen eines Eintrags.</li><li><strong>📂 Excel Import / ⬇ Excel Export</strong> der Anmeldungen. Reihenfolge wie im Sheet: <code>ID,Name,Schicht,Aufgabe,Timestamp</code>. Der <strong>Import ersetzt alle</strong> bestehenden Anmeldungen (mit Sicherheitsabfrage) und prüft jede Zeile gegen die vorhandenen Schichten.</li></ul>
       </div>
       <div style="margin-bottom:16px;">
         <div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--red);margin-bottom:6px;border-bottom:1px solid var(--gray-mid);padding-bottom:4px;">Übersicht</div>
@@ -775,8 +775,8 @@ Primarschule Rebacker, Schulhausstrasse 23, 8704 Herrliberg</textarea>
       </div>
       <div style="margin-bottom:16px;">
         <div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--red);margin-bottom:6px;border-bottom:1px solid var(--gray-mid);padding-bottom:4px;">Schichten bearbeiten</div>
-        <ul style="padding-left:16px;"><li>Timeline aller Schichten mit <strong>gemeinsamem Zeitraster über alle Tage</strong> – gleiche Uhrzeiten stehen untereinander.</li><li>Klick auf einen Block → Schicht bearbeiten (Zeit, Aufgabe, Max-Personen, Farbe, Gesperrt …).</li><li><strong>+ Neue Schicht</strong> zum Anlegen. Im Editor entfernt <strong>🗑 Löschen</strong> die Schicht (mit Bestätigung; eingetragene Personen werden mitgelöscht).</li><li><strong>📂 CSV Import / ⬇ CSV Export</strong> der Schichten. Der <strong>Import ersetzt alle</strong> bestehenden Schichten (mit Sicherheitsabfrage).</li>
-          <li>CSV-Format: <code>ID,Datum,Von,Bis,Schicht,Aufgabe,Max Personen,Farbe,Informationen,Geschlossen</code><br>
+        <ul style="padding-left:16px;"><li>Timeline aller Schichten mit <strong>gemeinsamem Zeitraster über alle Tage</strong> – gleiche Uhrzeiten stehen untereinander.</li><li>Klick auf einen Block → Schicht bearbeiten (Zeit, Aufgabe, Max-Personen, Farbe, Gesperrt …).</li><li><strong>+ Neue Schicht</strong> zum Anlegen. Im Editor entfernt <strong>🗑 Löschen</strong> die Schicht (mit Bestätigung; eingetragene Personen werden mitgelöscht).</li><li><strong>📂 Excel Import / ⬇ Excel Export</strong> der Schichten. Der <strong>Import ersetzt alle</strong> bestehenden Schichten (mit Sicherheitsabfrage).</li>
+          <li>Excel-Spalten (Kopfzeile): <code>ID,Datum,Von,Bis,Schicht,Aufgabe,Max Personen,Farbe,Informationen,Geschlossen</code><br>
           Beispiel: <code>1,14.08.2026,10:00,14:00,GVH-Lunch,Service,2,#004cff,Treffpunkt Haupteingang,0</code></li></ul>
       </div>
       <div style="margin-bottom:16px;">
@@ -785,7 +785,7 @@ Primarschule Rebacker, Schulhausstrasse 23, 8704 Herrliberg</textarea>
       </div>
       <div style="margin-bottom:16px;">
         <div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--red);margin-bottom:6px;border-bottom:1px solid var(--gray-mid);padding-bottom:4px;">Gut zu wissen</div>
-        <ul style="padding-left:16px;"><li><strong>↺ Aktualisieren</strong> (oben rechts) lädt alle Daten neu, inklusive der Schichten-Timeline.</li><li><strong>ID-Prüfung:</strong> Bei jedem Laden werden doppelte Schicht-IDs erkannt; ein Warnfenster listet die betroffenen Schichten. Doppelte IDs im Sheet bzw. per CSV korrigieren, da der Editor sie sonst nicht eindeutig zuordnen kann.</li></ul>
+        <ul style="padding-left:16px;"><li><strong>↺ Aktualisieren</strong> (oben rechts) lädt alle Daten neu, inklusive der Schichten-Timeline.</li><li><strong>ID-Prüfung:</strong> Bei jedem Laden werden doppelte Schicht-IDs erkannt; ein Warnfenster listet die betroffenen Schichten. Doppelte IDs im Sheet bzw. per Excel korrigieren, da der Editor sie sonst nicht eindeutig zuordnen kann.</li></ul>
       </div>
     </div>
   </div>
@@ -830,9 +830,10 @@ Primarschule Rebacker, Schulhausstrasse 23, 8704 Herrliberg</textarea>
   </div>
 </div>
 <div class="toast" id="toast"></div>
-<div class="site-footer" style="position:relative;z-index:1;">© Stützpunktfeuerwehr Meilen / LOL &nbsp;·&nbsp; Admin &nbsp;·&nbsp; Cl1.124-dev</div>
+<div class="site-footer" style="position:relative;z-index:1;">© Stützpunktfeuerwehr Meilen / LOL &nbsp;·&nbsp; Admin &nbsp;·&nbsp; Cl1.125-dev</div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script>
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbztZ9C8RapYojQAb0U4fkY6xc_7JVsDMPsQEao4T1z_ObspHSeGB_X0ZONgqLANoyEbzQ/exec';
 const ADMIN_PW   = 'chilbi2025';
@@ -1006,8 +1007,8 @@ function importCSV(input) {
   const reader = new FileReader();
   reader.onload = async e => {
     input.value = '';
-    const rows = parseCSVrows(e.target.result);
-    if (rows.length < 2) { showToast('CSV leer oder ohne Datenzeilen', 'error'); return; }
+    const rows = _wbToRows(e.target.result);
+    if (rows.length < 2) { showToast('Excel leer oder ohne Datenzeilen', 'error'); return; }
     const headers = rows[0].map(h => String(h).trim().replace(/^\ufeff/,''));
     const idx = n => headers.findIndex(h => h.toLowerCase() === n.toLowerCase());
     const iId = idx('ID') >= 0 ? idx('ID') : idx('Tag');
@@ -1016,7 +1017,7 @@ function importCSV(input) {
     const iMax = idx('Max Personen') >= 0 ? idx('Max Personen') : idx('MaxPersonen');
     const iFarbe = idx('Farbe'), iInfo = idx('Informationen'), iGes = idx('Geschlossen');
     if (iId < 0 || iAuf < 0 || iVon < 0 || iBis < 0) {
-      showToast('CSV-Header unvollständig (erwartet: ID, Datum, Von, Bis, Schicht, Aufgabe, Max Personen, …)', 'error');
+      showToast('Excel-Header unvollständig (erwartet: ID, Datum, Von, Bis, Schicht, Aufgabe, Max Personen, …)', 'error');
       return;
     }
     const get = (r, i, def='') => (i >= 0 && r[i] != null ? String(r[i]).trim() : def);
@@ -1052,7 +1053,7 @@ function importCSV(input) {
       setTimeout(async () => { await loadData(); buildSchichtplan(); }, 1500);
     } catch(err) { showToast('Fehler: ' + err.message, 'error'); }
   };
-  reader.readAsText(file);
+  reader.readAsArrayBuffer(file);
 }
 
 function addRow(data={}) {
@@ -1315,12 +1316,9 @@ function setEhFilter(f, btn) {
 function exportEhemaligeCSV() {
   const data = EHEMALIGE || [];
   if (!data.length) { showToast('Keine Einträge zum Exportieren', 'error'); return; }
-  const headers = ['Timestamp','Anmeldung','Name','Vorname','Mail','Tel'];
-  const q = v => `"${String(v==null?'':v).replace(/"/g,'""')}"`;
-  const lines = data.map(r => [r.Timestamp, r.Anmeldung, r.Name, r.Vorname, r.Mail, r.Tel].map(q).join(','));
-  const csv = [headers.join(','), ...lines].join('\n');
-  const a = Object.assign(document.createElement('a'),{href:URL.createObjectURL(new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8'})),download:'chilbi_ehemalige.csv'});
-  a.click();
+  const aoa=[['Timestamp','Anmeldung','Name','Vorname','Mail','Tel']];
+  data.forEach(r=>aoa.push([r.Timestamp, r.Anmeldung, r.Name, r.Vorname, r.Mail, r.Tel]));
+  _xlsxDL(aoa,'Ehemalige','chilbi_ehemalige.xlsx');
 }
 
 // ===== Feuerwehrkollegen =====
@@ -1407,12 +1405,9 @@ function setFwFwFilter(v) {
 function exportFeuerwehrCSV() {
   const data = FEUERWEHR || [];
   if (!data.length) { showToast('Keine Einträge zum Exportieren', 'error'); return; }
-  const headers = ['Timestamp','Feuerwehr','Anmeldung','Grad','Vorname','Name','Mail','Tel'];
-  const q = v => `"${String(v==null?'':v).replace(/"/g,'""')}"`;
-  const lines = data.map(r => [r.Timestamp, r.Feuerwehr, r.Anmeldung, r.Grad, r.Vorname, r.Name, r.Mail, r.Tel].map(q).join(','));
-  const csv = [headers.join(','), ...lines].join('\n');
-  const a = Object.assign(document.createElement('a'),{href:URL.createObjectURL(new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8'})),download:'chilbi_feuerwehr.csv'});
-  a.click();
+  const aoa=[['Timestamp','Feuerwehr','Anmeldung','Grad','Vorname','Name','Mail','Tel']];
+  data.forEach(r=>aoa.push([r.Timestamp, r.Feuerwehr, r.Anmeldung, r.Grad, r.Vorname, r.Name, r.Mail, r.Tel]));
+  _xlsxDL(aoa,'Feuerwehr','chilbi_feuerwehr.xlsx');
 }
 
 // ===== Feuerwehren-Liste (Dropdown-Quelle) editieren =====
@@ -2061,7 +2056,7 @@ function printDay(dayId) {
   </head><body>
     <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:${px(0.5)}px;padding-bottom:${px(0.3)}px;border-bottom:2px solid black;">
       <div style="font-size:${px(1.3)}px;font-weight:700;text-transform:uppercase">${titleText}</div>
-      <div style="font-size:${px(0.62)}px;color:#666">Stützpunktfeuerwehr Meilen &nbsp;·&nbsp; Chilbi Herrliberg &nbsp;·&nbsp; Cl1.124-dev</div>
+      <div style="font-size:${px(0.62)}px;color:#666">Stützpunktfeuerwehr Meilen &nbsp;·&nbsp; Chilbi Herrliberg &nbsp;·&nbsp; Cl1.125-dev</div>
     </div>
     <div style="display:flex;margin-bottom:${px(0.2)}px;">
       <div style="width:${labelW}px;min-width:${labelW}px;"></div>
@@ -2077,28 +2072,18 @@ function printDay(dayId) {
 }
 
 function exportCSV() {
-  // Reihenfolge wie im Sheet: ID | Name | Schicht | Aufgabe | Timestamp
-  const headers = ['ID','Name','Schicht','Aufgabe','Timestamp'];
-  const q = v => `"${String(v==null?'':v).replace(/"/g,'""')}"`;
-  const rows = SIGNUPS.map(s => [s.Tag||s.ID||'', s.Name, s.Schicht, s.Aufgabe, s.Timestamp].map(q).join(','));
-  const csv = [headers.join(','),...rows].join('\n');
-  const a = Object.assign(document.createElement('a'),{href:URL.createObjectURL(new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8'})),download:'chilbi_anmeldungen.csv'});
-  a.click();
+  const aoa=[['ID','Name','Schicht','Aufgabe','Timestamp']];
+  (SIGNUPS||[]).forEach(s=>aoa.push([s.Tag||s.ID||'', s.Name, s.Schicht, s.Aufgabe, s.Timestamp]));
+  _xlsxDL(aoa,'Anmeldungen','chilbi_anmeldungen.xlsx');
 }
 
 // ── Schichten (Konfiguration) als CSV exportieren – round-trip-fähig mit importCSV ──
 function exportConfigCSV() {
   const rows = CONFIG || [];
   if (!rows.length) { showToast('Keine Schichten zum Exportieren', 'error'); return; }
-  const headers = ['ID','Datum','Von','Bis','Schicht','Aufgabe','Max Personen','Farbe','Informationen','Geschlossen'];
-  const q = v => `"${String(v==null?'':v).replace(/"/g,'""')}"`;
-  const lines = rows.map(r => [
-    r.Tag||r.ID, r.Datum||r.TagLabel, r.Von, r.Bis, r.Schicht, r.Aufgabe,
-    r.MaxPersonen||r['Max Personen'], r.Farbe, r.Informationen, r.Geschlossen
-  ].map(q).join(','));
-  const csv = [headers.join(','), ...lines].join('\n');
-  const a = Object.assign(document.createElement('a'),{href:URL.createObjectURL(new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8'})),download:'chilbi_schichten.csv'});
-  a.click();
+  const aoa=[['ID','Datum','Von','Bis','Schicht','Aufgabe','Max Personen','Farbe','Informationen','Geschlossen']];
+  rows.forEach(r=>aoa.push([r.Tag||r.ID, r.Datum||r.TagLabel, r.Von, r.Bis, r.Schicht, r.Aufgabe, r.MaxPersonen||r['Max Personen'], r.Farbe, r.Informationen, r.Geschlossen]));
+  _xlsxDL(aoa,'Schichten','chilbi_schichten.xlsx');
 }
 
 // ── CSV-Parser (mit Anführungszeichen, "" Escapes, \r\n) ──
@@ -2120,36 +2105,33 @@ function parseCSVrows(text) {
   if (cur!=='' || row.length) { row.push(cur); rows.push(row); }
   return rows.filter(r => r.length && r.some(c => String(c).trim()!==''));
 }
+function _xlsxDL(aoa, sheetName, filename){ if(typeof XLSX==='undefined'){ showToast('Excel-Bibliothek noch nicht geladen – kurz warten.','error'); return; } var wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(aoa),sheetName||'Sheet1'); XLSX.writeFile(wb,filename); }
+function _xlsxDLmulti(sheets, filename){ if(typeof XLSX==='undefined'){ showToast('Excel-Bibliothek noch nicht geladen – kurz warten.','error'); return; } var wb=XLSX.utils.book_new(); sheets.forEach(function(s){ XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(s.aoa),s.name); }); XLSX.writeFile(wb,filename); }
+function _wbToRows(buf){ var wb=XLSX.read(new Uint8Array(buf),{type:'array'}); var ws=wb.Sheets[wb.SheetNames[0]]; return ws?XLSX.utils.sheet_to_json(ws,{header:1,blankrows:false}):[]; }
+function _wbSheetRows(buf, name){ var wb=XLSX.read(new Uint8Array(buf),{type:'array'}); var ws=wb.Sheets[name]; return ws?XLSX.utils.sheet_to_json(ws,{header:1,blankrows:false}):[]; }
 
 // ── Anmeldungen importieren: replace-all, validiert gegen CONFIG, mit Bestätigung ──
 function scheduleFullExport(){
-  var q=function(v){ return '"'+String(v==null?'':v).replace(/"/g,'""')+'"'; };
-  var lines=['Bereich,ID,Datum,Von,Bis,Schicht,Aufgabe,MaxPersonen,Farbe,Informationen,Geschlossen,Name,Timestamp'];
-  (CONFIG||[]).forEach(function(r){ lines.push(['CFG',r.Tag||r.ID||'',r.Datum||r.TagLabel||'',r.Von||'',r.Bis||'',r.Schicht||'',r.Aufgabe||'',r.MaxPersonen||r['Max Personen']||'',r.Farbe||'',r.Informationen||'',r.Geschlossen||'','',''].map(q).join(',')); });
-  (SIGNUPS||[]).forEach(function(s){ lines.push(['SIG',s.Tag||s.ID||'','','','',s.Schicht||'',s.Aufgabe||'','','','','',s.Name||'',s.Timestamp||''].map(q).join(',')); });
-  var csv='\ufeff'+lines.join('\n');
-  var a=Object.assign(document.createElement('a'),{href:URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'})),download:'chilbi_schichten_komplett.csv'});
-  document.body.appendChild(a); a.click(); a.remove();
+  var cfg=[['ID','Datum','Von','Bis','Schicht','Aufgabe','MaxPersonen','Farbe','Informationen','Geschlossen']];
+  (CONFIG||[]).forEach(function(r){ cfg.push([r.Tag||r.ID||'',r.Datum||r.TagLabel||'',r.Von||'',r.Bis||'',r.Schicht||'',r.Aufgabe||'',r.MaxPersonen||r['Max Personen']||'',r.Farbe||'',r.Informationen||'',r.Geschlossen||'']); });
+  var sig=[['ID','Name','Schicht','Aufgabe','Timestamp']];
+  (SIGNUPS||[]).forEach(function(s){ sig.push([s.Tag||s.ID||'',s.Name||'',s.Schicht||'',s.Aufgabe||'',s.Timestamp||'']); });
+  _xlsxDLmulti([{name:'Schichten',aoa:cfg},{name:'Anmeldungen',aoa:sig}],'chilbi_schichten_komplett.xlsx');
 }
 function scheduleFullImport(input){
   var file=input.files&&input.files[0]; if(!file) return;
+  if(typeof XLSX==='undefined'){ showToast('Excel-Bibliothek noch nicht geladen – kurz warten.','error'); return; }
   var reader=new FileReader();
   reader.onload=async function(e){
     input.value='';
     try{
-      var rows=parseCSVrows(e.target.result);
-      if(rows.length<2){ showToast('CSV leer oder ohne Datenzeilen','error'); return; }
-      var headers=rows[0].map(function(h){ return String(h).trim().replace(/^\ufeff/,'').toLowerCase(); });
-      var idx=function(n){ return headers.indexOf(n.toLowerCase()); };
-      var iB=idx('bereich'), iId=idx('id')>=0?idx('id'):idx('tag'), iDat=idx('datum'), iVon=idx('von'), iBis=idx('bis'), iSch=idx('schicht'), iAuf=idx('aufgabe'), iMax=idx('maxpersonen')>=0?idx('maxpersonen'):idx('max personen'), iFarbe=idx('farbe'), iInfo=idx('informationen'), iGes=idx('geschlossen'), iName=idx('name'), iTs=idx('timestamp');
-      if(iB<0){ showToast('Kein Komplett-Backup (Spalte «Bereich» fehlt). Für nur Schichten den normalen CSV-Import nutzen.','error'); return; }
-      var g=function(r,i){ return i>=0&&r[i]!=null?String(r[i]).trim():''; };
-      var cfg=[], sig=[];
-      rows.slice(1).forEach(function(r){
-        var b=g(r,iB).toUpperCase();
-        if(b==='CFG'){ var tag=g(r,iId), auf=g(r,iAuf); if(!tag||!auf) return; cfg.push({ Tag:tag, Datum:g(r,iDat), TagLabel:g(r,iDat), Schicht:g(r,iSch), Aufgabe:auf, Von:g(r,iVon), Bis:g(r,iBis), MaxPersonen:g(r,iMax)||'2', Farbe:g(r,iFarbe), Informationen:g(r,iInfo), Geschlossen:g(r,iGes)||'0' }); }
-        else if(b==='SIG'){ var t=g(r,iId), nm=g(r,iName); if(!t&&!nm) return; sig.push({ tag:t, name:nm, schicht:g(r,iSch), aufgabe:g(r,iAuf), timestamp:g(r,iTs) }); }
-      });
+      var cfgRows=_wbSheetRows(e.target.result,'Schichten');
+      var sigRows=_wbSheetRows(e.target.result,'Anmeldungen');
+      if(cfgRows.length<2){ showToast('Tabellenblatt «Schichten» fehlt oder ist leer','error'); return; }
+      var toObj=function(rows){ if(!rows.length) return []; var h=rows[0].map(function(x){return String(x==null?'':x).trim().toLowerCase();}); return rows.slice(1).map(function(r){ var o={}; h.forEach(function(k,i){o[k]=r[i];}); return o; }); };
+      var g=function(v){ return v==null?'':String(v).trim(); };
+      var cfg=toObj(cfgRows).map(function(r){ return { Tag:g(r.id||r.tag), Datum:g(r.datum), TagLabel:g(r.datum), Schicht:g(r.schicht), Aufgabe:g(r.aufgabe), Von:g(r.von), Bis:g(r.bis), MaxPersonen:g(r.maxpersonen||r['max personen'])||'2', Farbe:g(r.farbe), Informationen:g(r.informationen), Geschlossen:g(r.geschlossen)||'0' }; }).filter(function(r){ return r.Tag&&r.Aufgabe; });
+      var sig=toObj(sigRows).map(function(r){ return { tag:g(r.id||r.tag), name:g(r.name), schicht:g(r.schicht), aufgabe:g(r.aufgabe), timestamp:g(r.timestamp) }; }).filter(function(s){ return s.tag||s.name; });
       if(!cfg.length){ showToast('Keine Schicht-Definitionen im Backup gefunden','error'); return; }
       var valid=function(s){ return cfg.some(function(c){ return String(c.Tag)===s.tag && String(c.Schicht)===s.schicht && String(c.Aufgabe)===s.aufgabe; }); };
       var invalid=sig.filter(function(s){ return !valid(s); });
@@ -2164,7 +2146,7 @@ function scheduleFullImport(input){
       setTimeout(loadData,2000);
     }catch(err){ showToast('Import-Fehler: '+err.message,'error'); }
   };
-  reader.readAsText(file);
+  reader.readAsArrayBuffer(file);
 }
 function importSignupsCSV(input) {
   const file = input.files[0];
@@ -2172,8 +2154,8 @@ function importSignupsCSV(input) {
   const reader = new FileReader();
   reader.onload = async e => {
     input.value = '';
-    const rows = parseCSVrows(e.target.result);
-    if (rows.length < 2) { showToast('CSV leer oder ohne Datenzeilen', 'error'); return; }
+    const rows = _wbToRows(e.target.result);
+    if (rows.length < 2) { showToast('Excel leer oder ohne Datenzeilen', 'error'); return; }
     const headers = rows[0].map(h => String(h).trim().replace(/^\ufeff/,''));
     const idx = n => headers.findIndex(h => h.toLowerCase() === n.toLowerCase());
     const iTs = idx('Timestamp');
@@ -2182,7 +2164,7 @@ function importSignupsCSV(input) {
     const iSch = idx('Schicht');
     const iAuf = idx('Aufgabe');
     if (iName < 0 || iTag < 0 || iSch < 0 || iAuf < 0) {
-      showToast('CSV-Header unvollständig (erwartet: Timestamp, Name, Tag, Schicht, Aufgabe)', 'error');
+      showToast('Excel-Header unvollständig (erwartet: Timestamp, Name, Tag, Schicht, Aufgabe)', 'error');
       return;
     }
     const data = [], invalid = [];
@@ -2200,7 +2182,7 @@ function importSignupsCSV(input) {
       alert('Import abgebrochen – diese Zeilen passen zu keiner konfigurierten Schicht (Tag / Schicht / Aufgabe):\n\n'
         + invalid.slice(0,15).join('\n')
         + (invalid.length>15 ? `\n… und ${invalid.length-15} weitere` : '')
-        + '\n\nBitte CSV korrigieren und erneut importieren.');
+        + '\n\nBitte Excel-Datei korrigieren und erneut importieren.');
       return;
     }
     if (!data.length) { showToast('Keine gültigen Zeilen gefunden', 'error'); return; }
@@ -2211,7 +2193,7 @@ function importSignupsCSV(input) {
       setTimeout(loadData, 1500);
     } catch(err) { showToast('Fehler: ' + err.message, 'error'); }
   };
-  reader.readAsText(file);
+  reader.readAsArrayBuffer(file);
 }
 
 
@@ -2937,36 +2919,32 @@ async function kzSave(){
   try{ await loadKuerzelNames(); }catch(e){}
 }
 function kzExport(){
-  var rows=[['Typ','Kürzel','Vorname','Name','Email','Tel']];
-  KZ.fw.forEach(function(r){ rows.push(['Feuerwehr',r.kuerzel||'',r.vorname||'',r.name||'',r.email||'','']); });
-  KZ.gh.forEach(function(r){ rows.push(['Gasthelfer',r.kuerzel||'',r.vorname||'',r.name||'',r.email||'',r.tel||'']); });
-  var csv=rows.map(function(row){ return row.map(function(c){ c=String(c==null?'':c); return /[";,\n]/.test(c)?'"'+c.replace(/"/g,'""')+'"':c; }).join(';'); }).join('\r\n');
-  var blob=new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8'});
-  var a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='kuerzel_chilbi.csv'; document.body.appendChild(a); a.click(); a.remove();
+  var aoa=[['Typ','Kürzel','Vorname','Name','Email','Tel']];
+  KZ.fw.forEach(function(r){ aoa.push(['Feuerwehr',r.kuerzel||'',r.vorname||'',r.name||'',r.email||'','']); });
+  KZ.gh.forEach(function(r){ aoa.push(['Gasthelfer',r.kuerzel||'',r.vorname||'',r.name||'',r.email||'',r.tel||'']); });
+  _xlsxDL(aoa,'Kürzel','kuerzel_chilbi.xlsx');
 }
 function kzImport(input){
   var file=input.files&&input.files[0]; if(!file){ return; }
+  if(typeof XLSX==='undefined'){ showToast('Excel-Bibliothek noch nicht geladen – kurz warten.','error'); return; }
   var rd=new FileReader();
-  rd.onload=function(){
+  rd.onload=function(e){
     try{
-      var text=String(rd.result).replace(/^\ufeff/,'');
-      var lines=text.split(/\r?\n/).filter(function(l){ return l.trim().length; });
-      if(!lines.length){ input.value=''; return; }
-      var sep=(lines[0].split(';').length>=lines[0].split(',').length)?';':',';
-      var parse=function(line){ var out=[],cur='',q=false; for(var i=0;i<line.length;i++){ var ch=line[i]; if(q){ if(ch=='"'){ if(line[i+1]=='"'){cur+='"';i++;} else q=false; } else cur+=ch; } else { if(ch=='"') q=true; else if(ch===sep){ out.push(cur); cur=''; } else cur+=ch; } } out.push(cur); return out; };
-      var header=parse(lines[0]).map(function(h){ return h.trim().toLowerCase(); });
+      var rows=_wbToRows(e.target.result);
+      if(rows.length<2){ input.value=''; showToast('Excel leer oder ohne Datenzeilen','error'); return; }
+      var header=rows[0].map(function(h){ return String(h==null?'':h).trim().toLowerCase(); });
       var idx=function(names){ for(var j=0;j<header.length;j++){ if(names.indexOf(header[j])>=0) return j; } return -1; };
       var iTyp=idx(['typ','type']), iK=idx(['kürzel','kuerzel','kurzel']), iV=idx(['vorname']), iN=idx(['name','nachname']), iE=idx(['email','e-mail','mail']), iT=idx(['tel','telefon']);
       var g=function(c,ix){ return ix>=0&&c[ix]!=null?String(c[ix]).trim():''; };
       var fw=[],gh=[];
-      lines.slice(1).forEach(function(l){ var c=parse(l); var row={kuerzel:g(c,iK),vorname:g(c,iV),name:g(c,iN),email:g(c,iE),tel:g(c,iT)}; if(!row.kuerzel&&!row.name&&!row.vorname&&!row.email) return; var typ=g(c,iTyp).toLowerCase(); if(typ.indexOf('gast')>=0) gh.push(row); else fw.push({kuerzel:row.kuerzel,vorname:row.vorname,name:row.name,email:row.email}); });
-      if(!confirm('CSV importieren? Ersetzt die aktuelle Bearbeitung durch '+fw.length+' Feuerwehr + '+gh.length+' Gasthelfer.\n(Erst nach «Speichern» wird ins Sheet geschrieben.)')){ input.value=''; return; }
+      rows.slice(1).forEach(function(c){ var row={kuerzel:g(c,iK),vorname:g(c,iV),name:g(c,iN),email:g(c,iE),tel:g(c,iT)}; if(!row.kuerzel&&!row.name&&!row.vorname&&!row.email) return; var typ=g(c,iTyp).toLowerCase(); if(typ.indexOf('gast')>=0) gh.push(row); else fw.push({kuerzel:row.kuerzel,vorname:row.vorname,name:row.name,email:row.email}); });
+      if(!confirm('Excel importieren? Ersetzt die aktuelle Bearbeitung durch '+fw.length+' Feuerwehr + '+gh.length+' Gasthelfer.\n(Erst nach «Speichern» wird ins Sheet geschrieben.)')){ input.value=''; return; }
       KZ.fw=fw; KZ.gh=gh; kzRender();
-      showToast('CSV geladen – prüfen, dann Speichern.', 'ok');
-    }catch(e){ showToast('CSV-Fehler: '+e.message, 'error'); }
+      showToast('Excel geladen – prüfen, dann Speichern.', 'ok');
+    }catch(e){ showToast('Excel-Fehler: '+e.message, 'error'); }
     input.value='';
   };
-  rd.readAsText(file,'utf-8');
+  rd.readAsArrayBuffer(file);
 }
 function renderStatHelfer(){
   const box = document.getElementById('statHelferList'); if(!box) return;
