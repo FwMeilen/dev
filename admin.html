@@ -4,14 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta http-equiv="Cache-Control" content="no-cache, must-revalidate">
-<meta name="app-version" content="Cl1.125-dev">
+<meta name="app-version" content="Cl1.126-dev">
 <script>
 (function(){var el=document.querySelector('meta[name="app-version"]');var RUN=el?el.content:'';fetch(location.pathname+'?_v='+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){var m=t.match(/name="app-version" content="([^"]+)"/);if(m&&RUN&&m[1]!==RUN){var tg='v='+encodeURIComponent(m[1]);if(location.search.indexOf(tg)===-1){location.replace(location.pathname+'?'+tg);}}}).catch(function(){});})();
 </script>
 <link rel="icon" href="favicon.ico" sizes="any">
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
-<title>Chilbi Admin – Schichtverwaltung Cl1.125-dev</title>
+<title>Chilbi Admin – Schichtverwaltung Cl1.126-dev</title>
 <meta property="og:title" content="Chilbi Herrliberg – Admin">
 <meta property="og:description" content="Schichtverwaltung Chilbi Herrliberg – Stützpunktfeuerwehr Meilen">
 <meta property="og:image" content="https://www.feuerwehr-meilen.ch/fileadmin/Public/Website/Templates/Images/Logo-FeuerwehrMeilen.png">
@@ -180,7 +180,7 @@ td input[type=color]{width:36px;height:26px;padding:1px;cursor:pointer;border:1p
     <div class="login-error" id="loginError"></div>
     <button class="btn btn-red" style="width:100%" onclick="doLogin()">Einloggen</button>
     <div style="margin-top:16px;padding-top:12px;border-top:1px solid var(--gray-mid);text-align:center;font-size:11px;color:var(--text3);">
-      © Stützpunktfeuerwehr Meilen / LOL &nbsp;·&nbsp; <strong>Cl1.125-dev</strong>
+      © Stützpunktfeuerwehr Meilen / LOL &nbsp;·&nbsp; <strong>Cl1.126-dev</strong>
     </div>
   </div>
 </div>
@@ -191,7 +191,7 @@ td input[type=color]{width:36px;height:26px;padding:1px;cursor:pointer;border:1p
     <img src="https://www.feuerwehr-meilen.ch/fileadmin/Public/Website/Templates/Images/Logo-FeuerwehrMeilen.png" alt="Feuerwehr Meilen" style="height:38px;width:auto;object-fit:contain;">
     <div class="logo-text">Chilbi Herrliberg<span>Admin – Schichtverwaltung</span></div>
     <div class="header-right">
-      <span class="header-version">Cl1.125-dev</span>
+      <span class="header-version">Cl1.126-dev</span>
       <button class="help-btn" onclick="document.getElementById('helpOverlay').style.display='flex'" title="Bedienungsanleitung" style="background:none;border:1.5px solid rgba(255,255,255,.5);color:white;width:22px;height:22px;border-radius:50%;font-size:12px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;margin-left:4px;">?</button>
       <button class="btn btn-sm" onclick="window.open('index.html','_blank')">Zu Schichtplan Signup</button>
       <button class="btn-refresh" id="btnRefresh" onclick="manualRefresh()">
@@ -830,7 +830,7 @@ Primarschule Rebacker, Schulhausstrasse 23, 8704 Herrliberg</textarea>
   </div>
 </div>
 <div class="toast" id="toast"></div>
-<div class="site-footer" style="position:relative;z-index:1;">© Stützpunktfeuerwehr Meilen / LOL &nbsp;·&nbsp; Admin &nbsp;·&nbsp; Cl1.125-dev</div>
+<div class="site-footer" style="position:relative;z-index:1;">© Stützpunktfeuerwehr Meilen / LOL &nbsp;·&nbsp; Admin &nbsp;·&nbsp; Cl1.126-dev</div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -2056,7 +2056,7 @@ function printDay(dayId) {
   </head><body>
     <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:${px(0.5)}px;padding-bottom:${px(0.3)}px;border-bottom:2px solid black;">
       <div style="font-size:${px(1.3)}px;font-weight:700;text-transform:uppercase">${titleText}</div>
-      <div style="font-size:${px(0.62)}px;color:#666">Stützpunktfeuerwehr Meilen &nbsp;·&nbsp; Chilbi Herrliberg &nbsp;·&nbsp; Cl1.125-dev</div>
+      <div style="font-size:${px(0.62)}px;color:#666">Stützpunktfeuerwehr Meilen &nbsp;·&nbsp; Chilbi Herrliberg &nbsp;·&nbsp; Cl1.126-dev</div>
     </div>
     <div style="display:flex;margin-bottom:${px(0.2)}px;">
       <div style="width:${labelW}px;min-width:${labelW}px;"></div>
@@ -2946,36 +2946,47 @@ function kzImport(input){
   };
   rd.readAsArrayBuffer(file);
 }
+function _hmMin(t){ t=String(t==null?'':t).trim(); if(!t) return null; var m=t.match(/^(\d{1,2})[:.h]?(\d{2})?/); if(!m) return null; var h=parseInt(m[1],10); if(isNaN(h)) return null; var mi=m[2]?parseInt(m[2],10):0; return h*60+mi; }
+function _shiftHours(cfg){ if(!cfg) return 0; var a=_hmMin(cfg.Von), b=_hmMin(cfg.Bis); if(a==null||b==null) return 0; var d=b-a; if(d<0) d+=1440; return d/60; }
+function helferstundenTotal(){ var tot=0; (SIGNUPS||[]).forEach(function(sg){ var cfg=(CONFIG||[]).find(function(r){return String(r.Tag)===String(sg.Tag);}); tot+=_shiftHours(cfg); }); return Math.round(tot*100)/100; }
 function renderStatHelfer(){
   const box = document.getElementById('statHelferList'); if(!box) return;
   const q = (document.getElementById('statSearch').value||'').trim().toLowerCase();
   const showAll = document.getElementById('statShowAll').checked;
   const sortAlpha = document.getElementById('statSortAlpha').checked;
   const count = {};
-  (SIGNUPS||[]).forEach(sg => { const k = String(sg.Name||'').trim().toUpperCase(); if(k) count[k] = (count[k]||0) + 1; });
+  const hours = {};
+  let totalH = 0, noTime = 0;
+  (SIGNUPS||[]).forEach(sg => {
+    const k = String(sg.Name||'').trim().toUpperCase();
+    if(k) count[k] = (count[k]||0) + 1;
+    const cfg = (CONFIG||[]).find(r=>String(r.Tag)===String(sg.Tag));
+    const h = _shiftHours(cfg);
+    if(h>0){ if(k) hours[k]=(hours[k]||0)+h; totalH+=h; } else { noTime++; }
+  });
   const info = {};
   (KLIST||[]).forEach(r => { info[r.kuerzel] = r; });
   let keys;
   if(showAll){ const set = new Set(Object.keys(info)); Object.keys(count).forEach(k=>set.add(k)); keys = [...set]; }
   else { keys = Object.keys(count); }
-  let rows = keys.map(k => { const i = info[k]||{}; return { kuerzel:k, name:(KNAMES[k]||i.name||k), count:(count[k]||0), guest:!!i.guest, email:(i.email||'') }; });
+  let rows = keys.map(k => { const i = info[k]||{}; return { kuerzel:k, name:(KNAMES[k]||i.name||k), count:(count[k]||0), hours:(hours[k]||0), guest:!!i.guest, email:(i.email||'') }; });
   const helfer = Object.keys(count).length;
   const totalSch = Object.values(count).reduce((a,b)=>a+b,0);
   if(q) rows = rows.filter(r => r.kuerzel.toLowerCase().includes(q) || (r.name||'').toLowerCase().includes(q));
   if(sortAlpha) rows.sort((a,b)=> (a.name||a.kuerzel).localeCompare(b.name||b.kuerzel,'de'));
   else rows.sort((a,b)=> b.count-a.count || (a.name||a.kuerzel).localeCompare(b.name||b.kuerzel,'de'));
-  document.getElementById('statTotal').textContent = helfer + ' Helfer · ' + totalSch + ' Schichten';
+  document.getElementById('statTotal').textContent = helfer + ' Helfer · ' + totalSch + ' Schichten · ' + (Math.round(totalH*10)/10) + ' Helferstunden' + (noTime? ' (' + noTime + ' Anmeldung' + (noTime>1?'en':'') + ' ohne Zeit)':'');
   if(!rows.length){ box.innerHTML = '<div style="padding:1.5rem;color:var(--text3);text-align:center">Keine Einträge.</div>'; return; }
   const head = showAll
-    ? '<th style="padding:6px 8px;">Name</th><th style="padding:6px 8px;">Kürzel</th><th style="padding:6px 8px;">Typ</th><th style="padding:6px 8px;">E-Mail</th><th style="padding:6px 8px;text-align:right;">Schichten</th>'
-    : '<th style="padding:6px 8px;">Name</th><th style="padding:6px 8px;">Kürzel</th><th style="padding:6px 8px;text-align:right;">Schichten</th>';
+    ? '<th style="padding:6px 8px;">Name</th><th style="padding:6px 8px;">Kürzel</th><th style="padding:6px 8px;">Typ</th><th style="padding:6px 8px;">E-Mail</th><th style="padding:6px 8px;text-align:right;">Schichten</th><th style="padding:6px 8px;text-align:right;">Std.</th>'
+    : '<th style="padding:6px 8px;">Name</th><th style="padding:6px 8px;">Kürzel</th><th style="padding:6px 8px;text-align:right;">Schichten</th><th style="padding:6px 8px;text-align:right;">Std.</th>';
   box.innerHTML = '<table style="width:100%;border-collapse:collapse;font-size:13px;">'
     + '<thead><tr style="text-align:left;border-bottom:2px solid var(--black);">' + head + '</tr></thead><tbody>'
     + rows.map(r => '<tr style="border-bottom:1px solid var(--gray-mid);">'
         + '<td style="padding:6px 8px;">'+esc(r.name||'—')+'</td>'
         + '<td style="padding:6px 8px;font-weight:700;">'+esc(r.kuerzel)+'</td>'
         + (showAll ? '<td style="padding:6px 8px;">'+(r.guest?'<span style="font-size:11px;padding:1px 6px;background:var(--bg2);border:1px solid var(--gray-mid);">Gast</span>':'FW')+'</td><td style="padding:6px 8px;color:'+(r.email?'var(--text)':'var(--text3)')+'">'+(r.email?esc(r.email):'—')+'</td>' : '')
-        + '<td style="padding:6px 8px;text-align:right;font-weight:700;'+(r.count===0?'color:var(--text3)':'')+'">'+r.count+'</td>'
+        + '<td style="padding:6px 8px;text-align:right;font-weight:700;'+(r.count===0?'color:var(--text3)':'')+'">'+r.count+'</td>'+ '<td style="padding:6px 8px;text-align:right;'+(r.hours?'':'color:var(--text3)')+'">'+(r.hours?(Math.round(r.hours*10)/10):'–')+'</td>'
         + '</tr>').join('')
     + '</tbody></table>';
 }
