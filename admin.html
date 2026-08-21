@@ -4,14 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta http-equiv="Cache-Control" content="no-cache, must-revalidate">
-<meta name="app-version" content="Cl1.123-dev">
+<meta name="app-version" content="Cl1.124-dev">
 <script>
 (function(){var el=document.querySelector('meta[name="app-version"]');var RUN=el?el.content:'';fetch(location.pathname+'?_v='+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){var m=t.match(/name="app-version" content="([^"]+)"/);if(m&&RUN&&m[1]!==RUN){var tg='v='+encodeURIComponent(m[1]);if(location.search.indexOf(tg)===-1){location.replace(location.pathname+'?'+tg);}}}).catch(function(){});})();
 </script>
 <link rel="icon" href="favicon.ico" sizes="any">
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
-<title>Chilbi Admin – Schichtverwaltung Cl1.123-dev</title>
+<title>Chilbi Admin – Schichtverwaltung Cl1.124-dev</title>
 <meta property="og:title" content="Chilbi Herrliberg – Admin">
 <meta property="og:description" content="Schichtverwaltung Chilbi Herrliberg – Stützpunktfeuerwehr Meilen">
 <meta property="og:image" content="https://www.feuerwehr-meilen.ch/fileadmin/Public/Website/Templates/Images/Logo-FeuerwehrMeilen.png">
@@ -180,7 +180,7 @@ td input[type=color]{width:36px;height:26px;padding:1px;cursor:pointer;border:1p
     <div class="login-error" id="loginError"></div>
     <button class="btn btn-red" style="width:100%" onclick="doLogin()">Einloggen</button>
     <div style="margin-top:16px;padding-top:12px;border-top:1px solid var(--gray-mid);text-align:center;font-size:11px;color:var(--text3);">
-      © Stützpunktfeuerwehr Meilen / LOL &nbsp;·&nbsp; <strong>Cl1.123-dev</strong>
+      © Stützpunktfeuerwehr Meilen / LOL &nbsp;·&nbsp; <strong>Cl1.124-dev</strong>
     </div>
   </div>
 </div>
@@ -191,7 +191,7 @@ td input[type=color]{width:36px;height:26px;padding:1px;cursor:pointer;border:1p
     <img src="https://www.feuerwehr-meilen.ch/fileadmin/Public/Website/Templates/Images/Logo-FeuerwehrMeilen.png" alt="Feuerwehr Meilen" style="height:38px;width:auto;object-fit:contain;">
     <div class="logo-text">Chilbi Herrliberg<span>Admin – Schichtverwaltung</span></div>
     <div class="header-right">
-      <span class="header-version">Cl1.123-dev</span>
+      <span class="header-version">Cl1.124-dev</span>
       <button class="help-btn" onclick="document.getElementById('helpOverlay').style.display='flex'" title="Bedienungsanleitung" style="background:none;border:1.5px solid rgba(255,255,255,.5);color:white;width:22px;height:22px;border-radius:50%;font-size:12px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;margin-left:4px;">?</button>
       <button class="btn btn-sm" onclick="window.open('index.html','_blank')">Zu Schichtplan Signup</button>
       <button class="btn-refresh" id="btnRefresh" onclick="manualRefresh()">
@@ -257,11 +257,13 @@ td input[type=color]{width:36px;height:26px;padding:1px;cursor:pointer;border:1p
         <div class="card-title" style="margin-bottom:0">Schichten bearbeiten</div>
         <div style="display:flex;gap:8px;">
           <label class="btn btn-sm" style="cursor:pointer">📂 CSV Import<input type="file" accept=".csv" onchange="importCSV(this)" style="display:none"></label>
-          <button class="btn btn-sm" onclick="exportConfigCSV()">⬇ CSV Export</button>
+          <button class="btn btn-sm" onclick="exportConfigCSV()">⬇ Nur Schichten</button>
+          <button class="btn btn-sm" onclick="scheduleFullExport()">⬇ Komplett-Backup</button>
+          <label class="btn btn-sm" style="cursor:pointer">↪ Backup import<input type="file" accept=".csv" onchange="scheduleFullImport(this)" style="display:none"></label>
           <button class="btn btn-green btn-sm" onclick="openNewSchicht()">+ Neue Schicht</button>
         </div>
       </div>
-      <div style="font-size:12px;color:var(--text3);margin:0 0 1rem;">CSV-Import/-Export betrifft nur die Schichtdefinitionen (Zeiten, Aufgaben, Max-Personen) – ohne eingetragene Personen.</div>
+      <div style="font-size:12px;color:var(--text3);margin:0 0 1rem;">CSV-Import/-Export betrifft nur die Schichtdefinitionen (Zeiten, Aufgaben, Max-Personen) – ohne eingetragene Personen. «Komplett-Backup» sichert zusätzlich alle Anmeldungen in einer Datei; «Backup import» stellt Schichten + Anmeldungen wieder her (ersetzt beides).</div>
       <div id="schichtplanContent"></div>
     </div>
   </div>
@@ -828,7 +830,7 @@ Primarschule Rebacker, Schulhausstrasse 23, 8704 Herrliberg</textarea>
   </div>
 </div>
 <div class="toast" id="toast"></div>
-<div class="site-footer" style="position:relative;z-index:1;">© Stützpunktfeuerwehr Meilen / LOL &nbsp;·&nbsp; Admin &nbsp;·&nbsp; Cl1.123-dev</div>
+<div class="site-footer" style="position:relative;z-index:1;">© Stützpunktfeuerwehr Meilen / LOL &nbsp;·&nbsp; Admin &nbsp;·&nbsp; Cl1.124-dev</div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script>
@@ -2059,7 +2061,7 @@ function printDay(dayId) {
   </head><body>
     <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:${px(0.5)}px;padding-bottom:${px(0.3)}px;border-bottom:2px solid black;">
       <div style="font-size:${px(1.3)}px;font-weight:700;text-transform:uppercase">${titleText}</div>
-      <div style="font-size:${px(0.62)}px;color:#666">Stützpunktfeuerwehr Meilen &nbsp;·&nbsp; Chilbi Herrliberg &nbsp;·&nbsp; Cl1.123-dev</div>
+      <div style="font-size:${px(0.62)}px;color:#666">Stützpunktfeuerwehr Meilen &nbsp;·&nbsp; Chilbi Herrliberg &nbsp;·&nbsp; Cl1.124-dev</div>
     </div>
     <div style="display:flex;margin-bottom:${px(0.2)}px;">
       <div style="width:${labelW}px;min-width:${labelW}px;"></div>
@@ -2120,6 +2122,50 @@ function parseCSVrows(text) {
 }
 
 // ── Anmeldungen importieren: replace-all, validiert gegen CONFIG, mit Bestätigung ──
+function scheduleFullExport(){
+  var q=function(v){ return '"'+String(v==null?'':v).replace(/"/g,'""')+'"'; };
+  var lines=['Bereich,ID,Datum,Von,Bis,Schicht,Aufgabe,MaxPersonen,Farbe,Informationen,Geschlossen,Name,Timestamp'];
+  (CONFIG||[]).forEach(function(r){ lines.push(['CFG',r.Tag||r.ID||'',r.Datum||r.TagLabel||'',r.Von||'',r.Bis||'',r.Schicht||'',r.Aufgabe||'',r.MaxPersonen||r['Max Personen']||'',r.Farbe||'',r.Informationen||'',r.Geschlossen||'','',''].map(q).join(',')); });
+  (SIGNUPS||[]).forEach(function(s){ lines.push(['SIG',s.Tag||s.ID||'','','','',s.Schicht||'',s.Aufgabe||'','','','','',s.Name||'',s.Timestamp||''].map(q).join(',')); });
+  var csv='\ufeff'+lines.join('\n');
+  var a=Object.assign(document.createElement('a'),{href:URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'})),download:'chilbi_schichten_komplett.csv'});
+  document.body.appendChild(a); a.click(); a.remove();
+}
+function scheduleFullImport(input){
+  var file=input.files&&input.files[0]; if(!file) return;
+  var reader=new FileReader();
+  reader.onload=async function(e){
+    input.value='';
+    try{
+      var rows=parseCSVrows(e.target.result);
+      if(rows.length<2){ showToast('CSV leer oder ohne Datenzeilen','error'); return; }
+      var headers=rows[0].map(function(h){ return String(h).trim().replace(/^\ufeff/,'').toLowerCase(); });
+      var idx=function(n){ return headers.indexOf(n.toLowerCase()); };
+      var iB=idx('bereich'), iId=idx('id')>=0?idx('id'):idx('tag'), iDat=idx('datum'), iVon=idx('von'), iBis=idx('bis'), iSch=idx('schicht'), iAuf=idx('aufgabe'), iMax=idx('maxpersonen')>=0?idx('maxpersonen'):idx('max personen'), iFarbe=idx('farbe'), iInfo=idx('informationen'), iGes=idx('geschlossen'), iName=idx('name'), iTs=idx('timestamp');
+      if(iB<0){ showToast('Kein Komplett-Backup (Spalte «Bereich» fehlt). Für nur Schichten den normalen CSV-Import nutzen.','error'); return; }
+      var g=function(r,i){ return i>=0&&r[i]!=null?String(r[i]).trim():''; };
+      var cfg=[], sig=[];
+      rows.slice(1).forEach(function(r){
+        var b=g(r,iB).toUpperCase();
+        if(b==='CFG'){ var tag=g(r,iId), auf=g(r,iAuf); if(!tag||!auf) return; cfg.push({ Tag:tag, Datum:g(r,iDat), TagLabel:g(r,iDat), Schicht:g(r,iSch), Aufgabe:auf, Von:g(r,iVon), Bis:g(r,iBis), MaxPersonen:g(r,iMax)||'2', Farbe:g(r,iFarbe), Informationen:g(r,iInfo), Geschlossen:g(r,iGes)||'0' }); }
+        else if(b==='SIG'){ var t=g(r,iId), nm=g(r,iName); if(!t&&!nm) return; sig.push({ tag:t, name:nm, schicht:g(r,iSch), aufgabe:g(r,iAuf), timestamp:g(r,iTs) }); }
+      });
+      if(!cfg.length){ showToast('Keine Schicht-Definitionen im Backup gefunden','error'); return; }
+      var valid=function(s){ return cfg.some(function(c){ return String(c.Tag)===s.tag && String(c.Schicht)===s.schicht && String(c.Aufgabe)===s.aufgabe; }); };
+      var invalid=sig.filter(function(s){ return !valid(s); });
+      var msg='Komplett-Backup wiederherstellen?\n\n'+cfg.length+' Schichten und '+sig.length+' Anmeldungen ERSETZEN den aktuellen Schichtplan und ALLE bestehenden Anmeldungen.';
+      if(invalid.length) msg+='\n\n⚠ '+invalid.length+' Anmeldung(en) passen zu keiner Schicht und werden übersprungen.';
+      if(!confirm(msg)) return;
+      var sigValid=sig.filter(valid);
+      await fetch(SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'saveConfig',password:ADMIN_PW,rows:cfg})});
+      await new Promise(function(r){ setTimeout(r,900); });
+      await fetch(SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'importSignups',password:ADMIN_PW,rows:sigValid})});
+      showToast('✓ Backup wiederhergestellt ('+cfg.length+' Schichten, '+sigValid.length+' Anmeldungen) – lade neu…','success');
+      setTimeout(loadData,2000);
+    }catch(err){ showToast('Import-Fehler: '+err.message,'error'); }
+  };
+  reader.readAsText(file);
+}
 function importSignupsCSV(input) {
   const file = input.files[0];
   if (!file) return;
